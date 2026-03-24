@@ -1,0 +1,27 @@
+{
+  "name": "payload-plugin-scrape-ai",
+  "version": "0.1.0",
+  "description": "Payload CMS plugin that auto-generates AI-friendly content (llms.txt, markdown, JSON-LD)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "payload": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "openai": { "optional": true },
+    "@anthropic-ai/sdk": { "optional": true }
+  },
+  "devDependencies": {
+    "payload": "^3.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0"
+  },
+  "license": "MIT"
+}
