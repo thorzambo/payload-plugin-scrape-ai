@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>payload-plugin-scrape-ai | AI-Friendly Content for Payload CMS</title>
+  <meta name="description" content="Make any Payload CMS website instantly accessible to AI agents and LLMs. Auto-generates llms.txt, structured markdown, JSON-LD, and more.">
+  <meta property="og:title" content="payload-plugin-scrape-ai">
+  <meta property="og:description" content="Make any Payload CMS website instantly accessible to AI agents and LLMs.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       ZEPOCH STYLE SYSTEM — Dark Cosmic Theme
+       ============================================ */
+
+    :root {
+      --bk: #040406;
+      --s1: #0A0A0E;
+      --s2: #111115;
+      --s3: #18181D;
+      --s4: #1F1F25;
+      --wh: #F5F5F7;
+      --w: #E8E8EC;
+      --g1: #8E8E96;
+      --g2: #8A8A92;
+      --g3: #3A3A42;
+      --g4: #2A2A30;
+      --ac: #20C5D9;
+      --ah: #3DD4E5;
+      --ad: #1A6872;
+      --ag: rgba(32,197,217,0.08);
+      --warm: #C89B7B;
+      --br: 12px;
+      --e: cubic-bezier(0.16, 1, 0.3, 1);
+      --sans: 'Hanken Grotesk', -apple-system, system-ui, sans-serif;
+      --serif: 'Instrument Serif', Georgia, serif;
+      --mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+      --page-max: 1200px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    ::selection {
+      background: rgba(32,197,217,0.2);
+      color: var(--wh);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bk);
+      color: var(--g1);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- Background Effects --- */
+    .cosmos {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 40%, rgba(32,197,217,0.05), transparent),
+        radial-gradient(ellipse 50% 40% at 85% 15%, rgba(120,80,200,0.04), transparent),
+        radial-gradient(ellipse 40% 30% at 50% 90%, rgba(200,155,123,0.025), transparent);
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.04;
+      mix-blend-mode: screen;
+      image-rendering: pixelated;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+    }
+
+    /* --- Layout --- */
+    .page { position: relative; z-index: 2; }
+
+    .container {
+      max-width: var(--page-max);
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .sec {
+      padding: 96px 0;
+    }
+
+    /* --- Typography --- */
+    .d {
+      font-size: 64px;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      color: var(--wh);
+    }
+
+    .h1 {
+      font-size: 42px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--wh);
+    }
+
+    .h2 {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--wh);
+    }
+
+    .h3 {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      color: var(--w);
+    }
+
+    .b { font-size: 15px; line-height: 1.7; color: var(--g1); }
+
+    .sm { font-size: 13px; color: var(--g1); }
+
+    .ov {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ac);
+      font-family: var(--mono);
+    }
+
+    .si {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--g1);
+    }
+
+    .si-ac { font-family: var(--serif); font-style: italic; color: var(--ac); }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    a { color: var(--ac); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--ah); }
+
+    /* --- Buttons --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: var(--br);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s var(--e);
+      text-decoration: none;
+    }
+
+    .btn-ac {
+      background: var(--ac);
+      color: var(--bk);
+    }
+    .btn-ac:hover { background: var(--ah); color: var(--bk); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--wh);
+      border: 1px solid var(--g3);
+    }
+    .btn-outline:hover { border-color: var(--ac); color: var(--ac); }
+
+    .btn-warm {
+      background: var(--warm);
+      color: var(--bk);
+    }
+    .btn-warm:hover { opacity: 0.85; color: var(--bk); }
+
+    /* --- Cards --- */
+    .card {
+      background: rgba(10,10,14,0.7);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: var(--br);
+      padding: 28px;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s var(--e);
+    }
+
+    .card:hover {
+      background: rgba(17,17,21,0.8);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    /* --- Tags --- */
+    .tag {
+      display: inline-flex;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(19,19,22,0.8);
+      border: 1px solid var(--g4);
+      color: var(--g1);
+      transition: all 0.2s;
+    }
+
+    .tag:hover {
+      border-color: var(--ac);
+      color: var(--wh);
+      background: var(--ag);
+    }
+
+    /* --- Code Blocks --- */
+    .code-block {
+      background: var(--s1);
+      border: 1px solid var(--g4);
+      border-radius: var(--br);
+      padding: 20px 24px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--w);
+    }
+
+    .code-block .comment { color: var(--g3); }
+    .code-block .keyword { color: var(--ac); }
+    .code-block .string { color: var(--warm); }
+    .code-block .fn { color: #a78bfa; }
+
+    /* --- Image Placeholders --- */
+    .img-placeholder {
+      width: 100%;
+      border-radius: var(--br);
+      border: 1px solid var(--g4);
+      background: var(--s1);
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--g3);
+      font-family: var(--mono);
+      font-size: 13px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .img-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--br);
+    }
+
+    /* --- Table --- */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .tbl th {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--g4);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--g2);
+    }
+
+    .tbl td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--w);
+    }
+
+    .tbl tr:hover td { background: rgba(32,197,217,0.03); }
+
+    .tbl code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ac);
+      background: var(--ag);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* --- Divider --- */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--g4), transparent);
+      margin: 0;
+    }
+
+    /* --- Scroll Reveal --- */
+    .sr {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s var(--e), transform 0.7s var(--e);
+    }
+    .sr.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .sr-d1 { transition-delay: 0.05s; }
+    .sr-d2 { transition-delay: 0.1s; }
+    .sr-d3 { transition-delay: 0.15s; }
+    .sr-d4 { transition-delay: 0.2s; }
+
+    /* --- Section Header --- */
+    .sec-header {
+      margin-bottom: 48px;
+    }
+
+    .sec-header .ov {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sec-header .ov::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--ac), transparent);
+      max-width: 120px;
+    }
+
+    /* ============================================
+       HERO
+       ============================================ */
+    .hero {
+      padding: 180px 0 120px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero .ov { margin-bottom: 20px; display: block; }
+
+    .hero .d { margin-bottom: 20px; }
+
+    .hero .subtitle {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 20px;
+      color: var(--g1);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-version {
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--g3);
+    }
+
+    /* Geometric accent */
+    .geo-hero {
+      position: absolute;
+      top: 80px;
+      right: 10%;
+      width: 120px;
+      height: 120px;
+      opacity: 0.04;
+      animation: gf 25s ease-in-out infinite;
+    }
+
+    @keyframes gf {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+
+    /* ============================================
+       FEATURES GRID
+       ============================================ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--ag);
+      border: 1px solid rgba(32,197,217,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: var(--ac);
+      font-size: 18px;
+    }
+
+    .feature-card .h3 { margin-bottom: 8px; font-size: 18px; }
+    .feature-card .b { font-size: 14px; }
+
+    /* ============================================
+       PIPELINE
+       ============================================ */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .pipeline-step {
+      flex: 1;
+      min-width: 200px;
+      max-width: 280px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .pipeline-step .step-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ac);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .pipeline-step .h3 { font-size: 18px; margin-bottom: 6px; }
+
+    .pipeline-arrow {
+      color: var(--g3);
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .pipeline-cost {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+
+    .cost-free { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+    .cost-paid { background: rgba(234,179,8,0.1); color: #eab308; border: 1px solid rgba(234,179,8,0.2); }
+
+    /* ============================================
+       ENDPOINTS TABLE
+       ============================================ */
+    .endpoints-section .tbl td:first-child {
+      font-family: var(--mono);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    /* ============================================
+       INSTALL
+       ============================================ */
+    .install-block {
+      position: relative;
+    }
+
+    .install-label {
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--g2);
+      background: var(--s1);
+      padding: 0 8px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ============================================
+       CONTRIBUTE
+       ============================================ */
+    .contrib-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    /* ============================================
+       CTA / DONATE
+       ============================================ */
+    .cta-section {
+      text-align: center;
+      padding: 120px 0;
+      position: relative;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(32,197,217,0.06), transparent);
+      pointer-events: none;
+    }
+
+    .cta-section .h1 { margin-bottom: 16px; position: relative; }
+    .cta-section .b { max-width: 500px; margin: 0 auto 32px; position: relative; }
+    .cta-section .hero-actions { position: relative; }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    .footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--g4);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--g2);
+    }
+
+    .footer-links a:hover { color: var(--ac); }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 1024px) {
+      .container { padding: 0 32px; }
+      .sec { padding: 72px 0; }
+      .d { font-size: 48px; }
+      .h1 { font-size: 34px; }
+      .h2 { font-size: 26px; }
+      .hero { padding: 140px 0 80px; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 0 20px; }
+      .sec { padding: 56px 0; }
+      .d { font-size: 34px; }
+      .h1 { font-size: 26px; }
+      .h2 { font-size: 22px; }
+      .h3 { font-size: 18px; }
+      .hero { padding: 120px 0 60px; }
+      .hero .subtitle { font-size: 17px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .pipeline { flex-direction: column; }
+      .pipeline-arrow { transform: rotate(90deg); }
+      .contrib-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .tbl { font-size: 12px; }
+      .tbl td, .tbl th { padding: 8px 10px; }
+      .geo-hero { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cosmos"></div>
+<div class="grain"></div>
+
+<div class="page">
+
+  <!-- ==================== HERO ==================== -->
+  <section class="hero">
+    <div class="container">
+      <!-- Geometric accent -->
+      <svg class="geo-hero" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="0.5" color="#20C5D9">
+        <rect x="10" y="10" width="100" height="100" rx="4"/>
+        <rect x="30" y="30" width="60" height="60" rx="2"/>
+        <line x1="10" y1="10" x2="30" y2="30"/>
+        <line x1="110" y1="10" x2="90" y2="30"/>
+        <line x1="10" y1="110" x2="30" y2="90"/>
+        <line x1="110" y1="110" x2="90" y2="90"/>
+      </svg>
+
+      <div class="sr">
+        <span class="ov">Payload CMS Plugin</span>
+      </div>
+      <h1 class="d sr sr-d1">payload-plugin-scrape-ai</h1>
+      <p class="subtitle sr sr-d2">Make any Payload CMS website instantly accessible to AI agents and LLMs.</p>
+      <div class="hero-actions sr sr-d3">
+        <a href="#install" class="btn btn-ac">Install Now</a>
+        <a href="https://github.com/thorzambo/payload-plugin-scrape-ai" class="btn btn-outline" target="_blank">View on GitHub</a>
+      </div>
+      <div class="hero-version sr sr-d4">v0.1.0 &mdash; Payload CMS v3 compatible</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== WHAT IT DOES ==================== -->
+  <section class="sec">
+    <div class="container">
+      <div class="sec-header sr">
+        <span class="ov">Features</span>
+        <h2 class="h1">SEO, but for AI.</h2>
+        <p class="b" style="max-width:600px;margin-top:12px;">AI agents can't parse your HTML efficiently. This plugin auto-generates clean, structured content in every format they understand.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="card feature-card sr sr-d1">
+          <div class="icon">&#9776;</div>
+          <h3 class="h3">llms.txt Standard</h3>
+          <p class="b">Generates <code style="font-family:var(--mono);color:var(--ac);font-size:13px;">/llms.txt</code> and <code style="font-family:var(--mono);color:var(--ac);font-size:13px;">/llms-full.txt</code> following the official spec. The entry point AI agents look for.</p>
+        </div>
+
+        <div class="card feature-card sr sr-d2">
+          <div class="icon">&#8635;</div>
+          <h3 class="h3">Auto-Sync</h3>
+          <p class="b">Every content change triggers instant regeneration. No cron jobs, no manual triggers. Hybrid event + queue architecture handles bulk edits gracefully.</p>
+        </div>
+
+        <div class="card feature-card sr sr-d3">
+          <div class="icon">&#9881;</div>
+          <h3 class="h3">AI Enrichment</h3>
+          <p class="b">Optional AI-powered summaries, entity extraction, topic classification, and semantic chunking for RAG pipelines. Works without AI too.</p>
+        </div>
+
+        <div class="card feature-card sr sr-d1">
+          <div class="icon">{}</div>
+          <h3 class="h3">JSON-LD</h3>
+          <p class="b">Schema.org structured data for every page. Products, articles, services &mdash; automatically mapped from your collection types.</p>
+        </div>
+
+        <div class="card feature-card sr sr-d2">
+          <div class="icon">&#9733;</div>
+          <h3 class="h3">Smart Detection</h3>
+          <p class="b">Auto-discovers which collections contain content worth exposing. Pages, posts, products detected automatically. Toggle from the dashboard.</p>
+        </div>
+
+        <div class="card feature-card sr sr-d3">
+          <div class="icon">&#36;</div>
+          <h3 class="h3">Token Estimator</h3>
+          <p class="b">Estimates total AI cost before you enable enrichment. Recommends the cheapest model that fits your content. No surprise bills.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== HOW IT WORKS ==================== -->
+  <section class="sec">
+    <div class="container">
+      <div class="sec-header sr">
+        <span class="ov">Architecture</span>
+        <h2 class="h1">Three-Stage Pipeline</h2>
+      </div>
+
+      <div class="pipeline">
+        <div class="pipeline-step card sr sr-d1">
+          <span class="step-num">STAGE 01</span>
+          <h3 class="h3">Extract</h3>
+          <p class="sm">Lexical &amp; Slate rich text, relationships, blocks, media &rarr; clean Markdown</p>
+          <span class="pipeline-cost cost-free">FREE</span>
+        </div>
+        <span class="pipeline-arrow sr sr-d2">&rarr;</span>
+        <div class="pipeline-step card sr sr-d2">
+          <span class="step-num">STAGE 02</span>
+          <h3 class="h3">Structure</h3>
+          <p class="sm">YAML frontmatter, hierarchy detection, JSON-LD, related content links</p>
+          <span class="pipeline-cost cost-free">FREE</span>
+        </div>
+        <span class="pipeline-arrow sr sr-d3">&rarr;</span>
+        <div class="pipeline-step card sr sr-d3">
+          <span class="step-num">STAGE 03</span>
+          <h3 class="h3">Enrich</h3>
+          <p class="sm">AI summaries, topics, entities, semantic chunks for RAG</p>
+          <span class="pipeline-cost cost-paid">OPTIONAL</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== DASHBOARD PREVIEW ==================== -->
+  <section class="sec">
+    <div class="container">
+      <div class="sec-header sr">
+        <span class="ov">Admin Panel</span>
+        <h2 class="h1">Full Control Center</h2>
+        <p class="b" style="max-width:600px;margin-top:12px;">A dedicated dashboard inside your Payload admin. See what's generated, toggle collections, manage llms.txt priority, configure AI, test endpoints.</p>
+      </div>
+
+      <div class="img-placeholder sr sr-d1">
+        <img src="images/dashboard-overview.png" alt="Dashboard Overview" onerror="this.style.display='none';this.parentElement.textContent='[ screenshot: dashboard overview &mdash; replace docs/images/dashboard-overview.png ]'">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+        <div class="img-placeholder sr sr-d2" style="aspect-ratio:4/3;">
+          <img src="images/content-preview.png" alt="Content Preview" onerror="this.style.display='none';this.parentElement.textContent='[ screenshot: content preview pane ]'">
+        </div>
+        <div class="img-placeholder sr sr-d3" style="aspect-ratio:4/3;">
+          <img src="images/token-estimation.png" alt="Token Estimation" onerror="this.style.display='none';this.parentElement.textContent='[ screenshot: token estimation panel ]'">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== ENDPOINTS ==================== -->
+  <section class="sec endpoints-section">
+    <div class="container">
+      <div class="sec-header sr">
+        <span class="ov">API</span>
+        <h2 class="h1">Public Endpoints</h2>
+        <p class="b" style="max-width:600px;margin-top:12px;">All endpoints are public by design &mdash; AI agents need direct access. Rate-limited per IP.</p>
+      </div>
+
+      <div class="card sr" style="overflow-x:auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>GET /api/llms.txt</code></td>
+              <td><span class="tag">text/markdown</span></td>
+              <td>Curated content index</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/llms-full.txt</code></td>
+              <td><span class="tag">text/markdown</span></td>
+              <td>Complete content listing</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/ai/:collection/:slug.md</code></td>
+              <td><span class="tag">text/markdown</span></td>
+              <td>Individual page markdown</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/ai/sitemap.json</code></td>
+              <td><span class="tag">application/json</span></td>
+              <td>Content graph &amp; hierarchy</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/ai/structured/:collection/:slug.json</code></td>
+              <td><span class="tag">application/json</span></td>
+              <td>JSON-LD structured data</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/ai/context?query=...&limit=5</code></td>
+              <td><span class="tag">application/json</span></td>
+              <td>Relevance-scored search</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== INSTALL ==================== -->
+  <section class="sec" id="install">
+    <div class="container">
+      <div class="sec-header sr">
+        <span class="ov">Get Started</span>
+        <h2 class="h1">Installation</h2>
+      </div>
+
+      <div style="display:grid;gap:24px;max-width:700px;">
+        <div class="sr">
+          <p class="sm" style="margin-bottom:8px;color:var(--g2);">1. Install the package</p>
+          <div class="code-block install-block">
+            <span class="install-label">npm</span>
+<span class="comment"># From GitHub (current)</span>
+npm install <span class="string">github:thorzambo/payload-plugin-scrape-ai</span>
+
+<span class="comment"># From npm (coming soon)</span>
+<span class="comment"># npm install @thorzambo/payload-plugin-scrape-ai</span>
+          </div>
+        </div>
+
+        <div class="sr sr-d1">
+          <p class="sm" style="margin-bottom:8px;color:var(--g2);">2. Add to your Payload config</p>
+          <div class="code-block">
+<span class="comment">// payload.config.ts</span>
+<span class="keyword">import</span> { <span class="fn">scrapeAiPlugin</span> } <span class="keyword">from</span> <span class="string">'payload-plugin-scrape-ai'</span>
+
+<span class="keyword">export default</span> <span class="fn">buildConfig</span>({
+  plugins: [
+    <span class="fn">scrapeAiPlugin</span>({
+      siteUrl: <span class="string">'https://your-website.com'</span>,
+      siteName: <span class="string">'My Website'</span>,
+      siteDescription: <span class="string">'What this site is about'</span>,
+    }),
+  ],
+})
+          </div>
+        </div>
+
+        <div class="sr sr-d2">
+          <p class="sm" style="margin-bottom:8px;color:var(--g2);">3. That's it. Visit <code style="font-family:var(--mono);color:var(--ac);font-size:13px;">/admin/scrape-ai</code> to see the dashboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== CONTRIBUTING ==================== -->
+  <section class="sec">
+    <div class="container">
+      <div class="sec-header sr">
+        <span class="ov">Open Source</span>
+        <h2 class="h1">Contributing</h2>
+        <p class="b" style="max-width:600px;margin-top:12px;">This project is open for contributions. Fork it, improve it, submit a PR. All changes go through review.</p>
+      </div>
+
+      <div class="contrib-grid">
+        <div class="card sr sr-d1">
+          <h3 class="h3" style="margin-bottom:8px;">How to Contribute</h3>
+          <ol style="padding-left:20px;color:var(--g1);font-size:14px;line-height:2;">
+            <li>Fork the repository</li>
+            <li>Create a feature branch</li>
+            <li>Make your changes</li>
+            <li>Submit a Pull Request</li>
+            <li>Wait for review &amp; approval</li>
+          </ol>
+        </div>
+
+        <div class="card sr sr-d2">
+          <h3 class="h3" style="margin-bottom:8px;">Good First Issues</h3>
+          <ul style="padding-left:20px;color:var(--g1);font-size:14px;line-height:2;list-style:none;">
+            <li><span class="tag">enhancement</span> Better Slate editor support</li>
+            <li><span class="tag">enhancement</span> Custom JSON-LD type mappings</li>
+            <li><span class="tag">docs</span> More usage examples</li>
+            <li><span class="tag">feature</span> MCP server integration</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==================== CTA / DONATE ==================== -->
+  <section class="cta-section">
+    <div class="container">
+      <span class="ov sr" style="display:block;margin-bottom:16px;">Support the Project</span>
+      <h2 class="h1 sr sr-d1">Built with care.<br><span class="si-ac">Maintained with coffee.</span></h2>
+      <p class="b sr sr-d2">If this plugin saves you time, consider supporting its development. Every contribution helps keep it maintained and improved.</p>
+      <div class="hero-actions sr sr-d3">
+        <a href="https://github.com/sponsors/thorzambo" class="btn btn-warm" target="_blank">&#9829; Sponsor on GitHub</a>
+        <a href="https://github.com/thorzambo/payload-plugin-scrape-ai/issues" class="btn btn-outline" target="_blank">Report an Issue</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <span class="sm" style="color:var(--g2);">Built by <a href="https://github.com/thorzambo" target="_blank">Leonardo Zambaiti</a> / <a href="https://zepoch.io" target="_blank" style="color:var(--warm);">Zepoch</a></span>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/thorzambo/payload-plugin-scrape-ai" target="_blank">GitHub</a>
+          <a href="https://github.com/thorzambo/payload-plugin-scrape-ai/issues" target="_blank">Issues</a>
+          <a href="https://payloadcms.com/docs/plugins/overview" target="_blank">Payload Docs</a>
+          <a href="https://llmstxt.org" target="_blank">llms.txt Spec</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Scroll Reveal Script -->
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.sr').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
