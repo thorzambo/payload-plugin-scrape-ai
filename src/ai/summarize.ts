@@ -8,5 +8,9 @@ export async function generateSummary(
 ): Promise<string> {
   const truncated = markdown.slice(0, 4000) // limit to avoid token overflow
   const result = await provider.complete(truncated, SYSTEM_PROMPT)
-  return result.trim()
+
+  // Validate output
+  if (!result || result.length < 10) return ''
+  if (result.trim().startsWith('{') || result.trim().startsWith('[')) return ''
+  return result.trim().slice(0, 500)
 }

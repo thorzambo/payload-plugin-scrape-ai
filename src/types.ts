@@ -53,7 +53,7 @@ export interface AiContentDoc {
   retryCount: number
   aiMeta?: AiMeta
   parentSlug?: string
-  relatedSlugs?: string[]
+  relatedSlugs?: Array<{ slug: string }>
   locale?: string
   isDraft: boolean
   lastSynced?: string

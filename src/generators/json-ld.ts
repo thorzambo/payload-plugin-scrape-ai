@@ -23,6 +23,7 @@ export function generateJsonLd(params: {
     '@type': schemaType,
     name: title,
     url: canonicalUrl,
+    '@id': canonicalUrl,
     isPartOf: {
       '@type': 'WebSite',
       name: siteName,

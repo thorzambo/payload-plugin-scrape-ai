@@ -1,5 +1,5 @@
 import type { CollectionAfterChangeHook, CollectionConfig } from 'payload'
-import type { ResolvedPluginConfig } from '../types'
+import type { ResolvedPluginConfig, AiConfigGlobal } from '../types'
 import { transformDocument } from '../pipeline/transform'
 
 /**
@@ -55,7 +55,7 @@ export function createAfterChangeHook(
         jsonLd: result.jsonLd,
         status: 'synced' as const,
         parentSlug: result.parentSlug || null,
-        relatedSlugs: result.relatedSlugs,
+        relatedSlugs: result.relatedSlugs.map((s) => ({ slug: s })),
         locale: locale || null,
         isDraft: result.isDraft,
         lastSynced: new Date().toISOString(),
@@ -79,8 +79,8 @@ export function createAfterChangeHook(
       // Queue AI enrichment if enabled (async, never blocks)
       // Check ai-config global for runtime toggle
       try {
-        const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-        if ((aiConfig as any)?.aiEnabled || pluginOptions.ai) {
+        const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+        if (aiConfig?.aiEnabled || pluginOptions.ai) {
           await payload.create({
             collection: 'ai-sync-queue',
             data: {

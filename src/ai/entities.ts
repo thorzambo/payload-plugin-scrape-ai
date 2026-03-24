@@ -20,6 +20,8 @@ export async function extractEntities(
     const jsonMatch = result.match(/\{[\s\S]*\}/)
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0])
+      parsed.topics = (parsed.topics || []).slice(0, 10)
+      parsed.entities = (parsed.entities || []).slice(0, 20)
       return {
         topics: Array.isArray(parsed.topics) ? parsed.topics : [],
         entities: Array.isArray(parsed.entities) ? parsed.entities : [],

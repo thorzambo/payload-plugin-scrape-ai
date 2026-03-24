@@ -79,7 +79,10 @@ export const aiContentCollection: CollectionConfig = {
     },
     {
       name: 'relatedSlugs',
-      type: 'json',
+      type: 'array',
+      fields: [
+        { name: 'slug', type: 'text', required: true },
+      ],
     },
     {
       name: 'locale',

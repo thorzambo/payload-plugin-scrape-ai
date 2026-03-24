@@ -1,5 +1,5 @@
 import type { PayloadRequest } from 'payload'
-import type { ResolvedPluginConfig } from '../types'
+import type { ResolvedPluginConfig, AiConfigGlobal } from '../types'
 import { detectContentCollections } from '../detection/smart-detect'
 import { createAiProvider } from '../ai/provider'
 import { estimateJob, MODEL_CATALOG, formatTokens, formatCost } from '../ai/token-estimator'
@@ -40,10 +40,12 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
             payload.findGlobal({ slug: 'ai-config' }).catch(() => null),
           ])
 
+          const typedAiConfig = aiConfig as unknown as AiConfigGlobal | null
+
           // Count per collection
           const collectionCounts: Record<string, number> = {}
           // We can't group-by with Payload local API, so we query per collection
-          const enabledCollections = (aiConfig as any)?.enabledCollections || {}
+          const enabledCollections = typedAiConfig?.enabledCollections || {}
           for (const slug of Object.keys(enabledCollections)) {
             if (!enabledCollections[slug]) continue
             const count = await payload.find({
@@ -59,11 +61,11 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
             pendingCount: pendingEntries.totalDocs,
             errorCount: errorEntries.totalDocs,
             collections: collectionCounts,
-            lastRebuild: (aiConfig as any)?.lastAggregateRebuild || null,
-            aiEnabled: (aiConfig as any)?.aiEnabled || false,
-            aiProvider: (aiConfig as any)?.aiProvider || null,
-            aiModel: (aiConfig as any)?.aiModel || null,
-            aiApiCallCount: (aiConfig as any)?.aiApiCallCount || 0,
+            lastRebuild: typedAiConfig?.lastAggregateRebuild || null,
+            aiEnabled: typedAiConfig?.aiEnabled || false,
+            aiProvider: typedAiConfig?.aiProvider || null,
+            aiModel: typedAiConfig?.aiModel || null,
+            aiApiCallCount: typedAiConfig?.aiApiCallCount || 0,
           })
         } catch (error: any) {
           return Response.json({ error: error.message }, { status: 500 })
@@ -202,8 +204,8 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
             return Response.json({ error: 'Provide { collection, enabled }' }, { status: 400 })
           }
 
-          const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-          const currentEnabled = (aiConfig as any)?.enabledCollections || {}
+          const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+          const currentEnabled = aiConfig?.enabledCollections || {}
 
           await payload.updateGlobal({
             slug: 'ai-config',
@@ -254,10 +256,10 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const { payload } = req
 
         try {
-          const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-          const provider = (aiConfig as any)?.aiProvider || pluginRawOptions?.ai?.provider
+          const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+          const provider = aiConfig?.aiProvider || pluginRawOptions?.ai?.provider
           const apiKey = pluginRawOptions?.ai?.apiKey
-          const model = (aiConfig as any)?.aiModel || pluginRawOptions?.ai?.model
+          const model = aiConfig?.aiModel || pluginRawOptions?.ai?.model
 
           if (!provider || !apiKey) {
             return Response.json({ success: false, error: 'No AI provider configured. Set ai.apiKey in plugin options (env var).' })
@@ -286,10 +288,10 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const { payload } = req
 
         try {
-          const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
+          const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
           return Response.json({
-            priority: (aiConfig as any)?.llmsTxtPriority || [],
-            sections: (aiConfig as any)?.llmsTxtSections || [],
+            priority: aiConfig?.llmsTxtPriority || [],
+            sections: aiConfig?.llmsTxtSections || [],
           })
         } catch (error: any) {
           return Response.json({ error: error.message }, { status: 500 })
@@ -337,8 +339,8 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const { payload } = req
 
         try {
-          const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-          const enabledCollections = (aiConfig as any)?.enabledCollections || {}
+          const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+          const enabledCollections = aiConfig?.enabledCollections || {}
 
           // Get all non-plugin collections
           const allCollections = Object.keys(payload.collections).filter(

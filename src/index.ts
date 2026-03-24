@@ -1,5 +1,5 @@
 import type { Config, Plugin } from 'payload'
-import type { ScrapeAiPluginOptions, ResolvedPluginConfig } from './types'
+import type { ScrapeAiPluginOptions, ResolvedPluginConfig, AiConfigGlobal } from './types'
 import { aiContentCollection } from './collections/ai-content'
 import { aiSyncQueueCollection } from './collections/ai-sync-queue'
 import { aiConfigGlobal } from './globals/ai-config'
@@ -137,8 +137,8 @@ export const scrapeAiPlugin =
 
       // Initialize enabled collections in ai-config global
       try {
-        const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-        const currentEnabled = (aiConfig as any)?.enabledCollections || {}
+        const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+        const currentEnabled = aiConfig?.enabledCollections || {}
         const needsUpdate = detectedCollections.some((slug) => currentEnabled[slug] === undefined)
 
         if (needsUpdate) {
@@ -160,8 +160,8 @@ export const scrapeAiPlugin =
       // Resolve AI provider
       let aiProvider = null
       try {
-        const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-        aiProvider = await resolveAiProvider(options.ai, aiConfig as any)
+        const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+        aiProvider = await resolveAiProvider(options.ai, aiConfig)
       } catch {
         aiProvider = options.ai ? await resolveAiProvider(options.ai) : null
       }

@@ -34,7 +34,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp src/admin/styles.css dist/admin/styles.css",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },

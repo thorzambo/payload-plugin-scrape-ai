@@ -1,5 +1,5 @@
 import type { Payload } from 'payload'
-import type { ResolvedPluginConfig, IAiProvider } from '../types'
+import type { ResolvedPluginConfig, IAiProvider, AiConfigGlobal, AiSyncQueueDoc, AiContentDoc } from '../types'
 import { enrichDocument } from '../pipeline/transform'
 import { runInitialSync } from './initial-sync'
 import { generateLlmsTxt } from '../generators/llms-txt'
@@ -91,8 +91,9 @@ async function processEnrichJobs(
         data: { status: 'processing' },
       })
 
-      const sourceCollection = (job as any).sourceCollection as string
-      const sourceDocId = (job as any).sourceDocId as string
+      const typedJob = job as unknown as AiSyncQueueDoc
+      const sourceCollection = typedJob.sourceCollection
+      const sourceDocId = typedJob.sourceDocId
 
       if (!sourceCollection || !sourceDocId) {
         await payload.update({
@@ -122,8 +123,8 @@ async function processEnrichJobs(
         continue
       }
 
-      const contentEntry = contentResult.docs[0]
-      const markdown = (contentEntry as any).markdown as string
+      const contentEntry = contentResult.docs[0] as unknown as AiContentDoc
+      const markdown = contentEntry.markdown
 
       if (!markdown) {
         await payload.update({
@@ -146,8 +147,8 @@ async function processEnrichJobs(
 
       // Increment API call counter
       try {
-        const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-        const currentCount = (aiConfig as any)?.aiApiCallCount || 0
+        const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+        const currentCount = aiConfig?.aiApiCallCount || 0
         await payload.updateGlobal({
           slug: 'ai-config',
           data: { aiApiCallCount: currentCount + 3 }, // 3 calls per enrichment (summary, entities, chunks)

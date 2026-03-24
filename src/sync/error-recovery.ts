@@ -1,5 +1,5 @@
 import type { Payload } from 'payload'
-import type { ResolvedPluginConfig, IAiProvider } from '../types'
+import type { ResolvedPluginConfig, IAiProvider, AiContentDoc } from '../types'
 import { transformDocument } from '../pipeline/transform'
 
 /**
@@ -26,9 +26,10 @@ export async function retryErrors(
   payload.logger.info(`[scrape-ai] Retrying ${errored.docs.length} errored entries`)
 
   for (const entry of errored.docs) {
-    const collectionSlug = (entry as any).sourceCollection as string
-    const sourceDocId = (entry as any).sourceDocId as string
-    const currentRetryCount = ((entry as any).retryCount as number) || 0
+    const typedEntry = entry as unknown as AiContentDoc
+    const collectionSlug = typedEntry.sourceCollection
+    const sourceDocId = typedEntry.sourceDocId
+    const currentRetryCount = typedEntry.retryCount || 0
 
     try {
       // Re-fetch the source document
@@ -71,7 +72,7 @@ export async function retryErrors(
           errorMessage: null,
           retryCount: 0,
           parentSlug: result.parentSlug || null,
-          relatedSlugs: result.relatedSlugs,
+          relatedSlugs: result.relatedSlugs.map((s) => ({ slug: s })),
           isDraft: result.isDraft,
           lastSynced: new Date().toISOString(),
         },
