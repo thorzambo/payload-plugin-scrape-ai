@@ -31,8 +31,12 @@ export const aiConfigGlobal: GlobalConfig = {
     {
       name: 'aiApiKey',
       type: 'text',
+      access: {
+        read: () => false, // never readable via API — use plugin config env var instead
+        update: ({ req }) => Boolean(req.user),
+      },
       admin: {
-        condition: () => false, // never exposed to client
+        condition: () => false,
       },
     },
     {

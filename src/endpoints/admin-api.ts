@@ -1,6 +1,7 @@
 import type { PayloadRequest } from 'payload'
 import type { ResolvedPluginConfig } from '../types'
 import { detectContentCollections } from '../detection/smart-detect'
+import { createAiProvider } from '../ai/provider'
 
 /**
  * Create all authenticated admin API endpoints for the dashboard.
@@ -259,7 +260,6 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
             return Response.json({ success: false, error: 'No AI provider configured' })
           }
 
-          const { createAiProvider } = require('../ai/provider')
           const ai = createAiProvider({ provider, apiKey, model })
 
           if (!ai) {

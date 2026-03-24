@@ -47,7 +47,7 @@ export async function generateAiSitemap(params: {
       title,
       slug,
       url: `/ai/${collection}/${slug}.md`,
-      canonicalUrl: `${siteUrl}/${slug.replace(/-/g, '/')}`,
+      canonicalUrl: ((entry as any).canonicalUrl as string) || `${siteUrl}/${slug}`,
       parent: parentSlug || null,
       children: [], // populated below
       relatedTo: relatedSlugs,

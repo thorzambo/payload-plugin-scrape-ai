@@ -18,7 +18,7 @@ export function startScheduler(
 
   // Main queue processing loop
   let isProcessing = false
-  setInterval(async () => {
+  const queueInterval = setInterval(async () => {
     if (isProcessing) return
     isProcessing = true
 
@@ -30,10 +30,11 @@ export function startScheduler(
       isProcessing = false
     }
   }, debounceMs)
+  queueInterval.unref()
 
   // Error recovery loop (every 5 minutes)
   let isRecovering = false
-  setInterval(async () => {
+  const recoveryInterval = setInterval(async () => {
     if (isRecovering) return
     isRecovering = true
 
@@ -45,9 +46,10 @@ export function startScheduler(
       isRecovering = false
     }
   }, 5 * 60 * 1000)
+  recoveryInterval.unref()
 
   // Monthly API call counter reset check (every hour)
-  setInterval(async () => {
+  const resetInterval = setInterval(async () => {
     try {
       const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
       const resetDate = (aiConfig as any)?.aiApiCallCountResetDate
@@ -67,4 +69,5 @@ export function startScheduler(
       // Non-critical
     }
   }, 60 * 60 * 1000)
+  resetInterval.unref()
 }

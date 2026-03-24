@@ -2,8 +2,10 @@ import type { AiProviderConfig, IAiProvider } from '../types'
 
 class OpenAiProvider implements IAiProvider {
   private client: any
+  private model: string
 
   constructor(config: AiProviderConfig) {
+    this.model = config.model || 'gpt-4o-mini'
     try {
       const OpenAI = require('openai')
       this.client = new OpenAI({ apiKey: config.apiKey })
@@ -16,7 +18,7 @@ class OpenAiProvider implements IAiProvider {
 
   async complete(prompt: string, systemPrompt: string): Promise<string> {
     const response = await this.client.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: this.model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt },
@@ -30,8 +32,10 @@ class OpenAiProvider implements IAiProvider {
 
 class AnthropicProvider implements IAiProvider {
   private client: any
+  private model: string
 
   constructor(config: AiProviderConfig) {
+    this.model = config.model || 'claude-haiku-4-5-20251001'
     try {
       const Anthropic = require('@anthropic-ai/sdk')
       this.client = new Anthropic({ apiKey: config.apiKey })
@@ -44,7 +48,7 @@ class AnthropicProvider implements IAiProvider {
 
   async complete(prompt: string, systemPrompt: string): Promise<string> {
     const response = await this.client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: this.model,
       max_tokens: 2000,
       system: systemPrompt,
       messages: [{ role: 'user', content: prompt }],

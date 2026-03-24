@@ -33,6 +33,10 @@ export const aiContentCollection: CollectionConfig = {
       required: true,
     },
     {
+      name: 'canonicalUrl',
+      type: 'text',
+    },
+    {
       name: 'markdown',
       type: 'textarea',
     },

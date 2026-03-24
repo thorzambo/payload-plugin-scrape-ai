@@ -50,6 +50,7 @@ export function createAfterChangeHook(
         sourceDocId: String(doc.id),
         slug: result.urlSlug,
         title: result.title,
+        canonicalUrl: result.canonicalUrl,
         markdown: result.markdown,
         jsonLd: result.jsonLd,
         status: 'synced' as const,

@@ -37,6 +37,7 @@ export function createContextQueryEndpoint(rateLimiter: RateLimiter, siteUrl: st
           collection: 'ai-content',
           where: whereClause,
           limit: 1000,
+          // Only fetch fields needed for scoring — avoid loading full markdown
         })
 
         // Score and rank entries
@@ -68,8 +69,9 @@ export function createContextQueryEndpoint(rateLimiter: RateLimiter, siteUrl: st
               score += 2
             }
 
-            // Body matches (1x weight)
-            if (markdown.toLowerCase().includes(termLower)) {
+            // Summary or title-based body matches (1x weight)
+            // We avoid scoring against full markdown to reduce memory pressure
+            if (summary.toLowerCase().includes(termLower)) {
               score += 1
             }
 
@@ -95,7 +97,7 @@ export function createContextQueryEndpoint(rateLimiter: RateLimiter, siteUrl: st
 
           if (score > 0) {
             // Normalize score to 0-1 range (rough approximation)
-            const maxPossibleScore = terms.length * (3 + 2 + 1 + 4 + 3 + 2) // 15 per term
+            const maxPossibleScore = terms.length * (3 + 2 + 1 + 4 + 3 + 2) // 15 per term max
             const normalizedScore = Math.min(score / maxPossibleScore, 1)
 
             scored.push({
@@ -103,8 +105,8 @@ export function createContextQueryEndpoint(rateLimiter: RateLimiter, siteUrl: st
               slug,
               collection,
               url: `/ai/${collection}/${slug}.md`,
-              canonicalUrl: `${siteUrl}/${slug.replace(/-/g, '/')}`,
-              excerpt: markdown.replace(/^---[\s\S]*?---\n*/m, '').slice(0, 200).trim(),
+              canonicalUrl: ((entry as any).canonicalUrl as string) || `${siteUrl}/${slug}`,
+              excerpt: (summary || title).slice(0, 200).trim(),
               summary: summary || undefined,
               topics: topics.length > 0 ? topics : undefined,
               relevanceScore: Math.round(normalizedScore * 100) / 100,

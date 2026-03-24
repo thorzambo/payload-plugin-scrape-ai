@@ -100,6 +100,7 @@ export interface TransformResult {
   title: string
   slug: string
   urlSlug: string
+  canonicalUrl: string
   parentSlug?: string
   relatedSlugs: string[]
   jsonLd: Record<string, unknown>

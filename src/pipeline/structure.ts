@@ -91,6 +91,7 @@ export function structureContent(params: {
     title,
     slug: urlSlug,
     urlSlug,
+    canonicalUrl: `${siteUrl}/${originalSlug}`,
     parentSlug: parentSlug ? toUrlSlug(parentSlug) : undefined,
     relatedSlugs,
     jsonLd,
@@ -176,7 +177,8 @@ function buildFrontmatter(data: Record<string, unknown>): string {
     } else if (typeof value === 'boolean') {
       lines.push(`${key}: ${value}`)
     } else {
-      lines.push(`${key}: "${value}"`)
+      const escaped = String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+      lines.push(`${key}: "${escaped}"`)
     }
   }
   lines.push('---')

@@ -11,25 +11,31 @@ export async function runInitialSync(
   pluginOptions: ResolvedPluginConfig,
   enabledCollections: string[],
 ): Promise<void> {
-  // Check if ai-content already has non-aggregate entries
-  const existingCount = await payload.find({
-    collection: 'ai-content',
-    where: {
-      sourceCollection: { not_equals: '__aggregate' },
-    },
-    limit: 1,
-  })
+  payload.logger.info(`[scrape-ai] Checking initial sync for ${enabledCollections.length} collections`)
 
-  if (existingCount.docs.length > 0) {
-    payload.logger.info('[scrape-ai] Content already synced, skipping initial sync')
+  // Filter to only collections that have no ai-content entries yet
+  const collectionsToSync: string[] = []
+  for (const slug of enabledCollections) {
+    const existing = await payload.find({
+      collection: 'ai-content',
+      where: { sourceCollection: { equals: slug } },
+      limit: 1,
+    })
+    if (existing.docs.length === 0) {
+      collectionsToSync.push(slug)
+    }
+  }
+
+  if (collectionsToSync.length === 0) {
+    payload.logger.info('[scrape-ai] All collections already synced, skipping initial sync')
     return
   }
 
-  payload.logger.info(`[scrape-ai] Starting initial sync for ${enabledCollections.length} collections`)
+  payload.logger.info(`[scrape-ai] Starting initial sync for ${collectionsToSync.length} collections: ${collectionsToSync.join(', ')}`)
 
   const concurrency = pluginOptions.sync.initialSyncConcurrency
 
-  for (const collectionSlug of enabledCollections) {
+  for (const collectionSlug of collectionsToSync) {
     const collectionConfig = payload.collections[collectionSlug]?.config
     if (!collectionConfig) {
       payload.logger.warn(`[scrape-ai] Collection '${collectionSlug}' not found, skipping`)
@@ -73,6 +79,7 @@ export async function runInitialSync(
               sourceDocId: String(doc.id),
               slug: transformResult.urlSlug,
               title: transformResult.title,
+              canonicalUrl: transformResult.canonicalUrl,
               markdown: transformResult.markdown,
               jsonLd: transformResult.jsonLd,
               status: 'synced',
