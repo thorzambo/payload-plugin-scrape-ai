@@ -46,16 +46,27 @@ export default buildConfig({
       // Sync settings
       sync: {
         debounceMs: 30000, // aggregate rebuild delay (default 30s)
+        initialSyncConcurrency: 5, // max parallel docs during initial sync
       },
 
-      // Base URL for generating canonical links in llms.txt
+      // REQUIRED: Base URL for generating canonical links
       siteUrl: 'https://example.com',
       siteName: 'My Website',
       siteDescription: 'A brief description of what this site is about',
+
+      // Draft handling
+      drafts: 'published-only', // 'published-only' (default) | 'include-drafts'
     }),
   ],
 })
 ```
+
+### Configuration Precedence Rules
+
+- `siteUrl` is **required**. The plugin throws at init if omitted.
+- `exclude` always wins over `collections`. If a slug appears in both, it is excluded.
+- `collections` overrides smart detection. If provided, only those slugs are considered (minus `exclude`).
+- If neither `collections` nor `exclude` is provided, smart detection runs and the admin toggles collections from the dashboard.
 
 ### Smart Collection Detection
 
@@ -66,22 +77,76 @@ When no `collections` array is provided, the plugin scans all collections for fi
 
 Collections matching 2+ signals are auto-detected as content collections. The admin can then toggle these on/off from the dashboard.
 
+### Draft/Publish Behavior
+
+- Default `drafts: 'published-only'`: only documents with `_status: 'published'` (or no draft system) trigger the pipeline. Draft saves are ignored.
+- `drafts: 'include-drafts'`: all saves trigger the pipeline, but draft content is marked with `draft: true` in frontmatter and excluded from `llms.txt` (only in `llms-full.txt`).
+
+### Optional AI Provider Dependency Handling
+
+If `ai` is configured but the required SDK package is not installed (`openai` or `@anthropic-ai/sdk`), the plugin logs a clear error at init: `"[scrape-ai] AI provider 'openai' configured but 'openai' package not found. Run: npm install openai"` — and disables AI enrichment (Stage 1+2 still works).
+
 ---
 
 ## 2. Plugin-Owned Data
 
 ### Collections
 
-| Collection | Purpose |
-|---|---|
-| `ai-content` | Stores generated markdown + metadata per content entry |
-| `ai-sync-queue` | Tracks pending/processing sync jobs |
+#### `ai-content` — Generated content storage
+
+| Field | Type | Purpose |
+|---|---|---|
+| `sourceCollection` | `text`, required, indexed | Slug of the source Payload collection |
+| `sourceDocId` | `text`, required, indexed | ID of the source document |
+| `slug` | `text`, required, unique, indexed | URL-safe slug (see Slug Transformation below) |
+| `title` | `text`, required | Document title |
+| `markdown` | `textarea` | Full generated markdown (Stage 1+2 output) |
+| `jsonLd` | `json` | JSON-LD structured data object |
+| `status` | `select`: `pending`, `processing`, `synced`, `error`, `error-permanent` | Sync status |
+| `errorMessage` | `text` | Last error message (if status is error) |
+| `retryCount` | `number`, default `0` | Consecutive failure count |
+| `aiMeta` | `json` | AI-generated metadata: `{ summary, topics, entities, chunks }` |
+| `parentSlug` | `text` | Inferred or overridden parent slug |
+| `relatedSlugs` | `json` (string array) | Related content slugs |
+| `locale` | `text` | Locale code if multi-locale |
+| `isDraft` | `checkbox`, default `false` | Whether source was a draft |
+| `lastSynced` | `date` | Timestamp of last successful sync |
+
+Compound index on `(sourceCollection, sourceDocId)` for fast lookups. Compound index on `(sourceCollection, locale)` for locale-aware queries.
+
+#### `ai-sync-queue` — Sync job queue
+
+| Field | Type | Purpose |
+|---|---|---|
+| `jobType` | `select`: `rebuild-aggregates`, `sync-document`, `initial-sync` | Job type |
+| `sourceCollection` | `text` | Collection slug (for sync-document jobs) |
+| `sourceDocId` | `text` | Document ID (for sync-document jobs) |
+| `status` | `select`: `pending`, `processing`, `completed`, `failed` | Job status |
+| `createdAt` | `date`, auto | When the job was queued |
+| `processedAt` | `date` | When the job was completed |
+| `errorMessage` | `text` | Error details if failed |
+
+#### Slug Transformation Rule
+
+Source slugs containing `/` are converted to `-` for URL paths. The original slug is preserved in frontmatter.
+- Source: `services/web-design` → URL path: `services-web-design` → Endpoint: `/ai/pages/services-web-design.md`
+- Frontmatter `slug` field retains the original: `services/web-design`
 
 ### Globals
 
-| Global | Purpose |
-|---|---|
-| `ai-config` | Admin-managed settings: collection toggles, AI config, priorities, site info |
+#### `ai-config` — Admin-managed settings
+
+| Field | Type | Purpose |
+|---|---|---|
+| `enabledCollections` | `json` (object: `{ [slug]: boolean }`) | Per-collection toggle state |
+| `aiEnabled` | `checkbox`, default `false` | Global AI enrichment toggle |
+| `aiProvider` | `select`: `openai`, `anthropic` | AI provider choice |
+| `aiApiKey` | `text`, admin: `{ condition: () => false }` | API key (hidden from client) |
+| `aiModel` | `text` | Model identifier |
+| `llmsTxtPriority` | `json` (array of `{ slug, section, optional }`) | Ordered priority list for llms.txt |
+| `llmsTxtSections` | `json` (array of `{ name, label }`) | Custom section definitions |
+| `aiApiCallCount` | `number`, default `0` | Monthly API call counter |
+| `lastAggregateRebuild` | `date` | Last time aggregates were rebuilt |
 
 ### Endpoints
 
@@ -92,7 +157,7 @@ Collections matching 2+ signals are auto-detected as content collections. The ad
 | `/ai/:collection/:slug.md` | GET | Per-page clean markdown |
 | `/ai/sitemap.json` | GET | Content relationships + hierarchy |
 | `/ai/structured/:collection/:slug.json` | GET | JSON-LD structured data per entry |
-| `/ai/mcp/context` | GET | MCP-compatible context query endpoint |
+| `/ai/context` | GET | Context query endpoint for AI agents |
 
 ---
 
@@ -101,7 +166,8 @@ Collections matching 2+ signals are auto-detected as content collections. The ad
 ### Stage 1 — Extraction (always runs, zero cost)
 
 - Traverses the Payload document recursively
-- Rich text (Lexical/Slate) → clean Markdown (headings, lists, links, images, tables)
+- **Rich text detection:** Checks field config for `editor` property. Lexical fields (Payload v3 default) use the Lexical serializer; Slate fields use the Slate serializer. Both produce clean Markdown. The plugin ships both serializers and picks the right one per field.
+- Rich text → clean Markdown (headings, lists, links, images, tables)
 - Relationship fields → resolved links with titles (`[Related Post Title](/ai/posts/related-post.md)`)
 - Blocks/layouts → semantic sections with headers
 - Media references → alt text + URL
@@ -156,11 +222,19 @@ Professional web design services focused on...
 
 ```
 Document afterChange/afterDelete hook fires
-  → Extract + Structure + (optional) AI Enrich
-  → Upsert into ai-content collection
-  → Mark entry status: "synced" (or "error" if failed)
+  → Check draft status: if drafts='published-only' and doc._status='draft', skip
+  → Extract + Structure (Stage 1+2, synchronous, fast)
+  → Upsert into ai-content collection with status "synced"
+  → If AI enrichment enabled: push "enrich-document" job to ai-sync-queue (ASYNC, never blocks the save)
   → Push "rebuild-aggregates" job to ai-sync-queue
 ```
+
+**Critical: AI enrichment is ALWAYS asynchronous.** It never runs in the afterChange hook. Stage 1+2 are deterministic and fast (< 50ms) so they run synchronously. Stage 3 (AI) is queued and processed by the scheduler. This means content is immediately available in basic form, and AI metadata appears shortly after.
+
+### Concurrency Control
+
+- Per-document upserts use `sourceCollection + sourceDocId` as a natural lock — Payload's `findOne + update` pattern means the last write wins, which is correct for content sync (latest version is always the right one).
+- The scheduler processes one aggregate rebuild at a time (serial within the setInterval tick). Queue entries are drained atomically.
 
 ### Debounced Path (aggregate files)
 
@@ -189,6 +263,8 @@ pending → processing → synced
 
 - `onInit` detects if `ai-content` is empty
 - Triggers a full scan: queries all enabled collections, runs every document through the pipeline
+- **Concurrency limit:** processes `initialSyncConcurrency` documents in parallel (default 5). Prevents overwhelming the server or AI API.
+- **AI rate limiting during initial sync:** if AI enrichment is enabled, AI calls are throttled to 10 requests/minute by default to avoid API rate limits.
 - Progress tracked in `ai-sync-queue` so the admin dashboard shows "Initial sync: 47/120 pages"
 - Debounced aggregate rebuild fires once after the full scan completes
 
@@ -293,9 +369,41 @@ JSON-LD per entry:
 }
 ```
 
-### GET /ai/mcp/context?query=...
+### GET /ai/context?query=...&limit=5
 
-Accepts a `query` parameter. Returns the most relevant content chunks for an AI agent's query. When AI enrichment is enabled, uses semantic chunk matching. When disabled, falls back to keyword search across titles and content.
+A simple HTTP context query endpoint for AI agents (not MCP protocol — see note below). Returns the most relevant content entries for a given query.
+
+**Response schema:**
+```json
+{
+  "query": "web design services",
+  "results": [
+    {
+      "title": "Web Design Services",
+      "slug": "services/web-design",
+      "collection": "pages",
+      "url": "/ai/pages/services-web-design.md",
+      "canonicalUrl": "https://example.com/services/web-design",
+      "excerpt": "First 200 chars of markdown content...",
+      "summary": "AI-generated summary if available",
+      "topics": ["web design", "UI/UX"],
+      "relevanceScore": 0.92
+    }
+  ],
+  "totalResults": 3
+}
+```
+
+**Relevance algorithm:**
+- **Without AI enrichment:** TF-IDF-style keyword matching against `title`, `markdown`, and `slug` fields. Scores based on term frequency and field weight (title 3x, slug 2x, body 1x).
+- **With AI enrichment:** Matches against `aiMeta.topics`, `aiMeta.entities`, and `aiMeta.summary` in addition to base fields. Topic/entity matches score higher than body keyword matches.
+
+**Parameters:**
+- `query` (required): search query string
+- `limit` (optional, default 5, max 20): number of results
+- `collection` (optional): filter to a specific collection
+
+**Note on MCP:** MCP (Model Context Protocol) uses JSON-RPC over stdio/SSE transport, not HTTP GET. This endpoint is a standard REST API designed for easy consumption by AI agents and applications. If actual MCP server support is desired in the future, it would be a separate integration wrapping this data.
 
 All endpoints return proper `Content-Type` headers and include `Cache-Control` with `ETag` based on last sync timestamp.
 
@@ -355,7 +463,7 @@ Custom view at `/admin/scrape-ai` in the Payload admin panel. All content is **r
 - Lists all active endpoints with their full URLs
 - Copy-to-clipboard for each
 - Live test: click any endpoint to see its current output in a modal
-- MCP connection instructions for AI agents
+- Integration instructions for AI agents (how to use the context query endpoint)
 
 ---
 
@@ -410,7 +518,7 @@ payload-plugin-scrape-ai/
 │   │   ├── content-markdown.ts           # GET /ai/:collection/:slug.md
 │   │   ├── sitemap-json.ts              # GET /ai/sitemap.json
 │   │   ├── structured-data.ts           # GET /ai/structured/:collection/:slug.json
-│   │   └── mcp-context.ts              # GET /ai/mcp/context
+│   │   └── context-query.ts             # GET /ai/context
 │   │
 │   ├── pipeline/
 │   │   ├── extract.ts                    # Stage 1: document → raw markdown
@@ -468,10 +576,24 @@ payload-plugin-scrape-ai/
 
 ---
 
-## 10. Security Considerations
+## 10. Localization / Multi-Locale Support
 
-- AI provider API keys stored in Payload Global (encrypted at rest by the DB layer), never exposed to client components
-- All `/ai/*` endpoints are public by design (the whole point is AI agent access) — but rate-limited
-- Admin dashboard actions require Payload authentication
-- The plugin never executes user-provided content as code
-- AI enrichment prompts are hardcoded in the plugin, not user-configurable (prevents prompt injection)
+- If the Payload config has `localization` enabled, the plugin generates **separate `ai-content` entries per locale** for each document.
+- Each entry has a `locale` field set to the locale code (e.g., `en`, `it`, `de`).
+- Endpoint behavior with locales:
+  - `/llms.txt` and `/llms-full.txt` accept an optional `?locale=en` parameter. Default: the site's default locale.
+  - `/ai/:collection/:slug.md` accepts `?locale=en`. Default: default locale.
+  - `/ai/sitemap.json` includes all locales, with entries grouped by locale.
+- Slug uniqueness is scoped to `(slug, locale)` — the same slug can exist in multiple locales.
+- If the site has no localization configured, the `locale` field is `null` and endpoints ignore the parameter.
+
+---
+
+## 11. Security Considerations
+
+- AI provider API keys stored in the `ai-config` Global with `admin: { condition: () => false }` to prevent client-side exposure. **Note:** the key is stored as plaintext in the database — the plugin does not add its own encryption layer. For production, the recommended approach is to pass the API key via the plugin config (`ai.apiKey: process.env.AI_API_KEY`) rather than storing it in the database. The dashboard AI settings panel is for convenience/override only.
+- All `/ai/*` endpoints are public by design (AI agent access is the purpose).
+- **Rate limiting:** The plugin adds a simple in-memory sliding window rate limiter to all `/ai/*` endpoints. Default: 60 requests/minute per IP. Configurable via `sync.rateLimitPerMinute`. Returns `429 Too Many Requests` when exceeded. For production deployments behind a reverse proxy, the plugin respects `X-Forwarded-For`.
+- Admin dashboard actions (regenerate, toggle, configure) require Payload authentication.
+- The plugin never executes user-provided content as code.
+- AI enrichment prompts are hardcoded in the plugin, not user-configurable (prevents prompt injection).
