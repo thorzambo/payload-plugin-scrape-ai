@@ -47,6 +47,7 @@ export default buildConfig({
       sync: {
         debounceMs: 30000, // aggregate rebuild delay (default 30s)
         initialSyncConcurrency: 5, // max parallel docs during initial sync
+        rateLimitPerMinute: 60, // rate limit for public /ai/* endpoints (default 60)
       },
 
       // REQUIRED: Base URL for generating canonical links
@@ -98,7 +99,7 @@ If `ai` is configured but the required SDK package is not installed (`openai` or
 |---|---|---|
 | `sourceCollection` | `text`, required, indexed | Slug of the source Payload collection |
 | `sourceDocId` | `text`, required, indexed | ID of the source document |
-| `slug` | `text`, required, unique, indexed | URL-safe slug (see Slug Transformation below) |
+| `slug` | `text`, required, indexed | URL-safe slug (see Slug Transformation below) |
 | `title` | `text`, required | Document title |
 | `markdown` | `textarea` | Full generated markdown (Stage 1+2 output) |
 | `jsonLd` | `json` | JSON-LD structured data object |
@@ -112,13 +113,15 @@ If `ai` is configured but the required SDK package is not installed (`openai` or
 | `isDraft` | `checkbox`, default `false` | Whether source was a draft |
 | `lastSynced` | `date` | Timestamp of last successful sync |
 
-Compound index on `(sourceCollection, sourceDocId)` for fast lookups. Compound index on `(sourceCollection, locale)` for locale-aware queries.
+Compound unique index on `(slug, locale)` — the same slug can exist in different locales but must be unique within a locale. Compound index on `(sourceCollection, sourceDocId, locale)` for fast lookups. Compound index on `(sourceCollection, locale)` for locale-aware queries.
+
+**Aggregate entries** (llms.txt, llms-full.txt, sitemap.json) are stored in `ai-content` with sentinel values: `sourceCollection: '__aggregate'`, `sourceDocId: '__llms-txt'` / `'__llms-full-txt'` / `'__sitemap-json'`. The `markdown` field holds the generated content. These entries have `status: 'synced'` and are excluded from the content entries table in the dashboard (filtered by `sourceCollection !== '__aggregate'`).
 
 #### `ai-sync-queue` — Sync job queue
 
 | Field | Type | Purpose |
 |---|---|---|
-| `jobType` | `select`: `rebuild-aggregates`, `sync-document`, `initial-sync` | Job type |
+| `jobType` | `select`: `rebuild-aggregates`, `sync-document`, `enrich-document`, `initial-sync` | Job type |
 | `sourceCollection` | `text` | Collection slug (for sync-document jobs) |
 | `sourceDocId` | `text` | Document ID (for sync-document jobs) |
 | `status` | `select`: `pending`, `processing`, `completed`, `failed` | Job status |
@@ -145,7 +148,8 @@ Source slugs containing `/` are converted to `-` for URL paths. The original slu
 | `aiModel` | `text` | Model identifier |
 | `llmsTxtPriority` | `json` (array of `{ slug, section, optional }`) | Ordered priority list for llms.txt |
 | `llmsTxtSections` | `json` (array of `{ name, label }`) | Custom section definitions |
-| `aiApiCallCount` | `number`, default `0` | Monthly API call counter |
+| `aiApiCallCount` | `number`, default `0` | API call counter (reset on 1st of each month by scheduler) |
+| `aiApiCallCountResetDate` | `date` | Date of last counter reset |
 | `lastAggregateRebuild` | `date` | Last time aggregates were rebuilt |
 
 ### Endpoints
@@ -175,7 +179,7 @@ Source slugs containing `/` are converted to `-` for URL paths. The original slu
 
 ### Stage 2 — Structuring (always runs, zero cost)
 
-- Adds YAML frontmatter: `title`, `slug`, `collection`, `lastModified`, `locale`, `contentType`, `canonicalUrl`
+- Adds YAML frontmatter: `title`, `slug`, `collection`, `lastModified`, `locale`, `contentType`, `canonicalUrl`, `parent`, `children`
 - Builds semantic sections: main content, related content, metadata
 - Detects parent/child via slug patterns (`/services/web-design` → child of `/services`)
 - Detects relationships via populated relation fields
@@ -200,6 +204,7 @@ canonicalUrl: "https://example.com/services/web-design"
 lastModified: "2026-03-24T12:00:00Z"
 contentType: "WebPage"
 parent: "services"
+children: []
 topics: ["web design", "UI/UX", "responsive"]
 summary: "Professional web design services..."
 chunks: 4
