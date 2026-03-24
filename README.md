@@ -82,17 +82,21 @@ A full control center inside your Payload admin panel:
 
 ## Quick Start
 
-### 1. Install
+### 1. Install the package
 
 ```bash
-npm install payload-plugin-scrape-ai
-# or
-yarn add payload-plugin-scrape-ai
-# or
-pnpm add payload-plugin-scrape-ai
+# From GitHub (current)
+npm install github:thorzambo/payload-plugin-scrape-ai
+
+# From npm (coming soon)
+# npm install @thorzambo/payload-plugin-scrape-ai
 ```
 
 ### 2. Add to your Payload config
+
+Payload plugins **do not auto-register**. Like every other Payload plugin (`@payloadcms/plugin-seo`, `@payloadcms/plugin-search`, etc.), you need to manually add it to your `plugins` array.
+
+If your config is in a single file:
 
 ```typescript
 // payload.config.ts
@@ -106,20 +110,50 @@ export default buildConfig({
       siteName: 'My Website',
       siteDescription: 'A brief description for the llms.txt header',
     }),
+    // ... your other plugins
   ],
   // ... your existing config
 })
 ```
 
-### 3. Done
+If your plugins are in a separate file (common pattern):
 
-The plugin will:
-1. Auto-detect your content collections
-2. Run an initial sync of all existing content
-3. Start generating AI-friendly content on every change
-4. Serve it at `/api/llms.txt` and other endpoints
+```typescript
+// src/plugins/index.ts
+import { scrapeAiPlugin } from 'payload-plugin-scrape-ai'
+import type { Plugin } from 'payload'
 
-Visit `/admin/scrape-ai` in your admin panel to see the dashboard.
+export const plugins: Plugin[] = [
+  scrapeAiPlugin({
+    siteUrl: process.env.NEXT_PUBLIC_SERVER_URL || 'https://your-website.com',
+    siteName: 'My Website',
+    siteDescription: 'What this site is about',
+    collections: ['pages', 'posts', 'products'], // optional: explicit list
+    exclude: ['users', 'media'],                   // optional: never include these
+  }),
+  // ... your other plugins
+]
+```
+
+### 3. Restart your dev server
+
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+### 4. Visit the dashboard
+
+Go to **`/admin/scrape-ai`** in your Payload admin panel. You'll see the "Scrape AI" link in the sidebar.
+
+On first load, the plugin will:
+1. Create `ai-content` and `ai-sync-queue` collections in your database
+2. Create the `ai-config` global for dashboard settings
+3. Auto-detect content collections (or use the ones you specified)
+4. Run an initial sync of all existing documents
+5. Start the background scheduler for ongoing sync
+6. Serve content at `/api/llms.txt` and other endpoints
 
 ---
 

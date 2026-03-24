@@ -359,19 +359,33 @@ npm install <span class="s">github:thorzambo/payload-plugin-scrape-ai</span>
 
 <span class="c"># From npm (coming soon)</span>
 <span class="c"># npm install @thorzambo/payload-plugin-scrape-ai</span></div></div>
-        <div class="sr sr-d1"><p class="xs" style="margin-bottom:8px;">2. Add to your Payload config</p><div class="code-block"><span class="c">// payload.config.ts</span>
+        <div class="sr sr-d1"><p class="xs" style="margin-bottom:8px;">2. Add to your <code style="font-family:var(--mono);color:var(--ac);font-size:11px">plugins</code> array in payload.config.ts</p><div class="code-block"><span class="c">// payload.config.ts (or src/plugins/index.ts if using a separate file)</span>
 <span class="k">import</span> { <span class="f">scrapeAiPlugin</span> } <span class="k">from</span> <span class="s">'payload-plugin-scrape-ai'</span>
 
 <span class="k">export default</span> <span class="f">buildConfig</span>({
   plugins: [
     <span class="f">scrapeAiPlugin</span>({
-      siteUrl: <span class="s">'https://your-website.com'</span>,
+      siteUrl: <span class="s">'https://your-website.com'</span>,  <span class="c">// required</span>
       siteName: <span class="s">'My Website'</span>,
       siteDescription: <span class="s">'What this site is about'</span>,
+      collections: [<span class="s">'pages'</span>, <span class="s">'posts'</span>, <span class="s">'products'</span>], <span class="c">// optional</span>
+      exclude: [<span class="s">'users'</span>, <span class="s">'media'</span>],                  <span class="c">// optional</span>
     }),
+    <span class="c">// ... your other plugins</span>
   ],
 })</div></div>
-        <div class="sr sr-d2"><p class="xs">3. Visit <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/admin/scrape-ai</code> to see the dashboard.</p></div>
+        <div class="sr sr-d2">
+          <p class="xs" style="margin-bottom:8px;">3. Restart your dev server</p>
+          <div class="code-block">npm run dev  <span class="c"># or: pnpm dev</span></div>
+        </div>
+        <div class="sr sr-d3">
+          <p class="xs" style="margin-bottom:8px;">4. Visit the dashboard</p>
+          <p class="b" style="font-size:14px;">Go to <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/admin/scrape-ai</code> in your Payload admin panel. The "Scrape AI" link appears in the sidebar.</p>
+        </div>
+        <div class="card sr sr-d4" style="margin-top:8px;padding:20px 24px;">
+          <p class="xs" style="color:var(--ac);margin-bottom:8px;">NOTE</p>
+          <p class="b" style="font-size:13px;">Like all Payload plugins, this does <strong style="color:var(--w)">not</strong> auto-register on install. You must manually add <code style="font-family:var(--mono);color:var(--ac);font-size:12px">scrapeAiPlugin()</code> to your <code style="font-family:var(--mono);color:var(--ac);font-size:12px">plugins</code> array in <code style="font-family:var(--mono);color:var(--ac);font-size:12px">payload.config.ts</code> and restart.</p>
+        </div>
       </div>
     </div>
   </section>
