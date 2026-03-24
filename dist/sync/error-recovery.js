@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.retryErrors = retryErrors;
-const transform_1 = require("../pipeline/transform");
+import { transformDocument } from '../pipeline/transform';
 /**
  * Retry errored ai-content entries.
  * Called periodically (every 5 minutes) by the scheduler.
  */
-async function retryErrors(payload, pluginOptions) {
+export async function retryErrors(payload, pluginOptions) {
     // Find entries with error status and retryCount < 3
     const errored = await payload.find({
         collection: 'ai-content',
@@ -42,7 +39,7 @@ async function retryErrors(payload, pluginOptions) {
             if (!collectionConfig)
                 continue;
             // Re-run pipeline
-            const result = (0, transform_1.transformDocument)({
+            const result = transformDocument({
                 doc: doc,
                 collectionSlug,
                 collectionConfig,

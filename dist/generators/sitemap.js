@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateAiSitemap = generateAiSitemap;
 /**
  * Generate the AI sitemap JSON with content relationships and hierarchy.
  */
-async function generateAiSitemap(params) {
+export async function generateAiSitemap(params) {
     const { payload, siteUrl, siteName } = params;
     const allContent = await payload.find({
         collection: 'ai-content',

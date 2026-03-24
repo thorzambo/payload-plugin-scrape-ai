@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateLlmsTxt = generateLlmsTxt;
 /**
  * Generate the curated llms.txt content following the standard.
  */
-async function generateLlmsTxt(params) {
+export async function generateLlmsTxt(params) {
     const { payload, siteUrl, siteName, siteDescription } = params;
     // Load config for priority and sections
     let aiConfig = null;

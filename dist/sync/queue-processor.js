@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.processQueue = processQueue;
-const transform_1 = require("../pipeline/transform");
-const llms_txt_1 = require("../generators/llms-txt");
-const llms_full_txt_1 = require("../generators/llms-full-txt");
-const sitemap_1 = require("../generators/sitemap");
+import { enrichDocument } from '../pipeline/transform';
+import { generateLlmsTxt } from '../generators/llms-txt';
+import { generateLlmsFullTxt } from '../generators/llms-full-txt';
+import { generateAiSitemap } from '../generators/sitemap';
 /**
  * Process pending jobs from the ai-sync-queue.
  */
-async function processQueue(payload, pluginOptions, aiProvider) {
+export async function processQueue(payload, pluginOptions, aiProvider) {
     // Process enrich-document jobs first
     if (aiProvider) {
         await processEnrichJobs(payload, aiProvider);
@@ -72,7 +69,7 @@ async function processEnrichJobs(payload, aiProvider) {
                 continue;
             }
             // Run AI enrichment
-            const aiMeta = await (0, transform_1.enrichDocument)(markdown, aiProvider);
+            const aiMeta = await enrichDocument(markdown, aiProvider);
             // Update the ai-content entry with AI metadata
             await payload.update({
                 collection: 'ai-content',
@@ -129,19 +126,19 @@ async function processRebuildJobs(payload, pluginOptions) {
     try {
         // Generate all aggregates in one pass
         const [llmsTxt, llmsFullTxt, sitemap] = await Promise.all([
-            (0, llms_txt_1.generateLlmsTxt)({
+            generateLlmsTxt({
                 payload,
                 siteUrl: pluginOptions.siteUrl,
                 siteName: pluginOptions.siteName,
                 siteDescription: pluginOptions.siteDescription,
             }),
-            (0, llms_full_txt_1.generateLlmsFullTxt)({
+            generateLlmsFullTxt({
                 payload,
                 siteUrl: pluginOptions.siteUrl,
                 siteName: pluginOptions.siteName,
                 siteDescription: pluginOptions.siteDescription,
             }),
-            (0, sitemap_1.generateAiSitemap)({
+            generateAiSitemap({
                 payload,
                 siteUrl: pluginOptions.siteUrl,
                 siteName: pluginOptions.siteName,

@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.semanticChunk = semanticChunk;
 const SYSTEM_PROMPT = `You are a content chunking assistant. Given a markdown document, split it into logical semantic sections suitable for RAG (retrieval-augmented generation) pipelines.
 
 For each chunk, provide:
@@ -12,7 +9,7 @@ Return ONLY valid JSON as an array:
 [{"id": "...", "topic": "...", "content": "..."}]
 
 Aim for 3-8 chunks. Each chunk should be self-contained and cover one topic.`;
-async function semanticChunk(markdown, provider) {
+export async function semanticChunk(markdown, provider) {
     // If no AI provider, fall back to heading-based chunking
     if (!provider) {
         return headingBasedChunk(markdown);

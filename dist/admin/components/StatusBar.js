@@ -1,13 +1,10 @@
-"use strict";
 'use client';
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.StatusBar = void 0;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-const StatusBar = () => {
-    const [status, setStatus] = (0, react_1.useState)(null);
-    const [loading, setLoading] = (0, react_1.useState)(true);
-    const [regenerating, setRegenerating] = (0, react_1.useState)(false);
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useEffect, useState } from 'react';
+export const StatusBar = () => {
+    const [status, setStatus] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [regenerating, setRegenerating] = useState(false);
     const fetchStatus = async () => {
         try {
             const res = await fetch('/api/scrape-ai/status', { credentials: 'include' });
@@ -21,7 +18,7 @@ const StatusBar = () => {
             setLoading(false);
         }
     };
-    (0, react_1.useEffect)(() => {
+    useEffect(() => {
         fetchStatus();
         const interval = setInterval(fetchStatus, 10000);
         return () => clearInterval(interval);
@@ -42,9 +39,9 @@ const StatusBar = () => {
         }
     };
     if (loading)
-        return (0, jsx_runtime_1.jsx)("div", { style: styles.container, children: "Loading..." });
+        return _jsx("div", { style: styles.container, children: "Loading..." });
     if (!status)
-        return (0, jsx_runtime_1.jsx)("div", { style: styles.container, children: "Failed to load status" });
+        return _jsx("div", { style: styles.container, children: "Failed to load status" });
     const statusColor = status.errorCount > 0 ? '#ef4444' : status.pendingCount > 0 ? '#eab308' : '#22c55e';
     const statusText = status.errorCount > 0
         ? `${status.errorCount} Errors`
@@ -52,9 +49,8 @@ const StatusBar = () => {
             ? `${status.pendingCount} Pending`
             : 'All Synced';
     const collectionCount = Object.keys(status.collections).length;
-    return ((0, jsx_runtime_1.jsx)("div", { style: styles.container, children: (0, jsx_runtime_1.jsxs)("div", { style: styles.row, children: [(0, jsx_runtime_1.jsxs)("div", { style: styles.statusGroup, children: [(0, jsx_runtime_1.jsx)("span", { style: { ...styles.pill, backgroundColor: statusColor }, children: statusText }), (0, jsx_runtime_1.jsxs)("span", { style: styles.stat, children: [status.totalEntries, " pages across ", collectionCount, " collections"] })] }), (0, jsx_runtime_1.jsxs)("div", { style: styles.rightGroup, children: [status.lastRebuild && ((0, jsx_runtime_1.jsxs)("span", { style: styles.timestamp, children: ["Last rebuild: ", new Date(status.lastRebuild).toLocaleString()] })), status.aiEnabled && ((0, jsx_runtime_1.jsxs)("span", { style: styles.aiPill, children: ["AI: ", status.aiApiCallCount, " calls"] })), (0, jsx_runtime_1.jsx)("button", { style: styles.button, onClick: handleRegenerateAll, disabled: regenerating, children: regenerating ? 'Regenerating...' : 'Regenerate All' })] })] }) }));
+    return (_jsx("div", { style: styles.container, children: _jsxs("div", { style: styles.row, children: [_jsxs("div", { style: styles.statusGroup, children: [_jsx("span", { style: { ...styles.pill, backgroundColor: statusColor }, children: statusText }), _jsxs("span", { style: styles.stat, children: [status.totalEntries, " pages across ", collectionCount, " collections"] })] }), _jsxs("div", { style: styles.rightGroup, children: [status.lastRebuild && (_jsxs("span", { style: styles.timestamp, children: ["Last rebuild: ", new Date(status.lastRebuild).toLocaleString()] })), status.aiEnabled && (_jsxs("span", { style: styles.aiPill, children: ["AI: ", status.aiApiCallCount, " calls"] })), _jsx("button", { style: styles.button, onClick: handleRegenerateAll, disabled: regenerating, children: regenerating ? 'Regenerating...' : 'Regenerate All' })] })] }) }));
 };
-exports.StatusBar = StatusBar;
 const styles = {
     container: {
         padding: '16px 24px',

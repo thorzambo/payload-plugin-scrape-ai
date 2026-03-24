@@ -1,22 +1,14 @@
-"use strict";
 /**
  * Token estimation and model recommendation engine.
  *
  * Estimates total token usage for AI enrichment across all content,
  * then recommends the cheapest model that can handle the workload.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MODEL_CATALOG = void 0;
-exports.estimateTokens = estimateTokens;
-exports.estimateDocumentTokens = estimateDocumentTokens;
-exports.estimateJob = estimateJob;
-exports.formatTokens = formatTokens;
-exports.formatCost = formatCost;
 /**
  * Known models with pricing and context windows.
  * Updated as of March 2026. Users can override with custom model IDs.
  */
-exports.MODEL_CATALOG = [
+export const MODEL_CATALOG = [
     // OpenAI models
     {
         id: 'gpt-4.1-nano',
@@ -105,7 +97,7 @@ exports.MODEL_CATALOG = [
  * Approximate token count from text.
  * Uses the ~4 chars per token heuristic (works for English, slightly underestimates for code/markdown).
  */
-function estimateTokens(text) {
+export function estimateTokens(text) {
     if (!text)
         return 0;
     // ~4 characters per token for English text, ~3.5 for mixed content
@@ -114,7 +106,7 @@ function estimateTokens(text) {
 /**
  * Estimate tokens for a single document's AI enrichment.
  */
-function estimateDocumentTokens(title, markdown, sourceCollection, sourceDocId) {
+export function estimateDocumentTokens(title, markdown, sourceCollection, sourceDocId) {
     const contentTokens = estimateTokens(markdown);
     // Summary and entities use first 4000 chars
     const summaryInputText = markdown.slice(0, 4000);
@@ -159,7 +151,7 @@ function estimateDocumentTokens(title, markdown, sourceCollection, sourceDocId) 
 /**
  * Estimate the full AI enrichment job.
  */
-function estimateJob(documents, preferredProvider) {
+export function estimateJob(documents, preferredProvider) {
     const needsEnrichment = documents.filter((d) => !d.hasAiMeta && d.markdown);
     const perDocEstimates = needsEnrichment.map((doc) => estimateDocumentTokens(doc.title, doc.markdown, doc.sourceCollection, doc.sourceDocId));
     const totalInputTokens = perDocEstimates.reduce((sum, d) => sum + d.totalInputTokens, 0);
@@ -174,8 +166,8 @@ function estimateJob(documents, preferredProvider) {
     }
     // Filter models by preferred provider if specified
     const models = preferredProvider
-        ? exports.MODEL_CATALOG.filter((m) => m.provider === preferredProvider)
-        : exports.MODEL_CATALOG;
+        ? MODEL_CATALOG.filter((m) => m.provider === preferredProvider)
+        : MODEL_CATALOG;
     // Calculate cost for each model
     const costEstimates = models.map((model) => {
         const inputCost = (totalInputTokens / 1000000) * model.inputPricePerMTok;
@@ -228,14 +220,14 @@ function estimateJob(documents, preferredProvider) {
     };
 }
 // --- Helpers ---
-function formatTokens(tokens) {
+export function formatTokens(tokens) {
     if (tokens >= 1000000)
         return `${(tokens / 1000000).toFixed(1)}M`;
     if (tokens >= 1000)
         return `${(tokens / 1000).toFixed(1)}K`;
     return String(tokens);
 }
-function formatCost(cost) {
+export function formatCost(cost) {
     if (cost < 0.01)
         return `$${cost.toFixed(4)}`;
     if (cost < 1)

@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateJsonLd = generateJsonLd;
 /**
  * Generate JSON-LD structured data for a document.
  * Maps collection slugs to schema.org types.
  */
-function generateJsonLd(params) {
+export function generateJsonLd(params) {
     const { title, slug, collection, siteUrl, siteName, description, lastModified } = params;
     const schemaType = inferSchemaType(collection, params.contentType);
     const canonicalUrl = `${siteUrl}/${slug}`;

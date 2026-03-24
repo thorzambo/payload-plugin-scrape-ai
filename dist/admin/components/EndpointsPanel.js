@@ -1,13 +1,10 @@
-"use strict";
 'use client';
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.EndpointsPanel = void 0;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-const EndpointsPanel = ({ siteUrl }) => {
-    const [testingEndpoint, setTestingEndpoint] = (0, react_1.useState)(null);
-    const [testResult, setTestResult] = (0, react_1.useState)(null);
-    const [copied, setCopied] = (0, react_1.useState)(null);
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from 'react';
+export const EndpointsPanel = ({ siteUrl }) => {
+    const [testingEndpoint, setTestingEndpoint] = useState(null);
+    const [testResult, setTestResult] = useState(null);
+    const [copied, setCopied] = useState(null);
     const endpoints = [
         { path: '/api/llms.txt', method: 'GET', description: 'Curated AI-friendly index' },
         { path: '/api/llms-full.txt', method: 'GET', description: 'Comprehensive content listing' },
@@ -48,9 +45,8 @@ const EndpointsPanel = ({ siteUrl }) => {
             setTestingEndpoint(null);
         }
     };
-    return ((0, jsx_runtime_1.jsxs)("div", { style: styles.container, children: [(0, jsx_runtime_1.jsx)("h3", { style: styles.heading, children: "Endpoints & Access" }), (0, jsx_runtime_1.jsx)("div", { style: styles.list, children: endpoints.map((ep) => ((0, jsx_runtime_1.jsxs)("div", { style: styles.row, children: [(0, jsx_runtime_1.jsxs)("div", { style: styles.info, children: [(0, jsx_runtime_1.jsxs)("code", { style: styles.path, children: [ep.method, " ", ep.path] }), (0, jsx_runtime_1.jsx)("span", { style: styles.description, children: ep.description })] }), (0, jsx_runtime_1.jsxs)("div", { style: styles.actions, children: [(0, jsx_runtime_1.jsx)("button", { style: styles.button, onClick: () => handleCopy(ep.path), children: copied === ep.path ? 'Copied!' : 'Copy URL' }), !ep.path.includes('{') && ((0, jsx_runtime_1.jsx)("button", { style: styles.button, onClick: () => handleTest(ep.path), disabled: testingEndpoint === ep.path, children: testingEndpoint === ep.path ? 'Testing...' : 'Test' }))] })] }, ep.path))) }), testResult && ((0, jsx_runtime_1.jsxs)("div", { style: styles.testOutput, children: [(0, jsx_runtime_1.jsx)("h4", { style: styles.subheading, children: "Response" }), (0, jsx_runtime_1.jsx)("pre", { style: styles.codeBlock, children: testResult })] })), (0, jsx_runtime_1.jsxs)("div", { style: styles.instructions, children: [(0, jsx_runtime_1.jsx)("h4", { style: styles.subheading, children: "Integration Guide" }), (0, jsx_runtime_1.jsxs)("p", { style: styles.text, children: ["Point AI agents to ", (0, jsx_runtime_1.jsxs)("code", { children: [siteUrl, "/api/llms.txt"] }), " as the entry point. The llms.txt file links to all available content in markdown format."] }), (0, jsx_runtime_1.jsxs)("p", { style: styles.text, children: ["For programmatic access, use the ", (0, jsx_runtime_1.jsx)("code", { children: "/api/ai/context?query=..." }), " endpoint to search content by relevance."] })] })] }));
+    return (_jsxs("div", { style: styles.container, children: [_jsx("h3", { style: styles.heading, children: "Endpoints & Access" }), _jsx("div", { style: styles.list, children: endpoints.map((ep) => (_jsxs("div", { style: styles.row, children: [_jsxs("div", { style: styles.info, children: [_jsxs("code", { style: styles.path, children: [ep.method, " ", ep.path] }), _jsx("span", { style: styles.description, children: ep.description })] }), _jsxs("div", { style: styles.actions, children: [_jsx("button", { style: styles.button, onClick: () => handleCopy(ep.path), children: copied === ep.path ? 'Copied!' : 'Copy URL' }), !ep.path.includes('{') && (_jsx("button", { style: styles.button, onClick: () => handleTest(ep.path), disabled: testingEndpoint === ep.path, children: testingEndpoint === ep.path ? 'Testing...' : 'Test' }))] })] }, ep.path))) }), testResult && (_jsxs("div", { style: styles.testOutput, children: [_jsx("h4", { style: styles.subheading, children: "Response" }), _jsx("pre", { style: styles.codeBlock, children: testResult })] })), _jsxs("div", { style: styles.instructions, children: [_jsx("h4", { style: styles.subheading, children: "Integration Guide" }), _jsxs("p", { style: styles.text, children: ["Point AI agents to ", _jsxs("code", { children: [siteUrl, "/api/llms.txt"] }), " as the entry point. The llms.txt file links to all available content in markdown format."] }), _jsxs("p", { style: styles.text, children: ["For programmatic access, use the ", _jsx("code", { children: "/api/ai/context?query=..." }), " endpoint to search content by relevance."] })] })] }));
 };
-exports.EndpointsPanel = EndpointsPanel;
 const styles = {
     container: {
         padding: '20px',

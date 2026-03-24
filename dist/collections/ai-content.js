@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.aiContentCollection = void 0;
-exports.aiContentCollection = {
+export const aiContentCollection = {
     slug: 'ai-content',
     admin: {
         hidden: true,

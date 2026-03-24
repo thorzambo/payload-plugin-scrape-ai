@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.aiSyncQueueCollection = void 0;
-exports.aiSyncQueueCollection = {
+export const aiSyncQueueCollection = {
     slug: 'ai-sync-queue',
     admin: {
         hidden: true,

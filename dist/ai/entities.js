@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractEntities = extractEntities;
 const SYSTEM_PROMPT = `You are a content analyzer. Given a markdown document, extract:
 1. topics: array of 3-8 key topics/themes (lowercase, short phrases)
 2. entities: array of named entities (people, companies, places, products mentioned)
@@ -8,7 +5,7 @@ const SYSTEM_PROMPT = `You are a content analyzer. Given a markdown document, ex
 
 Return ONLY valid JSON in this exact format:
 {"topics": [...], "entities": [...], "category": "..."}`;
-async function extractEntities(markdown, provider) {
+export async function extractEntities(markdown, provider) {
     const truncated = markdown.slice(0, 4000);
     const result = await provider.complete(truncated, SYSTEM_PROMPT);
     try {

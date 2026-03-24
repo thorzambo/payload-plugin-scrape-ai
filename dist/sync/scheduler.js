@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.startScheduler = startScheduler;
-const queue_processor_1 = require("./queue-processor");
-const error_recovery_1 = require("./error-recovery");
+import { processQueue } from './queue-processor';
+import { retryErrors } from './error-recovery';
 /**
  * Start the background scheduler that processes the sync queue
  * and handles error recovery.
  */
-function startScheduler(payload, pluginOptions, aiProvider) {
+export function startScheduler(payload, pluginOptions, aiProvider) {
     const debounceMs = pluginOptions.sync.debounceMs;
     payload.logger.info(`[scrape-ai] Scheduler started (interval: ${debounceMs}ms)`);
     // Main queue processing loop
@@ -17,7 +14,7 @@ function startScheduler(payload, pluginOptions, aiProvider) {
             return;
         isProcessing = true;
         try {
-            await (0, queue_processor_1.processQueue)(payload, pluginOptions, aiProvider);
+            await processQueue(payload, pluginOptions, aiProvider);
         }
         catch (error) {
             payload.logger.error(`[scrape-ai] Queue processing error: ${error.message}`);
@@ -34,7 +31,7 @@ function startScheduler(payload, pluginOptions, aiProvider) {
             return;
         isRecovering = true;
         try {
-            await (0, error_recovery_1.retryErrors)(payload, pluginOptions);
+            await retryErrors(payload, pluginOptions);
         }
         catch (error) {
             payload.logger.error(`[scrape-ai] Error recovery failed: ${error.message}`);

@@ -1,12 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.RateLimiter = void 0;
-exports.getClientIp = getClientIp;
-exports.rateLimitedResponse = rateLimitedResponse;
 /**
  * Simple in-memory sliding window rate limiter per IP.
  */
-class RateLimiter {
+export class RateLimiter {
     constructor(maxPerMinute) {
         this.requests = new Map();
         this.maxPerMinute = maxPerMinute;
@@ -47,18 +42,17 @@ class RateLimiter {
         }
     }
 }
-exports.RateLimiter = RateLimiter;
 /**
  * Extract client IP from request, respecting X-Forwarded-For.
  */
-function getClientIp(req) {
+export function getClientIp(req) {
     const forwarded = req.headers.get('x-forwarded-for');
     if (forwarded) {
         return forwarded.split(',')[0].trim();
     }
     return 'unknown';
 }
-function rateLimitedResponse() {
+export function rateLimitedResponse() {
     return new Response('Too Many Requests', {
         status: 429,
         headers: { 'Content-Type': 'text/plain', 'Retry-After': '60' },

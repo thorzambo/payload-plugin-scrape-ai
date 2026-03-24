@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.detectContentCollections = detectContentCollections;
 /**
  * Detect content collections by analyzing field signatures.
  * A collection is considered "content" if it has 2+ of these signals:
@@ -8,7 +5,7 @@ exports.detectContentCollections = detectContentCollections;
  * - A text field named 'title' or 'name'
  * - A text field named 'slug' or 'path'
  */
-function detectContentCollections(config, options) {
+export function detectContentCollections(config, options) {
     const collections = config.collections || [];
     // If explicit collections provided, use those minus excludes
     if (options.collections && options.collections.length > 0) {

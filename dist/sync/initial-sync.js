@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.runInitialSync = runInitialSync;
-const transform_1 = require("../pipeline/transform");
+import { transformDocument } from '../pipeline/transform';
 /**
  * Run initial sync on first plugin start.
  * Scans all enabled collections and creates ai-content entries.
  */
-async function runInitialSync(payload, pluginOptions, enabledCollections) {
+export async function runInitialSync(payload, pluginOptions, enabledCollections) {
     payload.logger.info(`[scrape-ai] Checking initial sync for ${enabledCollections.length} collections`);
     // Filter to only collections that have no ai-content entries yet
     const collectionsToSync = [];
@@ -50,7 +47,7 @@ async function runInitialSync(payload, pluginOptions, enabledCollections) {
                     if (pluginOptions.drafts === 'published-only' && doc._status === 'draft') {
                         return;
                     }
-                    const transformResult = (0, transform_1.transformDocument)({
+                    const transformResult = transformDocument({
                         doc: doc,
                         collectionSlug,
                         collectionConfig,

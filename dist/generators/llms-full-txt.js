@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateLlmsFullTxt = generateLlmsFullTxt;
 /**
  * Generate comprehensive llms-full.txt with ALL synced entries.
  */
-async function generateLlmsFullTxt(params) {
+export async function generateLlmsFullTxt(params) {
     const { payload, siteUrl, siteName, siteDescription } = params;
     // Query ALL synced non-aggregate entries (including drafts if in include-drafts mode)
     const allContent = await payload.find({

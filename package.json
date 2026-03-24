@@ -2,6 +2,7 @@
   "name": "payload-plugin-scrape-ai",
   "version": "0.1.0",
   "description": "Payload CMS plugin that auto-generates AI-friendly content (llms.txt, markdown, JSON-LD)",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": ["dist"],

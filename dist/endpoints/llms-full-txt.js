@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createLlmsFullTxtEndpoint = createLlmsFullTxtEndpoint;
-const rate_limiter_1 = require("./rate-limiter");
-function createLlmsFullTxtEndpoint(rateLimiter) {
+import { getClientIp, rateLimitedResponse } from './rate-limiter';
+export function createLlmsFullTxtEndpoint(rateLimiter) {
     return {
         path: '/llms-full.txt',
         method: 'get',
         handler: async (req) => {
-            if (!rateLimiter.check((0, rate_limiter_1.getClientIp)(req))) {
-                return (0, rate_limiter_1.rateLimitedResponse)();
+            if (!rateLimiter.check(getClientIp(req))) {
+                return rateLimitedResponse();
             }
             const { payload } = req;
             try {

@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAdminEndpoints = createAdminEndpoints;
-const provider_1 = require("../ai/provider");
-const token_estimator_1 = require("../ai/token-estimator");
+import { createAiProvider } from '../ai/provider';
+import { estimateJob, MODEL_CATALOG, formatTokens, formatCost } from '../ai/token-estimator';
 /**
  * Create all authenticated admin API endpoints for the dashboard.
  */
-function createAdminEndpoints(pluginOptions, pluginRawOptions) {
+export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
     return [
         // GET /api/scrape-ai/status
         {
@@ -250,7 +247,7 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                     if (!provider || !apiKey) {
                         return Response.json({ success: false, error: 'No AI provider configured' });
                     }
-                    const ai = await (0, provider_1.createAiProvider)({ provider, apiKey, model });
+                    const ai = await createAiProvider({ provider, apiKey, model });
                     if (!ai) {
                         return Response.json({ success: false, error: 'Failed to create AI provider' });
                     }
@@ -366,7 +363,7 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                         sourceDocId: doc.sourceDocId || '',
                         hasAiMeta: Boolean(doc.aiMeta && Object.keys(doc.aiMeta).length > 0),
                     }));
-                    const estimate = (0, token_estimator_1.estimateJob)(documents, providerFilter || undefined);
+                    const estimate = estimateJob(documents, providerFilter || undefined);
                     // Format for the dashboard
                     return Response.json({
                         totalDocuments: estimate.totalDocuments,
@@ -377,10 +374,10 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                             totalTokens: estimate.totals.totalTokens,
                             maxSingleRequestTokens: estimate.totals.maxSingleRequestTokens,
                             formatted: {
-                                totalInputTokens: (0, token_estimator_1.formatTokens)(estimate.totals.totalInputTokens),
-                                totalOutputTokens: (0, token_estimator_1.formatTokens)(estimate.totals.totalOutputTokens),
-                                totalTokens: (0, token_estimator_1.formatTokens)(estimate.totals.totalTokens),
-                                maxSingleRequest: (0, token_estimator_1.formatTokens)(estimate.totals.maxSingleRequestTokens),
+                                totalInputTokens: formatTokens(estimate.totals.totalInputTokens),
+                                totalOutputTokens: formatTokens(estimate.totals.totalOutputTokens),
+                                totalTokens: formatTokens(estimate.totals.totalTokens),
+                                maxSingleRequest: formatTokens(estimate.totals.maxSingleRequestTokens),
                             },
                         },
                         costEstimates: estimate.costEstimates.map((c) => ({
@@ -389,11 +386,11 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                             provider: c.model.provider,
                             tier: c.model.tier,
                             contextWindow: c.model.contextWindow,
-                            contextWindowFormatted: (0, token_estimator_1.formatTokens)(c.model.contextWindow),
+                            contextWindowFormatted: formatTokens(c.model.contextWindow),
                             inputCost: c.inputCost,
                             outputCost: c.outputCost,
                             totalCost: c.totalCost,
-                            totalCostFormatted: (0, token_estimator_1.formatCost)(c.totalCost),
+                            totalCostFormatted: formatCost(c.totalCost),
                             canHandle: c.canHandle,
                             recommended: c.recommended,
                             reason: c.reason,
@@ -405,7 +402,7 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                                 modelName: estimate.recommendation.model.name,
                                 provider: estimate.recommendation.model.provider,
                                 totalCost: estimate.recommendation.totalCost,
-                                totalCostFormatted: (0, token_estimator_1.formatCost)(estimate.recommendation.totalCost),
+                                totalCostFormatted: formatCost(estimate.recommendation.totalCost),
                                 reason: estimate.recommendation.reason,
                             }
                             : null,
@@ -417,13 +414,13 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                             title: d.title,
                             sourceCollection: d.sourceCollection,
                             contentTokens: d.contentTokens,
-                            contentTokensFormatted: (0, token_estimator_1.formatTokens)(d.contentTokens),
+                            contentTokensFormatted: formatTokens(d.contentTokens),
                             totalInputTokens: d.totalInputTokens,
                             totalOutputTokens: d.totalOutputTokens,
                             callsBreakdown: {
-                                summary: `${(0, token_estimator_1.formatTokens)(d.calls.summary.inputTokens)} in / ${(0, token_estimator_1.formatTokens)(d.calls.summary.outputTokens)} out`,
-                                entities: `${(0, token_estimator_1.formatTokens)(d.calls.entities.inputTokens)} in / ${(0, token_estimator_1.formatTokens)(d.calls.entities.outputTokens)} out`,
-                                chunks: `${(0, token_estimator_1.formatTokens)(d.calls.chunks.inputTokens)} in / ${(0, token_estimator_1.formatTokens)(d.calls.chunks.outputTokens)} out`,
+                                summary: `${formatTokens(d.calls.summary.inputTokens)} in / ${formatTokens(d.calls.summary.outputTokens)} out`,
+                                entities: `${formatTokens(d.calls.entities.inputTokens)} in / ${formatTokens(d.calls.entities.outputTokens)} out`,
+                                chunks: `${formatTokens(d.calls.chunks.inputTokens)} in / ${formatTokens(d.calls.chunks.outputTokens)} out`,
                             },
                         })),
                     });
@@ -441,12 +438,12 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 if (!req.user)
                     return Response.json({ error: 'Unauthorized' }, { status: 401 });
                 return Response.json({
-                    models: token_estimator_1.MODEL_CATALOG.map((m) => ({
+                    models: MODEL_CATALOG.map((m) => ({
                         id: m.id,
                         name: m.name,
                         provider: m.provider,
                         contextWindow: m.contextWindow,
-                        contextWindowFormatted: (0, token_estimator_1.formatTokens)(m.contextWindow),
+                        contextWindowFormatted: formatTokens(m.contextWindow),
                         inputPricePerMTok: m.inputPricePerMTok,
                         outputPricePerMTok: m.outputPricePerMTok,
                         tier: m.tier,

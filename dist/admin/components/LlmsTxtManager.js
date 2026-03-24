@@ -1,18 +1,15 @@
-"use strict";
 'use client';
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LlmsTxtManager = void 0;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = require("react");
-const LlmsTxtManager = () => {
-    const [priority, setPriority] = (0, react_1.useState)([]);
-    const [sections, setSections] = (0, react_1.useState)([]);
-    const [preview, setPreview] = (0, react_1.useState)('');
-    const [showFull, setShowFull] = (0, react_1.useState)(false);
-    const [fullPreview, setFullPreview] = (0, react_1.useState)('');
-    const [saving, setSaving] = (0, react_1.useState)(false);
-    const [dragIndex, setDragIndex] = (0, react_1.useState)(null);
-    (0, react_1.useEffect)(() => {
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useEffect, useState } from 'react';
+export const LlmsTxtManager = () => {
+    const [priority, setPriority] = useState([]);
+    const [sections, setSections] = useState([]);
+    const [preview, setPreview] = useState('');
+    const [showFull, setShowFull] = useState(false);
+    const [fullPreview, setFullPreview] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [dragIndex, setDragIndex] = useState(null);
+    useEffect(() => {
         fetchConfig();
         fetchPreview();
     }, []);
@@ -73,12 +70,11 @@ const LlmsTxtManager = () => {
         newPriority[index] = { ...newPriority[index], optional: !newPriority[index].optional };
         setPriority(newPriority);
     };
-    return ((0, jsx_runtime_1.jsxs)("div", { style: styles.container, children: [(0, jsx_runtime_1.jsx)("h3", { style: styles.heading, children: "llms.txt Manager" }), priority.length > 0 && ((0, jsx_runtime_1.jsxs)("div", { style: styles.priorityList, children: [(0, jsx_runtime_1.jsx)("h4", { style: styles.subheading, children: "Priority Order (drag to reorder)" }), priority.map((entry, i) => ((0, jsx_runtime_1.jsxs)("div", { draggable: true, onDragStart: () => handleDragStart(i), onDragOver: (e) => handleDragOver(e, i), onDragEnd: handleDragEnd, style: {
+    return (_jsxs("div", { style: styles.container, children: [_jsx("h3", { style: styles.heading, children: "llms.txt Manager" }), priority.length > 0 && (_jsxs("div", { style: styles.priorityList, children: [_jsx("h4", { style: styles.subheading, children: "Priority Order (drag to reorder)" }), priority.map((entry, i) => (_jsxs("div", { draggable: true, onDragStart: () => handleDragStart(i), onDragOver: (e) => handleDragOver(e, i), onDragEnd: handleDragEnd, style: {
                             ...styles.priorityItem,
                             opacity: dragIndex === i ? 0.5 : 1,
-                        }, children: [(0, jsx_runtime_1.jsx)("span", { style: styles.dragHandle, children: "\u2630" }), (0, jsx_runtime_1.jsx)("span", { style: styles.entrySlug, children: entry.slug }), (0, jsx_runtime_1.jsx)("span", { style: styles.entrySection, children: entry.section }), (0, jsx_runtime_1.jsxs)("label", { style: styles.optionalLabel, children: [(0, jsx_runtime_1.jsx)("input", { type: "checkbox", checked: entry.optional, onChange: () => toggleOptional(i) }), "Optional"] })] }, entry.slug))), (0, jsx_runtime_1.jsx)("button", { style: styles.saveButton, onClick: handleSave, disabled: saving, children: saving ? 'Saving...' : 'Save & Rebuild' })] })), (0, jsx_runtime_1.jsxs)("div", { style: styles.previewSection, children: [(0, jsx_runtime_1.jsxs)("div", { style: styles.previewHeader, children: [(0, jsx_runtime_1.jsx)("button", { style: !showFull ? styles.activeTab : styles.tab, onClick: () => setShowFull(false), children: "llms.txt" }), (0, jsx_runtime_1.jsx)("button", { style: showFull ? styles.activeTab : styles.tab, onClick: () => setShowFull(true), children: "llms-full.txt" })] }), (0, jsx_runtime_1.jsx)("pre", { style: styles.previewContent, children: showFull ? fullPreview || 'No content yet' : preview || 'No content yet' })] })] }));
+                        }, children: [_jsx("span", { style: styles.dragHandle, children: "\u2630" }), _jsx("span", { style: styles.entrySlug, children: entry.slug }), _jsx("span", { style: styles.entrySection, children: entry.section }), _jsxs("label", { style: styles.optionalLabel, children: [_jsx("input", { type: "checkbox", checked: entry.optional, onChange: () => toggleOptional(i) }), "Optional"] })] }, entry.slug))), _jsx("button", { style: styles.saveButton, onClick: handleSave, disabled: saving, children: saving ? 'Saving...' : 'Save & Rebuild' })] })), _jsxs("div", { style: styles.previewSection, children: [_jsxs("div", { style: styles.previewHeader, children: [_jsx("button", { style: !showFull ? styles.activeTab : styles.tab, onClick: () => setShowFull(false), children: "llms.txt" }), _jsx("button", { style: showFull ? styles.activeTab : styles.tab, onClick: () => setShowFull(true), children: "llms-full.txt" })] }), _jsx("pre", { style: styles.previewContent, children: showFull ? fullPreview || 'No content yet' : preview || 'No content yet' })] })] }));
 };
-exports.LlmsTxtManager = LlmsTxtManager;
 const styles = {
     container: {
         padding: '20px',

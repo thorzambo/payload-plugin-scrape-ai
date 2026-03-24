@@ -1,19 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.enrichContent = enrichContent;
-const summarize_1 = require("../ai/summarize");
-const entities_1 = require("../ai/entities");
-const chunk_1 = require("../ai/chunk");
+import { generateSummary } from '../ai/summarize';
+import { extractEntities } from '../ai/entities';
+import { semanticChunk } from '../ai/chunk';
 /**
  * Stage 3: Optional AI enrichment.
  * Generates summary, topics, entities, and semantic chunks.
  * Gracefully handles partial failures — partial AI meta is better than none.
  */
-async function enrichContent(markdown, provider) {
+export async function enrichContent(markdown, provider) {
     const results = await Promise.allSettled([
-        (0, summarize_1.generateSummary)(markdown, provider),
-        (0, entities_1.extractEntities)(markdown, provider),
-        (0, chunk_1.semanticChunk)(markdown, provider),
+        generateSummary(markdown, provider),
+        extractEntities(markdown, provider),
+        semanticChunk(markdown, provider),
     ]);
     const meta = {};
     // Summary

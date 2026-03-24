@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.aiConfigGlobal = void 0;
-exports.aiConfigGlobal = {
+export const aiConfigGlobal = {
     slug: 'ai-config',
     admin: {
         hidden: true,

@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractDocument = extractDocument;
 /**
  * Stage 1: Extract document content into clean markdown.
  * Traverses all fields recursively, converting each type to markdown.
  */
-function extractDocument(doc, collectionConfig, payload) {
+export function extractDocument(doc, collectionConfig, payload) {
     const parts = [];
     const fields = collectionConfig.fields || [];
     const skipFields = new Set(['id', 'createdAt', 'updatedAt', '_status', '__v']);

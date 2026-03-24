@@ -1,9 +1,7 @@
-"use strict";
 'use client';
-Object.defineProperty(exports, "__esModule", { value: true });
-const jsx_runtime_1 = require("react/jsx-runtime");
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 const NavLink = () => {
-    return ((0, jsx_runtime_1.jsxs)("a", { href: "/admin/scrape-ai", style: {
+    return (_jsxs("a", { href: "/admin/scrape-ai", style: {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -19,7 +17,7 @@ const NavLink = () => {
         }, onMouseLeave: (e) => {
             ;
             e.target.style.backgroundColor = 'transparent';
-        }, children: [(0, jsx_runtime_1.jsxs)("svg", { width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [(0, jsx_runtime_1.jsx)("path", { d: "M12 2L2 7l10 5 10-5-10-5z" }), (0, jsx_runtime_1.jsx)("path", { d: "M2 17l10 5 10-5" }), (0, jsx_runtime_1.jsx)("path", { d: "M2 12l10 5 10-5" })] }), "Scrape AI"] }));
+        }, children: [_jsxs("svg", { width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [_jsx("path", { d: "M12 2L2 7l10 5 10-5-10-5z" }), _jsx("path", { d: "M2 17l10 5 10-5" }), _jsx("path", { d: "M2 12l10 5 10-5" })] }), "Scrape AI"] }));
 };
-exports.default = NavLink;
+export default NavLink;
 //# sourceMappingURL=NavLink.js.map

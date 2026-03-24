@@ -1,40 +1,3 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAiProvider = createAiProvider;
-exports.resolveAiProvider = resolveAiProvider;
 class OpenAiProvider {
     constructor(client, model) {
         this.client = client;
@@ -43,7 +6,7 @@ class OpenAiProvider {
     static async create(config) {
         const model = config.model || 'gpt-4o-mini';
         try {
-            const { default: OpenAI } = await Promise.resolve().then(() => __importStar(require('openai')));
+            const { default: OpenAI } = await import('openai');
             const client = new OpenAI({ apiKey: config.apiKey });
             return new OpenAiProvider(client, model);
         }
@@ -72,7 +35,7 @@ class AnthropicProvider {
     static async create(config) {
         const model = config.model || 'claude-haiku-4-5-20251001';
         try {
-            const { default: Anthropic } = await Promise.resolve().then(() => __importStar(require('@anthropic-ai/sdk')));
+            const { default: Anthropic } = await import('@anthropic-ai/sdk');
             const client = new Anthropic({ apiKey: config.apiKey });
             return new AnthropicProvider(client, model);
         }
@@ -94,7 +57,7 @@ class AnthropicProvider {
 /**
  * Create an AI provider from config. Returns null if SDK is not installed.
  */
-async function createAiProvider(config) {
+export async function createAiProvider(config) {
     try {
         switch (config.provider) {
             case 'openai':
@@ -115,7 +78,7 @@ async function createAiProvider(config) {
  * Try to create provider from runtime config (ai-config global),
  * falling back to plugin options.
  */
-async function resolveAiProvider(pluginAiConfig, globalConfig) {
+export async function resolveAiProvider(pluginAiConfig, globalConfig) {
     // Global config overrides plugin config if AI is enabled
     if (globalConfig?.aiEnabled && globalConfig.aiProvider && globalConfig.aiApiKey) {
         return createAiProvider({

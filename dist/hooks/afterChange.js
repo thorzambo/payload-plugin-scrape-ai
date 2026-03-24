@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAfterChangeHook = createAfterChangeHook;
-const transform_1 = require("../pipeline/transform");
+import { transformDocument } from '../pipeline/transform';
 /**
  * Creates an afterChange hook that runs Stage 1+2 synchronously,
  * then queues AI enrichment and aggregate rebuild asynchronously.
  */
-function createAfterChangeHook(pluginOptions, collectionConfig) {
+export function createAfterChangeHook(pluginOptions, collectionConfig) {
     return async ({ doc, req, operation, collection }) => {
         const { payload } = req;
         try {
@@ -18,7 +15,7 @@ function createAfterChangeHook(pluginOptions, collectionConfig) {
             // Determine locale
             const locale = req.locale || undefined;
             // Run Stage 1+2 (fast, synchronous)
-            const result = (0, transform_1.transformDocument)({
+            const result = transformDocument({
                 doc: doc,
                 collectionSlug,
                 collectionConfig,

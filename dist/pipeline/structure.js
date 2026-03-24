@@ -1,13 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.structureContent = structureContent;
-exports.toUrlSlug = toUrlSlug;
-exports.inferParent = inferParent;
-const json_ld_1 = require("../generators/json-ld");
+import { generateJsonLd } from '../generators/json-ld';
 /**
  * Stage 2: Add frontmatter, hierarchy, relationships, and JSON-LD to extracted markdown.
  */
-function structureContent(params) {
+export function structureContent(params) {
     const { markdown, doc, collectionSlug, collectionConfig, siteUrl, siteName, locale, allContent } = params;
     // Extract title
     const title = extractTitle(doc);
@@ -30,7 +25,7 @@ function structureContent(params) {
     const relatedSlugs = extractRelatedSlugs(doc, collectionConfig);
     // Generate JSON-LD
     const lastModified = (doc.updatedAt || doc.createdAt || new Date().toISOString());
-    const jsonLd = (0, json_ld_1.generateJsonLd)({
+    const jsonLd = generateJsonLd({
         title,
         slug: originalSlug,
         collection: collectionSlug,
@@ -96,10 +91,10 @@ function extractSlug(doc) {
     }
     return String(doc.id || 'unknown');
 }
-function toUrlSlug(slug) {
+export function toUrlSlug(slug) {
     return slug.replace(/\//g, '-');
 }
-function inferParent(slug) {
+export function inferParent(slug) {
     const parts = slug.split('/');
     if (parts.length <= 1)
         return undefined;

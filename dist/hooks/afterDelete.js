@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAfterDeleteHook = createAfterDeleteHook;
 /**
  * Creates an afterDelete hook that removes the corresponding ai-content entry
  * and queues an aggregate rebuild.
  */
-function createAfterDeleteHook(pluginOptions) {
+export function createAfterDeleteHook(pluginOptions) {
     return async ({ doc, req, collection }) => {
         const { payload } = req;
         try {

@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createContentMarkdownEndpoint = createContentMarkdownEndpoint;
-const rate_limiter_1 = require("./rate-limiter");
-function createContentMarkdownEndpoint(rateLimiter) {
+import { getClientIp, rateLimitedResponse } from './rate-limiter';
+export function createContentMarkdownEndpoint(rateLimiter) {
     return {
         path: '/ai/:collection/:slug',
         method: 'get',
         handler: async (req) => {
-            if (!rateLimiter.check((0, rate_limiter_1.getClientIp)(req))) {
-                return (0, rate_limiter_1.rateLimitedResponse)();
+            if (!rateLimiter.check(getClientIp(req))) {
+                return rateLimitedResponse();
             }
             const { payload } = req;
             const params = req.routeParams || {};
