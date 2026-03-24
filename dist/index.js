@@ -96,7 +96,7 @@ export const scrapeAiPlugin = (options) => (incomingConfig) => {
             views: {
                 ...(config.admin?.components?.views || {}),
                 scrapeAi: {
-                    Component: 'payload-plugin-scrape-ai/client#default',
+                    Component: 'payload-plugin-scrape-ai/rsc#ScrapeAiView',
                     path: '/scrape-ai',
                 },
             },
