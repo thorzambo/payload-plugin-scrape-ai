@@ -1,7 +1,7 @@
 # payload-plugin-scrape-ai
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/thorzambo?style=flat&logo=github&label=Sponsor&color=1F1F25)](https://github.com/sponsors/thorzambo)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/thorzambo)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/leozamba19s)
 [![Payload CMS](https://img.shields.io/badge/Payload%20CMS-v3-20C5D9?style=flat)](https://payloadcms.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
@@ -243,7 +243,7 @@ Content Change in Payload CMS
 If this plugin saves you time, consider supporting its development:
 
 - [Sponsor on GitHub](https://github.com/sponsors/thorzambo)
-- [Buy Me a Coffee](https://buymeacoffee.com/thorzambo)
+- [Buy Me a Coffee](https://buymeacoffee.com/leozamba19s)
 
 ---
 
@@ -259,4 +259,4 @@ Issues and PRs welcome at [github.com/thorzambo/payload-plugin-scrape-ai](https:
 
 ---
 
-Built by [Leonardo Zambaiti](https://github.com/thorzambo) / [Zepoch](https://zepoch.io)
+Built by [Leonardo Zambaiti](https://leonardo-zambaiti.zepoch.io/) / [Zepoch](https://zepoch.io)
