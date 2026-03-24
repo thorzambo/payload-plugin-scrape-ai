@@ -5,7 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -36,23 +38,30 @@
   "scripts": {
     "build": "tsc && cp src/admin/styles.css dist/admin/styles.css",
     "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "payload": "^3.0.0",
+    "@anthropic-ai/sdk": ">=0.20.0",
     "openai": ">=4.0.0",
-    "@anthropic-ai/sdk": ">=0.20.0"
+    "payload": "^3.0.0"
   },
   "peerDependenciesMeta": {
-    "openai": { "optional": true },
-    "@anthropic-ai/sdk": { "optional": true }
+    "openai": {
+      "optional": true
+    },
+    "@anthropic-ai/sdk": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "payload": "^3.0.0",
-    "typescript": "^5.0.0",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
-    "react": "^19.0.0"
+    "payload": "^3.0.0",
+    "react": "^19.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.1"
   },
   "license": "MIT"
 }
