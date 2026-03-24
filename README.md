@@ -162,24 +162,42 @@ This adds rewrites so AI agents find your content at standard locations:
 | `/api/ai/pages/home.md` | **`/ai/pages/home.md`** |
 | *(none)* | **`/.well-known/ai-plugin.json`** |
 
-### 4. Add discovery hints to your HTML (optional)
+### 4. Add in-page AI discovery (recommended for 10/10 score)
 
-Add these tags to your site's `<head>` so AI agents can discover the content index from any page:
+AI browsing tools (ChatGPT, Perplexity, etc.) extract **rendered page text** — they don't proactively check HTTP headers, robots.txt, or meta tags. These components put discovery info where text extractors actually see it.
 
-```typescript
-import { generateHeadTags } from 'payload-plugin-scrape-ai'
+Add to your root layout:
 
-// Returns <link> and <meta> tags as a string
-const tags = generateHeadTags('https://your-website.com')
+```tsx
+// app/layout.tsx (or src/app/(app)/layout.tsx)
+import { ScrapeAiMeta, ScrapeAiFooterTag } from 'payload-plugin-scrape-ai/discovery'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <head>
+        <ScrapeAiMeta
+          siteUrl="https://your-website.com"
+          siteName="My Website"
+        />
+      </head>
+      <body>
+        {children}
+        <ScrapeAiFooterTag siteUrl="https://your-website.com" />
+      </body>
+    </html>
+  )
+}
 ```
 
-Or add these manually to your layout:
+**`<ScrapeAiMeta>`** renders in `<head>`:
+- JSON-LD `WebSite` schema with `SearchAction` pointing to `/ai/context`
+- `<link rel="ai-content">` and `<meta name="ai-content-index">` tags
 
-```html
-<link rel="ai-content" href="https://your-website.com/llms.txt" type="text/markdown">
-<meta name="ai-content-index" content="https://your-website.com/llms.txt">
-<meta name="ai-plugin" content="https://your-website.com/.well-known/ai-plugin.json">
-```
+**`<ScrapeAiFooterTag>`** renders in `<body>`:
+- An invisible-to-humans (sr-only) but DOM-present section containing all AI endpoint URLs
+- Text extractors see it, human visitors don't
+- This is what makes ChatGPT, Perplexity, and other AI browsers discover your content instantly
 
 ### 5. Restart your dev server
 

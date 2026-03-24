@@ -23,6 +23,8 @@ import { resolveAiProvider } from './ai/provider'
 
 export type { ScrapeAiPluginOptions } from './types'
 export { generateHeadTags, getDiscoveryLinks } from './discovery/head-tags'
+export { ScrapeAiMeta } from './discovery/ScrapeAiMeta'
+export { ScrapeAiFooterTag } from './discovery/ScrapeAiFooterTag'
 export { withScrapeAi } from './next'
 
 export const scrapeAiPlugin =

@@ -384,8 +384,22 @@ npm install <span class="s">github:thorzambo/payload-plugin-scrape-ai</span>
           <p class="xs" style="margin-top:8px;color:var(--g3);">Maps <code style="font-family:var(--mono);color:var(--ac);font-size:11px">/llms.txt</code> and <code style="font-family:var(--mono);color:var(--ac);font-size:11px">/ai/*</code> to the plugin endpoints. Without this, AI agents can't find your content.</p>
         </div>
         <div class="sr sr-d3">
-          <p class="xs" style="margin-bottom:8px;">4. Restart and visit the dashboard</p>
-          <p class="b" style="font-size:14px;">Go to <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/admin/scrape-ai</code> in your Payload admin panel. The "Scrape AI" link appears in the sidebar.</p>
+          <p class="xs" style="margin-bottom:8px;">4. Add in-page discovery to your layout <span style="color:var(--ac)">(10/10 score)</span></p>
+          <div class="code-block"><span class="c">// app/layout.tsx</span>
+<span class="k">import</span> { <span class="f">ScrapeAiMeta</span>, <span class="f">ScrapeAiFooterTag</span> } <span class="k">from</span> <span class="s">'payload-plugin-scrape-ai/discovery'</span>
+
+&lt;head&gt;
+  &lt;<span class="f">ScrapeAiMeta</span> siteUrl=<span class="s">"https://your-site.com"</span> /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  {children}
+  &lt;<span class="f">ScrapeAiFooterTag</span> siteUrl=<span class="s">"https://your-site.com"</span> /&gt;
+&lt;/body&gt;</div>
+          <p class="xs" style="margin-top:8px;color:var(--g3);">Invisible to humans, visible to AI text extractors. This is what makes ChatGPT and Perplexity discover your content instantly.</p>
+        </div>
+        <div class="sr sr-d4">
+          <p class="xs" style="margin-bottom:8px;">5. Restart and visit the dashboard</p>
+          <p class="b" style="font-size:14px;">Go to <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/admin/scrape-ai</code> in your Payload admin panel.</p>
         </div>
         <div class="card sr sr-d4" style="margin-top:8px;padding:20px 24px;">
           <p class="xs" style="color:var(--ac);margin-bottom:8px;">NOTE</p>

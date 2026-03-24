@@ -24,6 +24,10 @@
       "import": "./dist/admin/components/NavLink.js",
       "types": "./dist/admin/components/NavLink.d.ts"
     },
+    "./discovery": {
+      "import": "./dist/discovery/index.js",
+      "types": "./dist/discovery/index.d.ts"
+    },
     "./next": {
       "import": "./dist/next.js",
       "require": "./dist/next.js",

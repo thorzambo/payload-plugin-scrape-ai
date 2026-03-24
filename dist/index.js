@@ -19,6 +19,8 @@ import { startScheduler } from './sync/scheduler';
 import { runInitialSync } from './sync/initial-sync';
 import { resolveAiProvider } from './ai/provider';
 export { generateHeadTags, getDiscoveryLinks } from './discovery/head-tags';
+export { ScrapeAiMeta } from './discovery/ScrapeAiMeta';
+export { ScrapeAiFooterTag } from './discovery/ScrapeAiFooterTag';
 export { withScrapeAi } from './next';
 export const scrapeAiPlugin = (options) => (incomingConfig) => {
     if (!options.siteUrl) {
