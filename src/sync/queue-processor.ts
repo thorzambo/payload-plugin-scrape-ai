@@ -1,6 +1,7 @@
 import type { Payload } from 'payload'
 import type { ResolvedPluginConfig, IAiProvider } from '../types'
 import { enrichDocument } from '../pipeline/transform'
+import { runInitialSync } from './initial-sync'
 import { generateLlmsTxt } from '../generators/llms-txt'
 import { generateLlmsFullTxt } from '../generators/llms-full-txt'
 import { generateAiSitemap } from '../generators/sitemap'
@@ -13,13 +14,55 @@ export async function processQueue(
   pluginOptions: ResolvedPluginConfig,
   aiProvider: IAiProvider | null,
 ): Promise<void> {
-  // Process enrich-document jobs first
+  // Process initial-sync jobs first
+  await processInitialSyncJobs(payload, pluginOptions)
+
+  // Process enrich-document jobs
   if (aiProvider) {
     await processEnrichJobs(payload, aiProvider)
   }
 
   // Process rebuild-aggregates jobs
   await processRebuildJobs(payload, pluginOptions)
+}
+
+async function processInitialSyncJobs(
+  payload: Payload,
+  pluginOptions: ResolvedPluginConfig,
+): Promise<void> {
+  const jobs = await payload.find({
+    collection: 'ai-sync-queue',
+    where: {
+      jobType: { equals: 'initial-sync' },
+      status: { equals: 'pending' },
+    },
+    limit: 1,
+  })
+
+  if (jobs.docs.length === 0) return
+
+  const job = jobs.docs[0]
+  await payload.update({
+    collection: 'ai-sync-queue',
+    id: job.id,
+    data: { status: 'processing' },
+  })
+
+  try {
+    await runInitialSync(payload, pluginOptions, pluginOptions.enabledCollections)
+    await payload.update({
+      collection: 'ai-sync-queue',
+      id: job.id,
+      data: { status: 'completed', processedAt: new Date().toISOString() },
+    })
+  } catch (error: any) {
+    payload.logger.error(`[scrape-ai] Initial sync failed: ${error.message}`)
+    await payload.update({
+      collection: 'ai-sync-queue',
+      id: job.id,
+      data: { status: 'failed', errorMessage: error.message },
+    })
+  }
 }
 
 async function processEnrichJobs(

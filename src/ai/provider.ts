@@ -90,27 +90,19 @@ export async function createAiProvider(config: AiProviderConfig): Promise<IAiPro
   }
 }
 
-/**
- * Try to create provider from runtime config (ai-config global),
- * falling back to plugin options.
- */
 export async function resolveAiProvider(
   pluginAiConfig?: AiProviderConfig,
-  globalConfig?: { aiEnabled: boolean; aiProvider?: string; aiApiKey?: string; aiModel?: string },
+  globalConfig?: { aiEnabled: boolean; aiProvider?: string; aiModel?: string },
 ): Promise<IAiProvider | null> {
-  // Global config overrides plugin config if AI is enabled
-  if (globalConfig?.aiEnabled && globalConfig.aiProvider && globalConfig.aiApiKey) {
+  if (!pluginAiConfig?.apiKey) return null
+
+  if (globalConfig?.aiEnabled) {
     return createAiProvider({
-      provider: globalConfig.aiProvider as 'openai' | 'anthropic',
-      apiKey: globalConfig.aiApiKey,
-      model: globalConfig.aiModel,
+      provider: (globalConfig.aiProvider as 'openai' | 'anthropic') || pluginAiConfig.provider,
+      apiKey: pluginAiConfig.apiKey,
+      model: globalConfig.aiModel || pluginAiConfig.model,
     })
   }
 
-  // Fall back to plugin config
-  if (pluginAiConfig) {
-    return createAiProvider(pluginAiConfig)
-  }
-
-  return null
+  return createAiProvider(pluginAiConfig)
 }

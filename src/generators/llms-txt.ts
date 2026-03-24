@@ -1,6 +1,29 @@
 import type { Payload } from 'payload'
 import type { AiConfigGlobal } from '../types'
 
+async function fetchAllContent(
+  payload: Payload,
+  where: Record<string, any>,
+  sort?: string,
+): Promise<any[]> {
+  const allDocs: any[] = []
+  let page = 1
+  let hasMore = true
+  while (hasMore) {
+    const result = await payload.find({
+      collection: 'ai-content',
+      where,
+      limit: 500,
+      page,
+      sort: sort || 'title',
+    })
+    allDocs.push(...result.docs)
+    hasMore = result.hasNextPage
+    page++
+  }
+  return allDocs
+}
+
 /**
  * Generate the curated llms.txt content following the standard.
  */
@@ -27,18 +50,11 @@ export async function generateLlmsTxt(params: {
   ]
 
   // Query all synced, non-aggregate, non-draft entries
-  const allContent = await payload.find({
-    collection: 'ai-content',
-    where: {
-      sourceCollection: { not_equals: '__aggregate' },
-      status: { equals: 'synced' },
-      isDraft: { equals: false },
-    },
-    limit: 1000,
-    sort: 'title',
-  })
-
-  const entries = allContent.docs
+  const entries = await fetchAllContent(payload, {
+    sourceCollection: { not_equals: '__aggregate' },
+    status: { equals: 'synced' },
+    isDraft: { equals: false },
+  }, 'title')
 
   // Build priority set for quick lookup
   const priorityMap = new Map<string, { section: string; optional: boolean }>()

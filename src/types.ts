@@ -76,7 +76,6 @@ export interface AiConfigGlobal {
   enabledCollections: Record<string, boolean>
   aiEnabled: boolean
   aiProvider?: 'openai' | 'anthropic'
-  aiApiKey?: string
   aiModel?: string
   llmsTxtPriority: Array<{ slug: string; section: string; optional: boolean }>
   llmsTxtSections: Array<{ name: string; label: string }>

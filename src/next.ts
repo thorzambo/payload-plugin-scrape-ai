@@ -34,9 +34,6 @@ const SCRAPE_AI_REWRITES = [
 
   // Discovery endpoints
   { source: '/.well-known/ai-plugin.json', destination: '/api/scrape-ai/well-known' },
-
-  // Merged robots.txt (reads existing + appends AI entries)
-  { source: '/robots.txt', destination: '/api/scrape-ai/robots-txt-merged' },
 ]
 
 const SCRAPE_AI_HEADERS = [

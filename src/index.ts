@@ -14,12 +14,11 @@ import { createStructuredDataEndpoint } from './endpoints/structured-data'
 import { createContextQueryEndpoint } from './endpoints/context-query'
 import { createAdminEndpoints } from './endpoints/admin-api'
 import { createWellKnownEndpoint } from './endpoints/well-known'
-import { createRobotsTxtEndpoint, createMergedRobotsTxtEndpoint } from './endpoints/robots-txt'
+import { createRobotsTxtEndpoint } from './endpoints/robots-txt'
 import { createSitemapXmlEndpoint } from './endpoints/sitemap-xml'
 import { withHeadSupport } from './endpoints/head-support'
 import { RateLimiter } from './endpoints/rate-limiter'
 import { startScheduler } from './sync/scheduler'
-import { runInitialSync } from './sync/initial-sync'
 import { resolveAiProvider } from './ai/provider'
 
 export type { ScrapeAiPluginOptions } from './types'
@@ -101,7 +100,6 @@ export const scrapeAiPlugin =
       createContextQueryEndpoint(rateLimiter, resolvedConfig.siteUrl),
       createWellKnownEndpoint(resolvedConfig.siteUrl),
       createRobotsTxtEndpoint(resolvedConfig.siteUrl),
-      createMergedRobotsTxtEndpoint(resolvedConfig.siteUrl),
       createSitemapXmlEndpoint(resolvedConfig.siteUrl),
     ]
 
@@ -168,8 +166,11 @@ export const scrapeAiPlugin =
         aiProvider = options.ai ? await resolveAiProvider(options.ai) : null
       }
 
-      // Run initial sync
-      await runInitialSync(payload, resolvedConfig, detectedCollections)
+      // Queue initial sync (non-blocking)
+      await payload.create({
+        collection: 'ai-sync-queue',
+        data: { jobType: 'initial-sync', status: 'pending' },
+      })
 
       // Start background scheduler
       startScheduler(payload, resolvedConfig, aiProvider)

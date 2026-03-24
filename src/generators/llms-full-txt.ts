@@ -1,5 +1,28 @@
 import type { Payload } from 'payload'
 
+async function fetchAllContent(
+  payload: Payload,
+  where: Record<string, any>,
+  sort?: string,
+): Promise<any[]> {
+  const allDocs: any[] = []
+  let page = 1
+  let hasMore = true
+  while (hasMore) {
+    const result = await payload.find({
+      collection: 'ai-content',
+      where,
+      limit: 500,
+      page,
+      sort: sort || 'title',
+    })
+    allDocs.push(...result.docs)
+    hasMore = result.hasNextPage
+    page++
+  }
+  return allDocs
+}
+
 /**
  * Generate comprehensive llms-full.txt with ALL synced entries.
  * Includes inline content excerpts so agents can get meaningful
@@ -13,17 +36,11 @@ export async function generateLlmsFullTxt(params: {
 }): Promise<string> {
   const { payload, siteUrl, siteName, siteDescription } = params
 
-  const allContent = await payload.find({
-    collection: 'ai-content',
-    where: {
-      sourceCollection: { not_equals: '__aggregate' },
-      status: { equals: 'synced' },
-    },
-    limit: 10000,
-    sort: 'sourceCollection',
-  })
-
-  const entries = allContent.docs
+  const entries = await fetchAllContent(payload, {
+    sourceCollection: { not_equals: '__aggregate' },
+    status: { equals: 'synced' },
+    isDraft: { equals: false },
+  }, 'sourceCollection')
 
   // Group by collection
   const grouped: Record<string, Array<{

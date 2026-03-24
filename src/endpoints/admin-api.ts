@@ -153,17 +153,18 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         try { body = await req.json() } catch { /* empty body */ }
         try {
           if (body.all) {
-            // Delete all non-aggregate entries to trigger full re-sync
-            const all = await payload.find({
+            // Bulk delete all non-aggregate entries
+            const result = await payload.delete({
               collection: 'ai-content',
               where: { sourceCollection: { not_equals: '__aggregate' } },
-              limit: 10000,
             })
-            for (const doc of all.docs) {
-              await payload.delete({ collection: 'ai-content', id: doc.id })
-            }
-            // Initial sync will re-run on next scheduler tick
-            return Response.json({ message: 'Full regeneration queued', count: all.totalDocs })
+            // Queue initial re-sync
+            await payload.create({
+              collection: 'ai-sync-queue',
+              data: { jobType: 'initial-sync', status: 'pending' },
+            })
+            const count = Array.isArray(result.docs) ? result.docs.length : 0
+            return Response.json({ message: 'Full regeneration queued', count })
           }
 
           if (body.ids && Array.isArray(body.ids)) {
@@ -233,7 +234,6 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
 
           if (typeof body.aiEnabled === 'boolean') data.aiEnabled = body.aiEnabled
           if (body.aiProvider) data.aiProvider = body.aiProvider
-          if (body.aiApiKey) data.aiApiKey = body.aiApiKey
           if (body.aiModel) data.aiModel = body.aiModel
 
           await payload.updateGlobal({ slug: 'ai-config', data })
@@ -255,12 +255,12 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
 
         try {
           const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-          const provider = (aiConfig as any)?.aiProvider
-          const apiKey = (aiConfig as any)?.aiApiKey || pluginOptions.ai?.apiKey
-          const model = (aiConfig as any)?.aiModel
+          const provider = (aiConfig as any)?.aiProvider || pluginRawOptions?.ai?.provider
+          const apiKey = pluginRawOptions?.ai?.apiKey
+          const model = (aiConfig as any)?.aiModel || pluginRawOptions?.ai?.model
 
           if (!provider || !apiKey) {
-            return Response.json({ success: false, error: 'No AI provider configured' })
+            return Response.json({ success: false, error: 'No AI provider configured. Set ai.apiKey in plugin options (env var).' })
           }
 
           const ai = await createAiProvider({ provider, apiKey, model })

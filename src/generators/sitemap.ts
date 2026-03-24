@@ -1,5 +1,28 @@
 import type { Payload } from 'payload'
 
+async function fetchAllContent(
+  payload: Payload,
+  where: Record<string, any>,
+  sort?: string,
+): Promise<any[]> {
+  const allDocs: any[] = []
+  let page = 1
+  let hasMore = true
+  while (hasMore) {
+    const result = await payload.find({
+      collection: 'ai-content',
+      where,
+      limit: 500,
+      page,
+      sort: sort || 'title',
+    })
+    allDocs.push(...result.docs)
+    hasMore = result.hasNextPage
+    page++
+  }
+  return allDocs
+}
+
 /**
  * Generate the AI sitemap JSON with content relationships and hierarchy.
  */
@@ -10,17 +33,10 @@ export async function generateAiSitemap(params: {
 }): Promise<Record<string, unknown>> {
   const { payload, siteUrl, siteName } = params
 
-  const allContent = await payload.find({
-    collection: 'ai-content',
-    where: {
-      sourceCollection: { not_equals: '__aggregate' },
-      status: { equals: 'synced' },
-    },
-    limit: 10000,
-    sort: 'sourceCollection',
-  })
-
-  const entries = allContent.docs
+  const entries = await fetchAllContent(payload, {
+    sourceCollection: { not_equals: '__aggregate' },
+    status: { equals: 'synced' },
+  }, 'sourceCollection')
 
   // Group by collection
   const collections: Record<string, { count: number; entries: any[] }> = {}
