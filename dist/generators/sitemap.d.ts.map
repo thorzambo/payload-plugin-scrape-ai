@@ -1,0 +1,1 @@
+{"version":3,"file":"sitemap.d.ts","sourceRoot":"","sources":["../../src/generators/sitemap.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,SAAS,CAAA;AAEtC;;GAEG;AACH,wBAAsB,iBAAiB,CAAC,MAAM,EAAE;IAC9C,OAAO,EAAE,OAAO,CAAA;IAChB,OAAO,EAAE,MAAM,CAAA;IACf,QAAQ,EAAE,MAAM,CAAA;CACjB,GAAG,OAAO,CAAC,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,CAAC,CA4EnC"}
