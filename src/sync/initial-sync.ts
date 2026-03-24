@@ -1,0 +1,113 @@
+import type { Payload } from 'payload'
+import type { ResolvedPluginConfig } from '../types'
+import { transformDocument } from '../pipeline/transform'
+
+/**
+ * Run initial sync on first plugin start.
+ * Scans all enabled collections and creates ai-content entries.
+ */
+export async function runInitialSync(
+  payload: Payload,
+  pluginOptions: ResolvedPluginConfig,
+  enabledCollections: string[],
+): Promise<void> {
+  // Check if ai-content already has non-aggregate entries
+  const existingCount = await payload.find({
+    collection: 'ai-content',
+    where: {
+      sourceCollection: { not_equals: '__aggregate' },
+    },
+    limit: 1,
+  })
+
+  if (existingCount.docs.length > 0) {
+    payload.logger.info('[scrape-ai] Content already synced, skipping initial sync')
+    return
+  }
+
+  payload.logger.info(`[scrape-ai] Starting initial sync for ${enabledCollections.length} collections`)
+
+  const concurrency = pluginOptions.sync.initialSyncConcurrency
+
+  for (const collectionSlug of enabledCollections) {
+    const collectionConfig = payload.collections[collectionSlug]?.config
+    if (!collectionConfig) {
+      payload.logger.warn(`[scrape-ai] Collection '${collectionSlug}' not found, skipping`)
+      continue
+    }
+
+    // Query all documents in the collection (paginated)
+    let page = 1
+    let hasMore = true
+
+    while (hasMore) {
+      const result = await payload.find({
+        collection: collectionSlug,
+        limit: concurrency,
+        page,
+        sort: 'createdAt',
+      })
+
+      const docs = result.docs
+
+      // Process batch
+      const promises = docs.map(async (doc: any) => {
+        try {
+          // Check draft status
+          if (pluginOptions.drafts === 'published-only' && doc._status === 'draft') {
+            return
+          }
+
+          const transformResult = transformDocument({
+            doc: doc as Record<string, unknown>,
+            collectionSlug,
+            collectionConfig,
+            payload,
+            pluginOptions,
+          })
+
+          await payload.create({
+            collection: 'ai-content',
+            data: {
+              sourceCollection: collectionSlug,
+              sourceDocId: String(doc.id),
+              slug: transformResult.urlSlug,
+              title: transformResult.title,
+              markdown: transformResult.markdown,
+              jsonLd: transformResult.jsonLd,
+              status: 'synced',
+              parentSlug: transformResult.parentSlug || null,
+              relatedSlugs: transformResult.relatedSlugs,
+              locale: transformResult.locale || null,
+              isDraft: transformResult.isDraft,
+              lastSynced: new Date().toISOString(),
+              retryCount: 0,
+            },
+          })
+        } catch (error: any) {
+          payload.logger.error(
+            `[scrape-ai] Failed to sync ${collectionSlug}/${doc.id}: ${error.message}`,
+          )
+        }
+      })
+
+      await Promise.all(promises)
+
+      hasMore = result.hasNextPage
+      page++
+    }
+
+    payload.logger.info(`[scrape-ai] Synced collection: ${collectionSlug}`)
+  }
+
+  // Queue aggregate rebuild
+  await payload.create({
+    collection: 'ai-sync-queue',
+    data: {
+      jobType: 'rebuild-aggregates',
+      status: 'pending',
+    },
+  })
+
+  payload.logger.info('[scrape-ai] Initial sync complete')
+}
