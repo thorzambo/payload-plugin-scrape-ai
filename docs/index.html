@@ -12,225 +12,188 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    /* =============================================
+       ZEPOCH STYLE SYSTEM — Exact replica
+       ============================================= */
     :root {
-      --bk: #040406;
-      --s1: #0A0A0E;
-      --s2: #111115;
-      --s3: #18181D;
-      --s4: #1F1F25;
-      --wh: #F5F5F7;
-      --w: #E8E8EC;
-      --g1: #8E8E96;
-      --g2: #8A8A92;
-      --g3: #3A3A42;
-      --g4: #2A2A30;
-      --ac: #20C5D9;
-      --ah: #3DD4E5;
-      --ad: #1A6872;
-      --ag: rgba(32,197,217,0.08);
+      color-scheme: dark;
+      --bk: #040406; --s1: #0A0A0E; --s2: #111115; --s3: #18181D; --s4: #1F1F25;
+      --wh: #F5F5F7; --w: #E8E8EC; --g1: #8E8E96; --g2: #8A8A92; --g3: #3A3A42; --g4: #2A2A30;
+      --ac: #20C5D9; --ah: #3DD4E5; --ad: #1A6872; --ag: rgba(32,197,217,0.08);
       --warm: #C89B7B;
-      --br: 12px;
-      --e: cubic-bezier(0.16, 1, 0.3, 1);
       --sans: 'Hanken Grotesk', -apple-system, system-ui, sans-serif;
       --serif: 'Instrument Serif', Georgia, serif;
-      --mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
-      --page-max: 1200px;
+      --mono: 'Geist Mono', 'SF Mono', monospace;
+      --type-d: 72px; --type-h1: 48px; --type-h2: 32px; --type-h3: 24px;
+      --type-b: 15px; --type-sm: 13px; --type-xs: 11px;
+      --br: 12px;
+      --page-max: 1440px;
+      --e: cubic-bezier(0.16, 1, 0.3, 1);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     ::selection { background: rgba(32,197,217,0.2); color: var(--wh); }
     html { scroll-behavior: smooth; }
-    body { background: var(--bk); color: var(--g1); font-family: var(--sans); font-size: 15px; line-height: 1.7; min-height: 100vh; overflow-x: hidden; }
+    body { background: var(--bk); color: var(--g1); font-family: var(--sans); font-size: var(--type-b); line-height: 1.7; min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
-    /* Backgrounds */
+    /* Cosmos bg — exact radial gradients */
     .cosmos { position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: radial-gradient(ellipse 60% 50% at 10% 40%, rgba(32,197,217,0.05), transparent),
                   radial-gradient(ellipse 50% 40% at 85% 15%, rgba(120,80,200,0.04), transparent),
                   radial-gradient(ellipse 40% 30% at 50% 90%, rgba(200,155,123,0.025), transparent); }
+
+    /* Grain overlay — exact */
     .grain { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04; mix-blend-mode: screen; image-rendering: pixelated;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E"); }
 
     .page { position: relative; z-index: 2; }
-    .container { max-width: var(--page-max); margin: 0 auto; padding: 0 64px; }
+
+    /* page-container — exact from Zepoch */
+    .page-container { max-width: var(--page-max); margin: 0 auto; padding: 0 64px; }
+
+    /* Section padding — exact */
     .sec { padding: 96px 0; }
+
+    /* Divider — exact gradient */
     .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--g4), transparent); }
 
-    /* Typography */
-    .d { font-size: 64px; font-weight: 600; letter-spacing: -0.04em; line-height: 1.05; color: var(--wh); }
-    .h1 { font-size: 42px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; color: var(--wh); }
-    .h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--wh); }
-    .h3 { font-size: 22px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.3; color: var(--w); }
-    .b { font-size: 15px; line-height: 1.7; color: var(--g1); }
-    .sm { font-size: 13px; color: var(--g1); }
-    .ov { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ac); font-family: var(--mono); }
+    /* Typography — exact classes from globals.css */
+    .d { font-size: var(--type-d); font-weight: 600; letter-spacing: -0.04em; line-height: 1.05; color: var(--wh); }
+    .h1 { font-size: var(--type-h1); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; color: var(--wh); }
+    .h2 { font-size: var(--type-h2); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; color: var(--wh); }
+    .h3 { font-size: var(--type-h3); font-weight: 500; letter-spacing: -0.01em; line-height: 1.3; color: var(--w); }
+    .b { font-size: var(--type-b); line-height: 1.7; color: var(--g1); }
+    .sm { font-size: var(--type-sm); color: var(--g1); }
+    .xs { font-size: var(--type-xs); color: var(--g2); }
+    .m { font-family: var(--mono); font-size: var(--type-sm); color: var(--g1); }
+    .ov { font-size: var(--type-xs); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ac); font-family: var(--mono); }
     .si { font-family: var(--serif); font-style: italic; color: var(--g1); }
     .si-ac { font-family: var(--serif); font-style: italic; color: var(--ac); }
+
     a { color: var(--ac); text-decoration: none; transition: color 0.2s; }
     a:hover { color: var(--ah); }
 
-    /* Buttons */
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-family: var(--mono); font-size: 13px; font-weight: 500; border-radius: var(--br); border: none; cursor: pointer; transition: all 0.3s var(--e); text-decoration: none; }
-    .btn-ac { background: var(--ac); color: var(--bk); }
-    .btn-ac:hover { background: var(--ah); color: var(--bk); }
-    .btn-outline { background: transparent; color: var(--wh); border: 1px solid var(--g3); }
-    .btn-outline:hover { border-color: var(--ac); color: var(--ac); }
-    .btn-warm { background: var(--warm); color: var(--bk); }
-    .btn-warm:hover { opacity: 0.85; color: var(--bk); }
-    .btn-gh { background: #333; color: var(--wh); }
-    .btn-gh:hover { background: #444; color: var(--wh); }
+    /* Buttons — exact .btn classes from globals.css */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; font-family: var(--mono); font-size: var(--type-sm); font-weight: 500; border-radius: var(--br); border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 0.02em; }
+    .bl { padding: 10px 22px; font-size: var(--type-sm); }
+    .bw { background: var(--wh); color: var(--bk); }
+    .bw:hover { opacity: 0.85; color: var(--bk); }
+    .ba { background: var(--ac); color: var(--bk); }
+    .ba:hover { background: var(--ah); color: var(--bk); }
+    .bo { background: transparent; color: var(--wh); border: 1px solid var(--g3); }
+    .bo:hover { border-color: var(--ac); color: var(--ac); }
+    .bg-ghost { background: transparent; color: var(--g1); border: none; padding: 10px 0; }
+    .bg-ghost:hover { color: var(--wh); }
+    /* Pill button — exact from PillButton component */
+    .btn-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--ac); color: var(--bk); padding: 8px 20px; font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; border-radius: var(--br); border: none; cursor: pointer; transition: background 0.2s; text-decoration: none; }
+    .btn-pill:hover { background: var(--ah); color: var(--bk); }
+    .btn-pill svg { transition: transform 0.5s var(--e); }
+    .btn-pill:hover svg { transform: rotate(90deg); }
     .btn-coffee { background: #FFDD00; color: #000; }
     .btn-coffee:hover { background: #FFE84D; color: #000; }
 
-    /* Cards */
+    /* Cards — exact from globals.css */
     .card { background: rgba(10,10,14,0.7); border: 1px solid rgba(255,255,255,0.04); border-radius: var(--br); padding: 28px; backdrop-filter: blur(8px); transition: all 0.3s var(--e); }
     .card:hover { background: rgba(17,17,21,0.8); border-color: rgba(255,255,255,0.08); }
 
-    .tag { display: inline-flex; font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; background: rgba(19,19,22,0.8); border: 1px solid var(--g4); color: var(--g1); transition: all 0.2s; }
+    /* Tags — exact */
+    .tag { display: inline-flex; font-family: var(--mono); font-size: var(--type-xs); font-weight: 500; padding: 3px 8px; border-radius: calc(var(--br) * 0.33); background: rgba(19,19,22,0.8); border: 1px solid var(--g4); color: var(--g1); transition: all 0.2s; }
     .tag:hover { border-color: var(--ac); color: var(--wh); background: var(--ag); }
 
-    .code-block { background: var(--s1); border: 1px solid var(--g4); border-radius: var(--br); padding: 20px 24px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.6; color: var(--w); }
-    .code-block .comment { color: var(--g3); }
-    .code-block .keyword { color: var(--ac); }
-    .code-block .string { color: var(--warm); }
-    .code-block .fn { color: #a78bfa; }
+    /* Code blocks */
+    .code-block { background: var(--s1); border: 1px solid var(--g4); border-radius: var(--br); padding: 20px 24px; overflow-x: auto; font-family: var(--mono); font-size: var(--type-sm); line-height: 1.6; color: var(--w); }
+    .code-block .c { color: var(--g3); }
+    .code-block .k { color: var(--ac); }
+    .code-block .s { color: var(--warm); }
+    .code-block .f { color: #a78bfa; }
 
-    .img-placeholder { width: 100%; border-radius: var(--br); border: 1px solid var(--g4); background: var(--s1); aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; color: var(--g3); font-family: var(--mono); font-size: 13px; overflow: hidden; position: relative; }
-    .img-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--br); }
+    /* Image placeholders */
+    .img-placeholder { width: 100%; border-radius: var(--br); border: 1px solid var(--g4); background: var(--s1); aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; color: var(--g3); font-family: var(--mono); font-size: var(--type-sm); overflow: hidden; }
+    .img-placeholder img { width: 100%; height: 100%; object-fit: cover; }
 
-    .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .tbl th { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--g4); font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g2); }
-    .tbl td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--w); }
+    /* Table — exact */
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl th { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--g4); font-family: var(--mono); font-size: var(--type-xs); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g2); }
+    .tbl td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--w); font-size: 14px; }
     .tbl tr:hover td { background: rgba(32,197,217,0.03); }
     .tbl code { font-family: var(--mono); font-size: 12px; color: var(--ac); background: var(--ag); padding: 2px 6px; border-radius: 4px; }
 
+    /* Section header — exact with animated line */
     .sec-header { margin-bottom: 48px; }
     .sec-header .ov { margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
     .sec-header .ov::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--ac), transparent); max-width: 120px; }
 
-    /* Scroll Reveal */
+    /* Scroll reveal — exact */
     .sr { opacity: 0; transform: translateY(24px); transition: opacity 0.7s var(--e), transform 0.7s var(--e); }
     .sr.visible { opacity: 1; transform: translateY(0); }
-    .sr-d1 { transition-delay: 0.05s; } .sr-d2 { transition-delay: 0.1s; } .sr-d3 { transition-delay: 0.15s; } .sr-d4 { transition-delay: 0.2s; }
+    .sr-d1 { transition-delay: 0.05s; } .sr-d2 { transition-delay: 0.1s; } .sr-d3 { transition-delay: 0.15s; } .sr-d4 { transition-delay: 0.2s; } .sr-d5 { transition-delay: 0.25s; }
 
-    /* ===== HERO ===== */
-    .hero { padding: 180px 0 0; position: relative; min-height: 100vh; }
-    .hero-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; }
-    .hero-left { max-width: 600px; flex-shrink: 0; }
-    .hero-terminal { font-family: var(--mono); font-size: 13px; color: var(--g2); margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
-    .hero-terminal .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ac); animation: pulse-dot 2s infinite; }
-    .hero .d { margin-bottom: 20px; }
-    .hero .d .si { font-size: inherit; color: var(--wh); }
-    .hero .subtitle { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--g1); max-width: 480px; line-height: 1.5; margin-bottom: 36px; }
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
-    /* Saturn Canvas */
-    .saturn-container { position: relative; width: 400px; height: 400px; flex-shrink: 0; opacity: 0.7; }
-    .saturn-container canvas { image-rendering: pixelated; width: 100%; height: 100%; }
-
-    /* Stats Bar */
-    .hero-stats { padding: 32px 0; border-top: 1px solid var(--g4); margin-top: 64px; }
-    .stats-row { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-    .stat { display: flex; align-items: baseline; gap: 6px; }
-    .stat-bracket { font-family: var(--mono); font-size: 14px; color: var(--g3); }
-    .stat-num { font-size: 36px; font-weight: 600; color: var(--wh); letter-spacing: -0.03em; }
-    .stat-num.accent { color: var(--ac); }
-    .stat-label { font-family: var(--mono); font-size: 12px; color: var(--g2); margin-left: 4px; }
-
-    /* Terminal ticker */
-    .ticker { overflow: hidden; white-space: nowrap; margin-top: 16px; mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent); }
-    .ticker-inner { display: inline-block; animation: scroll-left 40s linear infinite; font-family: var(--mono); font-size: 12px; color: var(--g3); }
-    .ticker-inner .ok { color: var(--ac); }
-    .ticker-inner .pass { color: #22c55e; }
-
-    /* Scroll indicator */
-    .scroll-hint { text-align: center; padding: 48px 0 24px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
-    .scroll-hint .arrow { display: block; margin-top: 8px; animation: bounce 2s infinite; }
-
+    /* Animations — exact from globals.css */
     @keyframes pulse-dot { 0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--ac); } 50% { opacity: 0.5; box-shadow: 0 0 8px var(--ac); } }
     @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+    @keyframes scroll-hint { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
-    /* ===== FEATURES ===== */
-    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .feature-card .icon { width: 40px; height: 40px; border-radius: 8px; background: var(--ag); border: 1px solid rgba(32,197,217,0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--ac); font-size: 18px; }
-    .feature-card .h3 { margin-bottom: 8px; font-size: 18px; }
-    .feature-card .b { font-size: 14px; }
+    /* ===== HERO — exact hero-hi layout ===== */
+    .hero-hi { padding: 180px 0 0; min-height: 100vh; position: relative; }
+
+    /* Stats — exact stat-num + bracket pattern */
+    .stat-num { font-size: 42px; font-weight: 600; color: var(--wh); letter-spacing: -0.03em; line-height: 1; }
+    .stat-num .suffix { font-size: 26px; }
 
     /* ===== PIPELINE ===== */
     .pipeline { display: flex; align-items: center; gap: 0; justify-content: center; flex-wrap: wrap; }
     .pipeline-step { flex: 1; min-width: 200px; max-width: 280px; text-align: center; padding: 24px; }
-    .pipeline-step .step-num { font-family: var(--mono); font-size: 11px; color: var(--ac); margin-bottom: 8px; display: block; }
-    .pipeline-step .h3 { font-size: 18px; margin-bottom: 6px; }
     .pipeline-arrow { color: var(--g3); font-size: 24px; flex-shrink: 0; }
-    .pipeline-cost { display: inline-block; font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-top: 8px; }
+    .cost-badge { display: inline-block; font-family: var(--mono); font-size: var(--type-xs); padding: 2px 8px; border-radius: 4px; margin-top: 8px; }
     .cost-free { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
-    .cost-paid { background: rgba(234,179,8,0.1); color: #eab308; border: 1px solid rgba(234,179,8,0.2); }
+    .cost-opt { background: rgba(234,179,8,0.1); color: #eab308; border: 1px solid rgba(234,179,8,0.2); }
 
-    /* ===== CTA ===== */
+    /* ===== CTA — exact pattern ===== */
     .cta-section { text-align: center; padding: 120px 0; position: relative; }
     .cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(32,197,217,0.06), transparent); pointer-events: none; }
-    .cta-section .cta-heading { font-family: var(--serif); font-style: italic; font-size: 48px; color: var(--wh); margin-bottom: 16px; position: relative; line-height: 1.15; }
-    .cta-section .b { max-width: 500px; margin: 0 auto 32px; position: relative; }
-    .cta-section .hero-actions { position: relative; justify-content: center; }
 
-    /* ===== DONATE ===== */
-    .donate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .donate-card { text-align: center; }
-    .donate-card .h3 { font-size: 16px; margin-bottom: 8px; }
-    .donate-card .b { font-size: 13px; margin-bottom: 16px; }
-
-    /* ===== CONTRIB ===== */
-    .contrib-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-
-    /* ===== FOOTER ===== */
-    .footer { padding: 64px 0 48px; border-top: 1px solid var(--g4); }
-    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
-    .footer-brand .tagline { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--g1); margin: 12px 0 16px; }
-    .footer-col-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g2); margin-bottom: 16px; }
-    .footer-col a { display: block; font-size: 14px; color: var(--g1); padding: 4px 0; transition: color 0.2s; }
+    /* ===== FOOTER — exact 4-column grid ===== */
+    .footer { border-top: 1px solid var(--g4); }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 40px; }
+    .footer-col-title { font-family: var(--mono); font-size: var(--type-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--g2); margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 14px; color: var(--g1); padding: 4px 0; transition: color 0.2s; text-decoration: none; }
     .footer-col a:hover { color: var(--wh); }
     .footer-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--g4); padding-top: 24px; font-family: var(--mono); font-size: 12px; color: var(--g3); }
-    .footer-social { display: flex; gap: 16px; }
-    .footer-social a { color: var(--g2); font-size: 13px; }
-    .footer-social a:hover { color: var(--ac); }
 
-    /* Install */
+    /* Install label */
     .install-block { position: relative; }
     .install-label { position: absolute; top: -10px; left: 16px; font-family: var(--mono); font-size: 10px; color: var(--g2); background: var(--s1); padding: 0 8px; letter-spacing: 0.08em; text-transform: uppercase; }
 
-    /* ===== RESPONSIVE ===== */
+    /* ===== RESPONSIVE — exact breakpoints ===== */
     @media (max-width: 1024px) {
-      .container { padding: 0 32px; }
+      :root { --type-d: 48px; --type-h1: 34px; --type-h2: 26px; --type-h3: 20px; }
+      .page-container { padding: 0 32px; }
       .sec { padding: 72px 0; }
-      .d { font-size: 48px; }
-      .h1 { font-size: 34px; }
-      .h2 { font-size: 26px; }
-      .hero { padding: 140px 0 0; }
-      .hero-inner { flex-direction: column; }
-      .saturn-container { width: 300px; height: 300px; position: absolute; top: 100px; right: 0; opacity: 0.3; }
+      .hero-hi { padding: 140px 0 0; }
+      .saturn-wrap { width: 350px; height: 245px; opacity: 0.35 !important; }
       .features-grid { grid-template-columns: repeat(2, 1fr); }
-      .donate-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-      .cta-section .cta-heading { font-size: 36px; }
     }
     @media (max-width: 640px) {
-      .container { padding: 0 20px; }
+      :root { --type-d: 34px; --type-h1: 26px; --type-h2: 22px; --type-h3: 18px; --type-b: 14px; --type-sm: 12px; }
+      .page-container { padding: 0 20px; }
       .sec { padding: 56px 0; }
-      .d { font-size: 34px; }
-      .h1 { font-size: 26px; }
-      .h2 { font-size: 22px; }
-      .h3 { font-size: 18px; }
-      .hero { padding: 120px 0 0; min-height: auto; }
-      .saturn-container { display: none; }
+      .hero-hi { padding: 120px 0 0; min-height: auto; }
+      .saturn-wrap { display: none; }
       .features-grid { grid-template-columns: 1fr; }
       .pipeline { flex-direction: column; }
       .pipeline-arrow { transform: rotate(90deg); }
-      .contrib-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr; gap: 32px; }
       .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
-      .stats-row { gap: 20px; }
-      .stat-num { font-size: 28px; }
-      .cta-section .cta-heading { font-size: 28px; }
+      .stat-num { font-size: 32px; }
+      .btn { font-size: 11px; padding: 8px 14px; }
     }
+
+    /* Feature grid */
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature-icon { width: 40px; height: 40px; border-radius: calc(var(--br) - 4px); background: var(--ag); border: 1px solid rgba(32,197,217,0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--ac); font-size: 16px; font-family: var(--mono); }
+
+    /* Contrib grid */
+    .contrib-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   </style>
 </head>
 <body>
@@ -238,184 +201,136 @@
 <div class="grain"></div>
 <div class="page">
 
-  <!-- ========== HERO ========== -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-inner">
-        <div class="hero-left">
-          <div class="hero-terminal sr">
-            <span class="dot"></span>
-            <span>scrape-ai@payload</span>
-            <span style="color:var(--g3);">~</span>
-            <span style="color:var(--g2);">making websites AI-friendly.</span>
-          </div>
-          <h1 class="d sr sr-d1">Content that <span class="si">AI understands.</span></h1>
-          <p class="subtitle sr sr-d2">Auto-generates llms.txt, structured markdown, JSON-LD, and a context search API from any Payload CMS website.</p>
-          <div class="hero-actions sr sr-d3">
-            <a href="#install" class="btn btn-ac">Install Now</a>
-            <a href="https://github.com/thorzambo/payload-plugin-scrape-ai" class="btn btn-outline" target="_blank">View on GitHub &rarr;</a>
-          </div>
+  <!-- ========== HERO — exact HighImpactHero layout ========== -->
+  <section class="hero-hi page-container">
+    <!-- Terminal status line -->
+    <div class="sr" style="display:flex;align-items:center;gap:12px;margin-bottom:48px;">
+      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac);animation:pulse-dot 2s ease-in-out infinite;"></span>
+      <span class="m" style="font-size:11px;color:var(--g2);letter-spacing:0.04em;">
+        <span style="color:var(--ac)">scrape-ai</span><span style="color:var(--g3)">@</span><span style="color:var(--g1)">payload</span>
+        <span style="color:var(--g3)"> ~ </span>
+        <span style="color:var(--g2)">making websites AI-friendly.</span>
+      </span>
+    </div>
+
+    <!-- Title -->
+    <h1 class="d sr sr-d1" style="margin-bottom:24px;">Content that<br><span style="font-family:var(--serif);font-style:italic;">AI understands.</span></h1>
+
+    <!-- Subtitle — serif italic, exact style -->
+    <p class="sr sr-d2" style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--g1);margin-bottom:40px;max-width:44ch;line-height:1.55;">Auto-generates llms.txt, structured markdown, JSON-LD, and a context search API from any Payload CMS website.</p>
+
+    <!-- CTA buttons -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px;" class="sr sr-d3">
+      <a href="#install" class="btn bw bl">Install Now</a>
+      <a href="https://github.com/thorzambo/payload-plugin-scrape-ai" class="btn bg-ghost bl" target="_blank">View on GitHub <span style="margin-left:8px">&rarr;</span></a>
+      <a href="https://buymeacoffee.com/thorzambo" class="btn btn-coffee bl" target="_blank" style="border-radius:var(--br);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        Buy Me a Coffee
+      </a>
+    </div>
+
+    <!-- Stats row — exact bracket pattern -->
+    <div class="sr sr-d4" style="border-top:1px solid var(--g4);padding-top:40px;">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="m" style="font-size:11px;color:var(--g3)">[</span>
+          <div><p class="stat-num">6</p><p class="m" style="font-size:10px;margin-top:6px;">endpoints</p></div>
+          <span class="m" style="font-size:11px;color:var(--g3)">]</span>
         </div>
-        <div class="saturn-container sr sr-d2">
-          <canvas id="saturn" width="500" height="500"></canvas>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="m" style="font-size:11px;color:var(--g3)">[</span>
+          <div><p class="stat-num" style="color:var(--ac)">3</p><p class="m" style="font-size:10px;margin-top:6px;">stages</p></div>
+          <span class="m" style="font-size:11px;color:var(--g3)">]</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="m" style="font-size:11px;color:var(--g3)">[</span>
+          <div><p class="stat-num">0</p><p class="m" style="font-size:10px;margin-top:6px;">config needed</p></div>
+          <span class="m" style="font-size:11px;color:var(--g3)">]</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="m" style="font-size:11px;color:var(--g3)">[</span>
+          <div><p class="stat-num" style="color:var(--warm)">v3</p><p class="m" style="font-size:10px;margin-top:6px;">Payload</p></div>
+          <span class="m" style="font-size:11px;color:var(--g3)">]</span>
         </div>
       </div>
 
-      <!-- Stats bar -->
-      <div class="hero-stats sr sr-d3">
-        <div class="stats-row">
-          <div class="stat">
-            <span class="stat-bracket">[</span>
-            <span class="stat-num">6</span>
-            <span class="stat-label">endpoints</span>
-            <span class="stat-bracket">]</span>
-          </div>
-          <div class="stat">
-            <span class="stat-bracket">[</span>
-            <span class="stat-num accent">3</span>
-            <span class="stat-label">pipeline stages</span>
-            <span class="stat-bracket">]</span>
-          </div>
-          <div class="stat">
-            <span class="stat-bracket">[</span>
-            <span class="stat-num">0</span>
-            <span class="stat-label">config needed</span>
-            <span class="stat-bracket">]</span>
-          </div>
-          <div class="stat">
-            <span class="stat-bracket">[</span>
-            <span class="stat-num accent">v3</span>
-            <span class="stat-label">Payload</span>
-            <span class="stat-bracket">]</span>
-          </div>
-        </div>
-        <div class="ticker">
-          <div class="ticker-inner">
-            $ syncing pages collection <span class="ok">OK</span> &middot; $ generating llms.txt <span class="ok">OK</span> &middot; $ extracting rich text to markdown <span class="ok">OK</span> &middot; $ building JSON-LD structured data <span class="ok">OK</span> &middot; $ running AI enrichment <span class="pass">PASS</span> &middot; $ rebuilding sitemap.json <span class="ok">OK</span> &middot; $ context query scoring <span class="ok">OK</span> &middot; $ initial sync 41/41 docs <span class="pass">COMPLETE</span> &middot; $ syncing pages collection <span class="ok">OK</span> &middot; $ generating llms.txt <span class="ok">OK</span> &middot; $ extracting rich text to markdown <span class="ok">OK</span> &middot; $ building JSON-LD structured data <span class="ok">OK</span> &middot; $ running AI enrichment <span class="pass">PASS</span> &middot; $ rebuilding sitemap.json <span class="ok">OK</span> &middot; $ context query scoring <span class="ok">OK</span> &middot; $ initial sync 41/41 docs <span class="pass">COMPLETE</span> &middot;&nbsp;
-          </div>
+      <!-- Scrolling terminal log — exact pattern -->
+      <div style="margin-top:32px;overflow:hidden;height:18px;position:relative;">
+        <div class="m" style="font-size:10px;color:var(--g3);position:absolute;white-space:nowrap;animation:scroll-left 40s linear infinite;">
+          <span style="color:var(--g3)">$</span> syncing pages collection <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> generating llms.txt <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> extracting rich text to markdown <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> building JSON-LD structured data <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> running AI enrichment <span style="color:#22c55e">PASS</span> &middot; <span style="color:var(--g3)">$</span> rebuilding sitemap.json <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> context query scoring <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> initial sync 41/41 docs <span style="color:#22c55e">COMPLETE</span> &middot;&nbsp;<span style="color:var(--g3)">$</span> syncing pages collection <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> generating llms.txt <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> extracting rich text to markdown <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> building JSON-LD structured data <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> running AI enrichment <span style="color:#22c55e">PASS</span> &middot; <span style="color:var(--g3)">$</span> rebuilding sitemap.json <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> context query scoring <span style="color:var(--ac)">OK</span> &middot; <span style="color:var(--g3)">$</span> initial sync 41/41 docs <span style="color:#22c55e">COMPLETE</span> &middot;&nbsp;
         </div>
       </div>
+    </div>
 
-      <div class="scroll-hint">
-        <span>scroll to explore</span>
-        <span class="arrow">&darr;</span>
+    <!-- Scroll hint — exact pattern -->
+    <div class="sr sr-d5" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px 0 24px;">
+      <span style="font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--warm);opacity:0.85;">scroll to explore</span>
+      <div style="animation:scroll-hint 2s ease-in-out infinite;">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="opacity:0.6"><path d="M2 4L6 8L10 4" stroke="var(--warm)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- Saturn ASCII — exact component, fixed position -->
+  <canvas id="saturn" width="1000" height="700" class="saturn-wrap" style="position:fixed;top:44%;right:12vw;transform:translateY(-50%) scale(0.65);transform-origin:center center;opacity:0.7;image-rendering:pixelated;pointer-events:none;z-index:4;"></canvas>
+
+  <div class="divider" style="position:relative;z-index:5;"></div>
 
   <!-- ========== FEATURES ========== -->
-  <section class="sec">
-    <div class="container">
+  <section class="sec" style="position:relative;z-index:5;">
+    <div class="page-container">
       <div class="sec-header sr">
         <span class="ov">Features</span>
         <h2 class="h1">SEO, but for AI.</h2>
         <p class="b" style="max-width:600px;margin-top:12px;">AI agents can't parse your HTML efficiently. This plugin auto-generates clean, structured content in every format they understand.</p>
       </div>
       <div class="features-grid">
-        <div class="card feature-card sr sr-d1">
-          <div class="icon">&#9776;</div>
-          <h3 class="h3">llms.txt Standard</h3>
-          <p class="b">Generates <code style="font-family:var(--mono);color:var(--ac);font-size:13px">/llms.txt</code> and <code style="font-family:var(--mono);color:var(--ac);font-size:13px">/llms-full.txt</code> following the official spec.</p>
-        </div>
-        <div class="card feature-card sr sr-d2">
-          <div class="icon">&#8635;</div>
-          <h3 class="h3">Auto-Sync</h3>
-          <p class="b">Every content change triggers instant regeneration. Hybrid event + queue architecture handles bulk edits gracefully.</p>
-        </div>
-        <div class="card feature-card sr sr-d3">
-          <div class="icon">&#9881;</div>
-          <h3 class="h3">AI Enrichment</h3>
-          <p class="b">Optional AI summaries, entity extraction, topic classification, and semantic chunking for RAG pipelines.</p>
-        </div>
-        <div class="card feature-card sr sr-d1">
-          <div class="icon">{}</div>
-          <h3 class="h3">JSON-LD</h3>
-          <p class="b">Schema.org structured data for every page. Products, articles, services &mdash; automatically mapped.</p>
-        </div>
-        <div class="card feature-card sr sr-d2">
-          <div class="icon">&#9733;</div>
-          <h3 class="h3">Smart Detection</h3>
-          <p class="b">Auto-discovers content collections. Pages, posts, products detected automatically. Toggle from the dashboard.</p>
-        </div>
-        <div class="card feature-card sr sr-d3">
-          <div class="icon">&#36;</div>
-          <h3 class="h3">Token Estimator</h3>
-          <p class="b">Estimates total AI cost before you enable enrichment. Recommends the cheapest model that fits.</p>
-        </div>
+        <div class="card sr sr-d1"><div class="feature-icon">&#9776;</div><h3 class="h3" style="margin-bottom:8px;font-size:18px;">llms.txt Standard</h3><p class="b" style="font-size:14px;">Generates <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/llms.txt</code> and <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/llms-full.txt</code> following the official spec.</p></div>
+        <div class="card sr sr-d2"><div class="feature-icon">&#8635;</div><h3 class="h3" style="margin-bottom:8px;font-size:18px;">Auto-Sync</h3><p class="b" style="font-size:14px;">Every content change triggers instant regeneration. Hybrid event + queue architecture handles bulk edits.</p></div>
+        <div class="card sr sr-d3"><div class="feature-icon">&#9881;</div><h3 class="h3" style="margin-bottom:8px;font-size:18px;">AI Enrichment</h3><p class="b" style="font-size:14px;">Optional AI summaries, entity extraction, topic classification, and semantic chunking for RAG pipelines.</p></div>
+        <div class="card sr sr-d1"><div class="feature-icon">{}</div><h3 class="h3" style="margin-bottom:8px;font-size:18px;">JSON-LD</h3><p class="b" style="font-size:14px;">Schema.org structured data for every page. Products, articles, services &mdash; automatically mapped.</p></div>
+        <div class="card sr sr-d2"><div class="feature-icon">&#9733;</div><h3 class="h3" style="margin-bottom:8px;font-size:18px;">Smart Detection</h3><p class="b" style="font-size:14px;">Auto-discovers content collections. Pages, posts, products detected. Toggle from the dashboard.</p></div>
+        <div class="card sr sr-d3"><div class="feature-icon">$</div><h3 class="h3" style="margin-bottom:8px;font-size:18px;">Token Estimator</h3><p class="b" style="font-size:14px;">Estimates total AI cost before you enable enrichment. Recommends the cheapest model that fits.</p></div>
       </div>
     </div>
   </section>
 
-  <div class="divider"></div>
+  <div class="divider" style="position:relative;z-index:5;"></div>
 
   <!-- ========== PIPELINE ========== -->
-  <section class="sec">
-    <div class="container">
-      <div class="sec-header sr">
-        <span class="ov">Architecture</span>
-        <h2 class="h1">Three-Stage Pipeline</h2>
-      </div>
+  <section class="sec" style="position:relative;z-index:5;">
+    <div class="page-container">
+      <div class="sec-header sr"><span class="ov">Architecture</span><h2 class="h1">Three-Stage Pipeline</h2></div>
       <div class="pipeline">
-        <div class="pipeline-step card sr sr-d1">
-          <span class="step-num">STAGE 01</span>
-          <h3 class="h3">Extract</h3>
-          <p class="sm">Lexical &amp; Slate rich text, relationships, blocks, media &rarr; clean Markdown</p>
-          <span class="pipeline-cost cost-free">FREE</span>
-        </div>
+        <div class="pipeline-step card sr sr-d1"><span class="ov" style="font-size:10px;">STAGE 01</span><h3 class="h3" style="font-size:18px;margin:8px 0 6px;">Extract</h3><p class="sm">Lexical &amp; Slate &rarr; Markdown</p><span class="cost-badge cost-free">FREE</span></div>
         <span class="pipeline-arrow sr sr-d2">&rarr;</span>
-        <div class="pipeline-step card sr sr-d2">
-          <span class="step-num">STAGE 02</span>
-          <h3 class="h3">Structure</h3>
-          <p class="sm">YAML frontmatter, hierarchy detection, JSON-LD, related content links</p>
-          <span class="pipeline-cost cost-free">FREE</span>
-        </div>
+        <div class="pipeline-step card sr sr-d2"><span class="ov" style="font-size:10px;">STAGE 02</span><h3 class="h3" style="font-size:18px;margin:8px 0 6px;">Structure</h3><p class="sm">Frontmatter, JSON-LD, hierarchy</p><span class="cost-badge cost-free">FREE</span></div>
         <span class="pipeline-arrow sr sr-d3">&rarr;</span>
-        <div class="pipeline-step card sr sr-d3">
-          <span class="step-num">STAGE 03</span>
-          <h3 class="h3">Enrich</h3>
-          <p class="sm">AI summaries, topics, entities, semantic chunks for RAG</p>
-          <span class="pipeline-cost cost-paid">OPTIONAL</span>
-        </div>
+        <div class="pipeline-step card sr sr-d3"><span class="ov" style="font-size:10px;">STAGE 03</span><h3 class="h3" style="font-size:18px;margin:8px 0 6px;">Enrich</h3><p class="sm">AI summaries, topics, chunks</p><span class="cost-badge cost-opt">OPTIONAL</span></div>
       </div>
     </div>
   </section>
 
-  <div class="divider"></div>
+  <div class="divider" style="position:relative;z-index:5;"></div>
 
   <!-- ========== DASHBOARD ========== -->
-  <section class="sec">
-    <div class="container">
-      <div class="sec-header sr">
-        <span class="ov">Admin Panel</span>
-        <h2 class="h1">Full Control Center</h2>
-        <p class="b" style="max-width:600px;margin-top:12px;">A dedicated dashboard inside your Payload admin. See what's generated, toggle collections, manage llms.txt priority, configure AI, test endpoints.</p>
-      </div>
-      <div class="img-placeholder sr sr-d1">
-        <img src="images/dashboard-overview.png" alt="Dashboard Overview" onerror="this.style.display='none';this.parentElement.textContent='[ screenshot: dashboard overview — replace docs/images/dashboard-overview.png ]'">
-      </div>
+  <section class="sec" style="position:relative;z-index:5;">
+    <div class="page-container">
+      <div class="sec-header sr"><span class="ov">Admin Panel</span><h2 class="h1">Full Control Center</h2><p class="b" style="max-width:600px;margin-top:12px;">A dedicated dashboard inside your Payload admin panel.</p></div>
+      <div class="img-placeholder sr sr-d1"><img src="images/dashboard-overview.png" alt="Dashboard Overview" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=color:var(--g3)>[ screenshot: dashboard &mdash; replace docs/images/dashboard-overview.png ]</span>'"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
-        <div class="img-placeholder sr sr-d2" style="aspect-ratio:4/3;">
-          <img src="images/content-preview.png" alt="Content Preview" onerror="this.style.display='none';this.parentElement.textContent='[ screenshot: content preview pane ]'">
-        </div>
-        <div class="img-placeholder sr sr-d3" style="aspect-ratio:4/3;">
-          <img src="images/token-estimation.png" alt="Token Estimation" onerror="this.style.display='none';this.parentElement.textContent='[ screenshot: token estimation panel ]'">
-        </div>
+        <div class="img-placeholder sr sr-d2" style="aspect-ratio:4/3;"><img src="images/content-preview.png" alt="Content Preview" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=color:var(--g3)>[ content preview pane ]</span>'"></div>
+        <div class="img-placeholder sr sr-d3" style="aspect-ratio:4/3;"><img src="images/token-estimation.png" alt="Token Estimation" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=color:var(--g3)>[ token estimation panel ]</span>'"></div>
       </div>
     </div>
   </section>
 
-  <div class="divider"></div>
+  <div class="divider" style="position:relative;z-index:5;"></div>
 
   <!-- ========== ENDPOINTS ========== -->
-  <section class="sec">
-    <div class="container">
-      <div class="sec-header sr">
-        <span class="ov">API</span>
-        <h2 class="h1">Public Endpoints</h2>
-        <p class="b" style="max-width:600px;margin-top:12px;">All endpoints are public by design &mdash; AI agents need direct access. Rate-limited per IP.</p>
-      </div>
+  <section class="sec" style="position:relative;z-index:5;">
+    <div class="page-container">
+      <div class="sec-header sr"><span class="ov">API</span><h2 class="h1">Public Endpoints</h2><p class="b" style="max-width:600px;margin-top:12px;">All endpoints are public by design. Rate-limited per IP.</p></div>
       <div class="card sr" style="overflow-x:auto;">
         <table class="tbl">
           <thead><tr><th>Endpoint</th><th>Type</th><th>Description</th></tr></thead>
@@ -432,235 +347,136 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <div class="divider" style="position:relative;z-index:5;"></div>
 
   <!-- ========== INSTALL ========== -->
-  <section class="sec" id="install">
-    <div class="container">
-      <div class="sec-header sr">
-        <span class="ov">Get Started</span>
-        <h2 class="h1">Installation</h2>
-      </div>
+  <section class="sec" id="install" style="position:relative;z-index:5;">
+    <div class="page-container">
+      <div class="sec-header sr"><span class="ov">Get Started</span><h2 class="h1">Installation</h2></div>
       <div style="display:grid;gap:24px;max-width:700px;">
-        <div class="sr">
-          <p class="sm" style="margin-bottom:8px;color:var(--g2);">1. Install the package</p>
-          <div class="code-block install-block">
-            <span class="install-label">npm</span>
-<span class="comment"># From GitHub (current)</span>
-npm install <span class="string">github:thorzambo/payload-plugin-scrape-ai</span>
+        <div class="sr"><p class="xs" style="margin-bottom:8px;">1. Install the package</p><div class="code-block install-block"><span class="install-label">npm</span><span class="c"># From GitHub (current)</span>
+npm install <span class="s">github:thorzambo/payload-plugin-scrape-ai</span>
 
-<span class="comment"># From npm (coming soon)</span>
-<span class="comment"># npm install @thorzambo/payload-plugin-scrape-ai</span></div>
-        </div>
-        <div class="sr sr-d1">
-          <p class="sm" style="margin-bottom:8px;color:var(--g2);">2. Add to your Payload config</p>
-          <div class="code-block">
-<span class="comment">// payload.config.ts</span>
-<span class="keyword">import</span> { <span class="fn">scrapeAiPlugin</span> } <span class="keyword">from</span> <span class="string">'payload-plugin-scrape-ai'</span>
+<span class="c"># From npm (coming soon)</span>
+<span class="c"># npm install @thorzambo/payload-plugin-scrape-ai</span></div></div>
+        <div class="sr sr-d1"><p class="xs" style="margin-bottom:8px;">2. Add to your Payload config</p><div class="code-block"><span class="c">// payload.config.ts</span>
+<span class="k">import</span> { <span class="f">scrapeAiPlugin</span> } <span class="k">from</span> <span class="s">'payload-plugin-scrape-ai'</span>
 
-<span class="keyword">export default</span> <span class="fn">buildConfig</span>({
+<span class="k">export default</span> <span class="f">buildConfig</span>({
   plugins: [
-    <span class="fn">scrapeAiPlugin</span>({
-      siteUrl: <span class="string">'https://your-website.com'</span>,
-      siteName: <span class="string">'My Website'</span>,
-      siteDescription: <span class="string">'What this site is about'</span>,
+    <span class="f">scrapeAiPlugin</span>({
+      siteUrl: <span class="s">'https://your-website.com'</span>,
+      siteName: <span class="s">'My Website'</span>,
+      siteDescription: <span class="s">'What this site is about'</span>,
     }),
   ],
-})</div>
-        </div>
-        <div class="sr sr-d2">
-          <p class="sm" style="color:var(--g2);">3. That's it. Visit <code style="font-family:var(--mono);color:var(--ac);font-size:13px">/admin/scrape-ai</code> to see the dashboard.</p>
-        </div>
+})</div></div>
+        <div class="sr sr-d2"><p class="xs">3. Visit <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/admin/scrape-ai</code> to see the dashboard.</p></div>
       </div>
     </div>
   </section>
 
-  <div class="divider"></div>
+  <div class="divider" style="position:relative;z-index:5;"></div>
 
   <!-- ========== CONTRIBUTING ========== -->
-  <section class="sec">
-    <div class="container">
-      <div class="sec-header sr">
-        <span class="ov">Open Source</span>
-        <h2 class="h1">Contributing</h2>
-        <p class="b" style="max-width:600px;margin-top:12px;">This project is open for contributions. Fork it, improve it, submit a PR. All changes go through review and approval.</p>
-      </div>
+  <section class="sec" style="position:relative;z-index:5;">
+    <div class="page-container">
+      <div class="sec-header sr"><span class="ov">Open Source</span><h2 class="h1">Contributing</h2><p class="b" style="max-width:600px;margin-top:12px;">Fork it, improve it, submit a PR. All changes go through review and approval.</p></div>
       <div class="contrib-grid">
-        <div class="card sr sr-d1">
-          <h3 class="h3" style="margin-bottom:8px;">How to Contribute</h3>
-          <ol style="padding-left:20px;color:var(--g1);font-size:14px;line-height:2;">
-            <li>Fork the repository</li>
-            <li>Create a feature branch</li>
-            <li>Make your changes</li>
-            <li>Submit a Pull Request</li>
-            <li>Wait for review &amp; approval</li>
-          </ol>
-        </div>
-        <div class="card sr sr-d2">
-          <h3 class="h3" style="margin-bottom:8px;">Good First Issues</h3>
-          <ul style="padding-left:20px;color:var(--g1);font-size:14px;line-height:2;list-style:none;">
-            <li><span class="tag">enhancement</span> Better Slate editor support</li>
-            <li><span class="tag">enhancement</span> Custom JSON-LD type mappings</li>
-            <li><span class="tag">docs</span> More usage examples</li>
-            <li><span class="tag">feature</span> MCP server integration</li>
-          </ul>
-        </div>
+        <div class="card sr sr-d1"><h3 class="h3" style="margin-bottom:8px;font-size:18px;">How to Contribute</h3><ol style="padding-left:20px;color:var(--g1);font-size:14px;line-height:2.2;"><li>Fork the repository</li><li>Create a feature branch</li><li>Make your changes</li><li>Submit a Pull Request</li><li>Wait for review &amp; approval</li></ol></div>
+        <div class="card sr sr-d2"><h3 class="h3" style="margin-bottom:8px;font-size:18px;">Good First Issues</h3><ul style="padding-left:0;list-style:none;font-size:14px;line-height:2.2;color:var(--g1);"><li><span class="tag" style="margin-right:8px;">enhancement</span> Better Slate editor support</li><li><span class="tag" style="margin-right:8px;">enhancement</span> Custom JSON-LD type mappings</li><li><span class="tag" style="margin-right:8px;">docs</span> More usage examples</li><li><span class="tag" style="margin-right:8px;">feature</span> MCP server integration</li></ul></div>
       </div>
     </div>
   </section>
 
-  <div class="divider"></div>
+  <div class="divider" style="position:relative;z-index:5;"></div>
 
   <!-- ========== CTA / DONATE ========== -->
-  <section class="cta-section">
-    <div class="container">
-      <span class="ov sr" style="display:block;margin-bottom:16px;">Support the Project</span>
-      <h2 class="cta-heading sr sr-d1">Built with care.<br>Maintained with coffee.</h2>
-      <p class="b sr sr-d2">If this plugin saves you time, consider supporting its development.<br>Every contribution helps keep it maintained and improved.</p>
-      <div class="hero-actions sr sr-d3" style="justify-content:center;gap:16px;flex-wrap:wrap;">
-        <a href="https://github.com/sponsors/thorzambo" class="btn btn-gh" target="_blank">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/></svg>
+  <section class="cta-section" style="position:relative;z-index:5;">
+    <div class="page-container">
+      <h2 style="font-family:var(--serif);font-style:italic;font-size:48px;color:var(--wh);margin-bottom:16px;position:relative;line-height:1.15;" class="sr">Built with care.<br>Maintained with coffee.</h2>
+      <p class="b sr sr-d1" style="max-width:500px;margin:0 auto 32px;position:relative;">If this plugin saves you time, consider supporting its development.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;" class="sr sr-d2">
+        <a href="https://github.com/sponsors/thorzambo" class="btn-pill" target="_blank">
           Sponsor on GitHub
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </a>
-        <a href="https://buymeacoffee.com/thorzambo" class="btn btn-coffee" target="_blank">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        <a href="https://buymeacoffee.com/thorzambo" class="btn btn-coffee bl" target="_blank" style="border-radius:var(--br);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
           Buy Me a Coffee
         </a>
-        <a href="https://github.com/thorzambo/payload-plugin-scrape-ai/issues" class="btn btn-outline" target="_blank">Report an Issue</a>
+        <a href="https://github.com/thorzambo/payload-plugin-scrape-ai/issues" class="btn bo bl" target="_blank">Report an Issue</a>
       </div>
     </div>
   </section>
 
-  <!-- ========== FOOTER ========== -->
-  <footer class="footer">
-    <div class="container">
+  <!-- ========== FOOTER — exact 4-column grid ========== -->
+  <footer class="footer" style="position:relative;z-index:5;">
+    <div class="page-container" style="padding-top:64px;padding-bottom:40px;">
       <div class="footer-grid">
-        <div class="footer-brand">
-          <div style="font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:0.15em;color:var(--wh);">SCRAPE-AI</div>
-          <p class="tagline">Making websites AI-friendly, automatically.</p>
-          <p class="sm" style="color:var(--g3);">A Payload CMS v3 plugin by Leonardo Zambaiti</p>
-          <div class="footer-social" style="margin-top:16px;">
-            <a href="https://github.com/thorzambo" target="_blank">GitHub</a>
-            <a href="https://linkedin.com/in/leonardo-zambaiti" target="_blank">LinkedIn</a>
+        <div>
+          <span style="display:block;margin-bottom:20px;font-weight:600;font-size:13px;letter-spacing:0.18em;color:var(--w);font-family:var(--mono);">SCRAPE-AI</span>
+          <p class="si" style="font-size:17px;color:var(--g2);margin-bottom:24px;line-height:1.55;max-width:30ch;">Making websites AI-friendly, automatically.</p>
+          <p class="xs">A Payload CMS v3 plugin by Leonardo Zambaiti</p>
+          <div style="display:flex;gap:16px;margin-top:16px;">
+            <a href="https://github.com/thorzambo" target="_blank" style="font-size:13px;color:var(--g2);">GitHub</a>
+            <a href="https://linkedin.com/in/leonardo-zambaiti" target="_blank" style="font-size:13px;color:var(--g2);">LinkedIn</a>
           </div>
         </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Plugin</p>
-          <a href="#install">Installation</a>
-          <a href="https://github.com/thorzambo/payload-plugin-scrape-ai" target="_blank">Source Code</a>
-          <a href="https://github.com/thorzambo/payload-plugin-scrape-ai/issues" target="_blank">Issues</a>
-          <a href="https://github.com/thorzambo/payload-plugin-scrape-ai/pulls" target="_blank">Pull Requests</a>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Resources</p>
-          <a href="https://payloadcms.com/docs/plugins/overview" target="_blank">Payload Plugin Docs</a>
-          <a href="https://llmstxt.org" target="_blank">llms.txt Spec</a>
-          <a href="https://schema.org" target="_blank">Schema.org</a>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col-title">Author</p>
-          <a href="https://zepoch.io" target="_blank" style="color:var(--warm);">Zepoch</a>
-          <a href="https://github.com/sponsors/thorzambo" target="_blank">Sponsor</a>
-          <a href="https://buymeacoffee.com/thorzambo" target="_blank">Buy Me a Coffee</a>
-        </div>
+        <div class="footer-col"><p class="footer-col-title">Plugin</p><a href="#install">Installation</a><a href="https://github.com/thorzambo/payload-plugin-scrape-ai" target="_blank">Source Code</a><a href="https://github.com/thorzambo/payload-plugin-scrape-ai/issues" target="_blank">Issues</a><a href="https://github.com/thorzambo/payload-plugin-scrape-ai/pulls" target="_blank">Pull Requests</a></div>
+        <div class="footer-col"><p class="footer-col-title">Resources</p><a href="https://payloadcms.com/docs/plugins/overview" target="_blank">Payload Plugin Docs</a><a href="https://llmstxt.org" target="_blank">llms.txt Spec</a><a href="https://schema.org" target="_blank">Schema.org</a></div>
+        <div class="footer-col"><p class="footer-col-title">Author</p><a href="https://zepoch.io" target="_blank" style="color:var(--warm)">Zepoch</a><a href="https://github.com/sponsors/thorzambo" target="_blank">Sponsor</a><a href="https://buymeacoffee.com/thorzambo" target="_blank">Buy Me a Coffee</a></div>
       </div>
       <div class="footer-bottom">
         <span>&copy; 2026 Leonardo Zambaiti &middot; MIT License</span>
-        <span style="color:var(--warm);">Built by <a href="https://zepoch.io" target="_blank" style="color:var(--warm);">Zepoch</a></span>
+        <span>Built by <a href="https://zepoch.io" target="_blank" style="color:var(--warm)">Zepoch</a></span>
       </div>
     </div>
   </footer>
 
 </div>
 
-<!-- ASCII Saturn Canvas -->
+<!-- ========== EXACT Saturn ASCII Canvas — copied from AsciiSaturn component ========== -->
 <script>
-(function() {
-  const canvas = document.getElementById('saturn');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = 500, H = 500;
-  const chars = '.,:;!ilIL1|/?+~<>xXzZcCdqaMWNB#%@&8';
-  const PR = 80, RI = 105, RO = 240;
-  const TILT = 0.45;
-  const CELL = 5;
-  let angle = 0;
-
-  function draw() {
-    ctx.fillStyle = 'rgba(4,4,6,1)';
-    ctx.fillRect(0, 0, W, H);
-    ctx.font = `${CELL}px monospace`;
-
-    const cx = W / 2, cy = H / 2;
-    const cosT = Math.cos(TILT), sinT = Math.sin(TILT);
-
-    for (let y = 0; y < H; y += CELL) {
-      for (let x = 0; x < W; x += CELL * 0.6) {
-        const dx = x - cx, dy = y - cy;
-        const rx = dx, ry = dy / cosT;
-        const dist = Math.sqrt(rx * rx + ry * ry);
-        const planetDist = Math.sqrt(dx * dx + dy * dy);
-
-        let brightness = 0;
-        let hue = 185;
-
-        // Planet body
-        if (planetDist < PR) {
-          const nx = dx / PR, ny = dy / PR;
-          const light = 0.5 + 0.5 * nx;
-          const rim = 1 - Math.pow(planetDist / PR, 3);
-          brightness = light * 0.6 + rim * 0.4;
-          brightness *= 0.7;
-          hue = 185 + ny * 15;
-        }
-        // Ring
-        else if (dist > RI && dist < RO) {
-          const ringPos = (dist - RI) / (RO - RI);
-          // Gaussian gaps
-          const gap1 = Math.exp(-Math.pow((ringPos - 0.28) / 0.03, 2));
-          const gap2 = Math.exp(-Math.pow((ringPos - 0.5) / 0.04, 2));
-          const density = 1 - gap1 * 0.8 - gap2 * 0.6;
-          // Behind planet check
-          const behindPlanet = (dy > 0 && planetDist < PR * 1.1);
-          if (!behindPlanet) {
-            brightness = density * (0.3 + 0.4 * (1 - ringPos));
-            brightness *= 0.5;
-            hue = 185 + ringPos * 30;
-          }
-        }
-
-        if (brightness > 0.02) {
-          const ci = Math.floor(brightness * (chars.length - 1));
-          const char = chars[Math.min(ci, chars.length - 1)];
-          const alpha = Math.min(brightness * 1.5, 0.8);
-          ctx.fillStyle = `hsla(${hue}, 40%, ${50 + brightness * 30}%, ${alpha})`;
-          ctx.fillText(char, x, y);
-        }
-      }
-    }
-
-    angle += 0.002;
-    requestAnimationFrame(draw);
+(function(){
+  var c=document.getElementById('saturn');if(!c)return;
+  var ctx=c.getContext('2d');if(!ctx)return;
+  var W=1000,H=700;c.width=W;c.height=H;
+  var charStr='.,:;!ilIL1|/?+~<>xXzZcCdqaMWNB#%@&8';
+  var PR=150,PR2=PR*PR,RI=195,RI2=RI*RI,RO=450,RO2=RO*RO;
+  var GW=4,GH=6;var ocx=W*0.47,ocy=H*0.45;var TILT=0.45;
+  var cT=Math.cos(TILT),sT=Math.sin(TILT);var rot=0;
+  var NHUES=32;var glyphs=[];
+  var ac=document.createElement('canvas');ac.width=GW;ac.height=GH;
+  var ax=ac.getContext('2d');ax.font=GH+'px monospace';ax.textAlign='left';ax.textBaseline='top';
+  for(var ci=0;ci<charStr.length;ci++){glyphs[ci]=[];for(var hi=0;hi<NHUES;hi++){ax.clearRect(0,0,GW,GH);var hue=(hi/NHUES)*360;ax.fillStyle='hsl('+(hue|0)+',35%,65%)';ax.fillText(charStr[ci],0,0);glyphs[ci][hi]=ax.getImageData(0,0,GW,GH);}}
+  var CL=charStr.length-1;var NL=8192;var noiseTbl=new Uint8Array(NL);for(var i=0;i<NL;i++)noiseTbl[i]=(Math.random()*256)|0;
+  var imgData=ctx.createImageData(W,H);var buf=imgData.data;var TARGET_MS=83;var last=0;
+  function render(now){
+    requestAnimationFrame(render);if(now-last<TARGET_MS)return;last=now;buf.fill(0);
+    var cR=Math.cos(rot),sR=Math.sin(rot);var denom=cR*sT;var denomOk=Math.abs(denom)>0.01;var invDenom=denomOk?1/denom:0;var frame=(rot*3)|0;var sRsT=sR*sT;
+    for(var py=0;py<H;py+=GH){var dyBase=py-ocy;var dyct=dyBase*cT;var dysT=dyBase*sT;
+    for(var px=0;px<W;px+=GW){var dx=px-ocx;var dist2=dx*dx+dyBase*dyBase;var b=0;
+      var planetB=0,planetZ=9999;
+      if(dist2<PR2){var edge2=dist2/PR2;var edge=Math.sqrt(edge2);var nz=Math.sqrt(1-edge2);planetZ=-nz*PR;var nx=dx/PR,ny=dyBase/PR;var rnx=nx*cR+nz*sR;var crescent=Math.max(0,nx*0.5-ny*0.65)*edge2*0.8;var rim=edge2*edge2*edge*0.5;var atmo=edge>0.82?(edge-0.82)*(edge-0.82)*30.9*Math.max(0,-ny*0.7+nx*0.4):0;planetB=crescent*0.5+rim+atmo+Math.max(0,rnx*0.4-ny*0.6+nz*0.2)*0.08+0.008;}
+      var ringB=0,ringZ=9999,isRing=false;
+      if(denomOk){var z=-(dyct+dx*sRsT)*invDenom;var lx=dx*cR-z*sR;var lz=-dysT+(dx*sR+z*cR)*cT;var rr2=lx*lx+lz*lz;if(rr2>=RI2&&rr2<=RO2){var rr=Math.sqrt(rr2);var rp=(rr-RI)/(RO-RI);var g1=Math.abs(rp-0.28)<0.018;var g2=Math.abs(rp-0.5)<0.012;if(!g1&&!g2){isRing=true;ringZ=z;ringB=0.5*(1-rp*0.65);var rAng=Math.atan2(lz,lx);ringB*=0.45+Math.cos(rAng)*0.55;if(rp<0.04)ringB*=rp*25;else if(rp>0.92)ringB*=(1-rp)*12.5;if(rp<0.12)ringB+=0.25-rp*2.08;if(ringB<0)ringB=0;}}}
+      var inP=dist2<PR2;if(inP&&isRing){b=ringZ<planetZ?Math.max(ringB*0.7,planetB*0.3):planetB;}else if(inP){b=planetB;}else if(isRing){b=ringB*0.6;}
+      if(b<0.01)continue;
+      var ci2=(b*CL)|0;if(ci2>CL)ci2=CL;var hi2=(px*73+py*137+frame*3)&(NL-1);var hueIdx=(noiseTbl[hi2]*NHUES/256)|0;var glyph=glyphs[ci2][hueIdx];var gd=glyph.data;var sc=Math.min(2.5,b*3+0.3);
+      for(var gy=0;gy<GH&&py+gy<H;gy++){var rowOff=((py+gy)*W+px)*4;var grows=gy*GW*4;for(var gx=0;gx<GW&&px+gx<W;gx++){var gi=grows+gx*4;var a=gd[gi+3];if(a<10)continue;var bi=rowOff+gx*4;var s=sc*(a/255);buf[bi]=(gd[gi]*s)|0;buf[bi+1]=(gd[gi+1]*s)|0;buf[bi+2]=(gd[gi+2]*s)|0;buf[bi+3]=Math.min(255,(a*sc)|0);}}
+    }}
+    ctx.putImageData(imgData,0,0);rot+=0.004;
   }
-
-  // Fade on scroll
-  const container = canvas.parentElement;
-  window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    const fade = Math.max(0, 1 - scrollY / 700);
-    container.style.opacity = fade * 0.7;
-  }, { passive: true });
-
-  draw();
+  requestAnimationFrame(render);
+  window.addEventListener('scroll',function(){var f=1-Math.min(1,window.scrollY/700);c.style.opacity=Math.max(0,f*0.7).toFixed(3);},{passive:true});
 })();
 </script>
 
 <!-- Scroll Reveal -->
 <script>
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('.sr').forEach(el => observer.observe(el));
+var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting)x.target.classList.add('visible');});},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.sr').forEach(function(el){obs.observe(el);});
 </script>
 
 </body>

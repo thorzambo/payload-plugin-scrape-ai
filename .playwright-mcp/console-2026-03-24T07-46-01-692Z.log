@@ -1,0 +1,3 @@
+[      97ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://thorzambo.github.io/payload-plugin-scrape-ai/images/dashboard-overview.png:0
+[     122ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://thorzambo.github.io/payload-plugin-scrape-ai/images/content-preview.png:0
+[     122ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://thorzambo.github.io/payload-plugin-scrape-ai/images/token-estimation.png:0
