@@ -1,1 +1,0 @@
-{"version":3,"file":"llms-txt.d.ts","sourceRoot":"","sources":["../../src/endpoints/llms-txt.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,SAAS,CAAA;AAC7C,OAAO,EAAE,WAAW,EAAoC,MAAM,gBAAgB,CAAA;AAE9E,wBAAgB,qBAAqB,CAAC,WAAW,EAAE,WAAW;;;mBAIrC,cAAc;EAyCtC"}

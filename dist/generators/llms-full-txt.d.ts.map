@@ -1,1 +1,0 @@
-{"version":3,"file":"llms-full-txt.d.ts","sourceRoot":"","sources":["../../src/generators/llms-full-txt.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,SAAS,CAAA;AAEtC;;;;GAIG;AACH,wBAAsB,mBAAmB,CAAC,MAAM,EAAE;IAChD,OAAO,EAAE,OAAO,CAAA;IAChB,OAAO,EAAE,MAAM,CAAA;IACf,QAAQ,EAAE,MAAM,CAAA;IAChB,eAAe,EAAE,MAAM,CAAA;CACxB,GAAG,OAAO,CAAC,MAAM,CAAC,CAsFlB"}

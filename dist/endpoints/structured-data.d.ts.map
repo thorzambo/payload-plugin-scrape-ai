@@ -1,1 +1,0 @@
-{"version":3,"file":"structured-data.d.ts","sourceRoot":"","sources":["../../src/endpoints/structured-data.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,SAAS,CAAA;AAC7C,OAAO,EAAE,WAAW,EAAoC,MAAM,gBAAgB,CAAA;AAE9E,wBAAgB,4BAA4B,CAAC,WAAW,EAAE,WAAW;;;mBAI5C,cAAc;EA4DtC"}

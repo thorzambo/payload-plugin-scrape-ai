@@ -1,1 +1,0 @@
-{"version":3,"file":"entities.d.ts","sourceRoot":"","sources":["../../src/ai/entities.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,UAAU,CAAA;AAU3C,wBAAsB,eAAe,CACnC,QAAQ,EAAE,MAAM,EAChB,QAAQ,EAAE,WAAW,GACpB,OAAO,CAAC;IAAE,MAAM,EAAE,MAAM,EAAE,CAAC;IAAC,QAAQ,EAAE,MAAM,EAAE,CAAC;IAAC,QAAQ,EAAE,MAAM,CAAA;CAAE,CAAC,CAoBrE"}
