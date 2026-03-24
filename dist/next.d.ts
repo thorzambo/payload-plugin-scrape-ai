@@ -1,25 +1,21 @@
 /**
- * Next.js config wrapper that adds root-level rewrites for AI discoverability.
+ * Next.js config wrapper for 10/10 AI discoverability.
  *
  * Usage in next.config.mjs:
  *
  *   import { withScrapeAi } from 'payload-plugin-scrape-ai/next'
  *   export default withScrapeAi(yourNextConfig)
  *
- * This maps:
- *   /llms.txt          → /api/llms.txt
- *   /llms-full.txt     → /api/llms-full.txt
- *   /ai/sitemap.json   → /api/ai/sitemap.json
- *   /ai/context        → /api/ai/context
- *   /ai/:path*         → /api/ai/:path*
- *   /.well-known/ai-plugin.json → /api/scrape-ai/well-known
- *
- * This is CRITICAL for AI discoverability. Without it, AI agents
- * can't find your content because /api/ paths are not standard
- * discovery locations.
+ * This single wrapper handles:
+ *   1. Root-level rewrites (/llms.txt, /ai/*, /.well-known/*)
+ *   2. robots.txt merging (appends AI entries to existing robots.txt)
+ *   3. HTTP Link headers on all pages (advertise /llms.txt from every response)
+ *   4. XML sitemap rewrite (/ai/sitemap.xml)
+ *   5. CORS headers on AI endpoints
  */
 type NextConfig = {
     rewrites?: () => Promise<any> | any;
+    headers?: () => Promise<any[]> | any[];
     [key: string]: any;
 };
 export declare function withScrapeAi(nextConfig?: NextConfig): NextConfig;

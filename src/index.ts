@@ -14,7 +14,8 @@ import { createStructuredDataEndpoint } from './endpoints/structured-data'
 import { createContextQueryEndpoint } from './endpoints/context-query'
 import { createAdminEndpoints } from './endpoints/admin-api'
 import { createWellKnownEndpoint } from './endpoints/well-known'
-import { createRobotsTxtEndpoint } from './endpoints/robots-txt'
+import { createRobotsTxtEndpoint, createMergedRobotsTxtEndpoint } from './endpoints/robots-txt'
+import { createSitemapXmlEndpoint } from './endpoints/sitemap-xml'
 import { RateLimiter } from './endpoints/rate-limiter'
 import { startScheduler } from './sync/scheduler'
 import { runInitialSync } from './sync/initial-sync'
@@ -97,6 +98,8 @@ export const scrapeAiPlugin =
       createContextQueryEndpoint(rateLimiter, resolvedConfig.siteUrl),
       createWellKnownEndpoint(resolvedConfig.siteUrl),
       createRobotsTxtEndpoint(resolvedConfig.siteUrl),
+      createMergedRobotsTxtEndpoint(resolvedConfig.siteUrl),
+      createSitemapXmlEndpoint(resolvedConfig.siteUrl),
       ...createAdminEndpoints(resolvedConfig, options),
     ]
 
