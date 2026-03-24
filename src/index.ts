@@ -1,5 +1,8 @@
 import type { Config, Plugin } from 'payload'
 import type { ScrapeAiPluginOptions, ResolvedPluginConfig } from './types'
+import { aiContentCollection } from './collections/ai-content'
+import { aiSyncQueueCollection } from './collections/ai-sync-queue'
+import { aiConfigGlobal } from './globals/ai-config'
 
 export type { ScrapeAiPluginOptions } from './types'
 
@@ -14,7 +17,7 @@ export const scrapeAiPlugin =
 
     const resolvedConfig: ResolvedPluginConfig = {
       enabledCollections: [], // resolved in onInit after smart detection
-      siteUrl: options.siteUrl.replace(/\/$/, ''), // strip trailing slash
+      siteUrl: options.siteUrl.replace(/\/$/, ''),
       siteName: options.siteName || 'My Website',
       siteDescription: options.siteDescription || '',
       drafts: options.drafts || 'published-only',
@@ -26,16 +29,22 @@ export const scrapeAiPlugin =
       ai: options.ai,
     }
 
-    // Collections are always added (even if plugin is disabled) for schema consistency
-    // They will be populated in subsequent tasks
-    config.collections = [...(config.collections || [])]
-    config.globals = [...(config.globals || [])]
+    // Always add collections and global (even if disabled) for schema consistency
+    config.collections = [
+      ...(config.collections || []),
+      aiContentCollection,
+      aiSyncQueueCollection,
+    ]
+    config.globals = [
+      ...(config.globals || []),
+      aiConfigGlobal,
+    ]
     config.endpoints = [...(config.endpoints ?? [])]
 
     if (options.enabled === false) return config
 
-    // Runtime features (hooks, endpoints, admin views, onInit) will be added in subsequent tasks
-    // Store resolvedConfig for use by hooks and onInit via closure
+    // Runtime features (hooks, endpoints, admin views, onInit) added in subsequent tasks
+    // resolvedConfig is captured by closure for use by hooks and onInit
 
     return config
   }
