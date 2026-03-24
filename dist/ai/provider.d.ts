@@ -2,7 +2,7 @@ import type { AiProviderConfig, IAiProvider } from '../types';
 /**
  * Create an AI provider from config. Returns null if SDK is not installed.
  */
-export declare function createAiProvider(config: AiProviderConfig): IAiProvider | null;
+export declare function createAiProvider(config: AiProviderConfig): Promise<IAiProvider | null>;
 /**
  * Try to create provider from runtime config (ai-config global),
  * falling back to plugin options.
@@ -12,5 +12,5 @@ export declare function resolveAiProvider(pluginAiConfig?: AiProviderConfig, glo
     aiProvider?: string;
     aiApiKey?: string;
     aiModel?: string;
-}): IAiProvider | null;
+}): Promise<IAiProvider | null>;
 //# sourceMappingURL=provider.d.ts.map

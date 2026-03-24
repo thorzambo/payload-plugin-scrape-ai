@@ -250,7 +250,7 @@ function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                     if (!provider || !apiKey) {
                         return Response.json({ success: false, error: 'No AI provider configured' });
                     }
-                    const ai = (0, provider_1.createAiProvider)({ provider, apiKey, model });
+                    const ai = await (0, provider_1.createAiProvider)({ provider, apiKey, model });
                     if (!ai) {
                         return Response.json({ success: false, error: 'Failed to create AI provider' });
                     }

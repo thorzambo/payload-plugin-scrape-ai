@@ -146,9 +146,9 @@ export const scrapeAiPlugin =
       let aiProvider = null
       try {
         const aiConfig = await payload.findGlobal({ slug: 'ai-config' })
-        aiProvider = resolveAiProvider(options.ai, aiConfig as any)
+        aiProvider = await resolveAiProvider(options.ai, aiConfig as any)
       } catch {
-        aiProvider = options.ai ? resolveAiProvider(options.ai) : null
+        aiProvider = options.ai ? await resolveAiProvider(options.ai) : null
       }
 
       // Run initial sync

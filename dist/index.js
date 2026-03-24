@@ -131,10 +131,10 @@ const scrapeAiPlugin = (options) => (incomingConfig) => {
         let aiProvider = null;
         try {
             const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
-            aiProvider = (0, provider_1.resolveAiProvider)(options.ai, aiConfig);
+            aiProvider = await (0, provider_1.resolveAiProvider)(options.ai, aiConfig);
         }
         catch {
-            aiProvider = options.ai ? (0, provider_1.resolveAiProvider)(options.ai) : null;
+            aiProvider = options.ai ? await (0, provider_1.resolveAiProvider)(options.ai) : null;
         }
         // Run initial sync
         await (0, initial_sync_1.runInitialSync)(payload, resolvedConfig, detectedCollections);

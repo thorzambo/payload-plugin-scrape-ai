@@ -4,11 +4,17 @@ class OpenAiProvider implements IAiProvider {
   private client: any
   private model: string
 
-  constructor(config: AiProviderConfig) {
-    this.model = config.model || 'gpt-4o-mini'
+  private constructor(client: any, model: string) {
+    this.client = client
+    this.model = model
+  }
+
+  static async create(config: AiProviderConfig): Promise<OpenAiProvider> {
+    const model = config.model || 'gpt-4o-mini'
     try {
-      const OpenAI = require('openai')
-      this.client = new OpenAI({ apiKey: config.apiKey })
+      const { default: OpenAI } = await import('openai')
+      const client = new OpenAI({ apiKey: config.apiKey })
+      return new OpenAiProvider(client, model)
     } catch {
       throw new Error(
         `[scrape-ai] AI provider 'openai' configured but 'openai' package not found. Run: npm install openai`,
@@ -34,11 +40,17 @@ class AnthropicProvider implements IAiProvider {
   private client: any
   private model: string
 
-  constructor(config: AiProviderConfig) {
-    this.model = config.model || 'claude-haiku-4-5-20251001'
+  private constructor(client: any, model: string) {
+    this.client = client
+    this.model = model
+  }
+
+  static async create(config: AiProviderConfig): Promise<AnthropicProvider> {
+    const model = config.model || 'claude-haiku-4-5-20251001'
     try {
-      const Anthropic = require('@anthropic-ai/sdk')
-      this.client = new Anthropic({ apiKey: config.apiKey })
+      const { default: Anthropic } = await import('@anthropic-ai/sdk')
+      const client = new Anthropic({ apiKey: config.apiKey })
+      return new AnthropicProvider(client, model)
     } catch {
       throw new Error(
         `[scrape-ai] AI provider 'anthropic' configured but '@anthropic-ai/sdk' package not found. Run: npm install @anthropic-ai/sdk`,
@@ -61,13 +73,13 @@ class AnthropicProvider implements IAiProvider {
 /**
  * Create an AI provider from config. Returns null if SDK is not installed.
  */
-export function createAiProvider(config: AiProviderConfig): IAiProvider | null {
+export async function createAiProvider(config: AiProviderConfig): Promise<IAiProvider | null> {
   try {
     switch (config.provider) {
       case 'openai':
-        return new OpenAiProvider(config)
+        return await OpenAiProvider.create(config)
       case 'anthropic':
-        return new AnthropicProvider(config)
+        return await AnthropicProvider.create(config)
       default:
         console.warn(`[scrape-ai] Unknown AI provider: ${config.provider}`)
         return null
@@ -82,10 +94,10 @@ export function createAiProvider(config: AiProviderConfig): IAiProvider | null {
  * Try to create provider from runtime config (ai-config global),
  * falling back to plugin options.
  */
-export function resolveAiProvider(
+export async function resolveAiProvider(
   pluginAiConfig?: AiProviderConfig,
   globalConfig?: { aiEnabled: boolean; aiProvider?: string; aiApiKey?: string; aiModel?: string },
-): IAiProvider | null {
+): Promise<IAiProvider | null> {
   // Global config overrides plugin config if AI is enabled
   if (globalConfig?.aiEnabled && globalConfig.aiProvider && globalConfig.aiApiKey) {
     return createAiProvider({
