@@ -24,6 +24,9 @@ export async function processQueue(
 
   // Process rebuild-aggregates jobs
   await processRebuildJobs(payload, pluginOptions)
+
+  // Cleanup completed/failed jobs older than 24 hours
+  await cleanupOldJobs(payload)
 }
 
 async function processInitialSyncJobs(
@@ -243,6 +246,28 @@ async function processRebuildJobs(
         data: { status: 'failed', errorMessage: error.message },
       })
     }
+  }
+}
+
+async function cleanupOldJobs(payload: Payload): Promise<void> {
+  try {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const oldJobs = await payload.find({
+      collection: 'ai-sync-queue',
+      where: {
+        status: { in: ['completed', 'failed'] },
+        createdAt: { less_than: cutoff },
+      },
+      limit: 100,
+    })
+
+    if (oldJobs.docs.length > 0) {
+      for (const job of oldJobs.docs) {
+        await payload.delete({ collection: 'ai-sync-queue', id: job.id })
+      }
+    }
+  } catch {
+    // Non-critical cleanup
   }
 }
 

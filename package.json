@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-scrape-ai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Payload CMS plugin that auto-generates AI-friendly content (llms.txt, markdown, JSON-LD)",
   "type": "module",
   "main": "dist/index.js",
@@ -9,14 +9,14 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./client": {
-      "import": "./dist/admin/views/Dashboard.js",
-      "types": "./dist/admin/views/Dashboard.d.ts"
+      "import": "./dist/admin/views/DashboardClient.js",
+      "types": "./dist/admin/views/DashboardClient.d.ts"
     },
     "./rsc": {
+      "react-server": "./dist/admin/views/ScrapeAiView.js",
       "import": "./dist/admin/views/ScrapeAiView.js",
       "types": "./dist/admin/views/ScrapeAiView.d.ts"
     },
@@ -30,7 +30,6 @@
     },
     "./next": {
       "import": "./dist/next.js",
-      "require": "./dist/next.js",
       "types": "./dist/next.d.ts"
     }
   },
@@ -40,7 +39,9 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "payload": "^3.0.0"
+    "payload": "^3.0.0",
+    "openai": ">=4.0.0",
+    "@anthropic-ai/sdk": ">=0.20.0"
   },
   "peerDependenciesMeta": {
     "openai": { "optional": true },

@@ -49,107 +49,40 @@ export const StatusBar: React.FC = () => {
     }
   }
 
-  if (loading) return <div style={styles.container}>Loading...</div>
-  if (!status) return <div style={styles.container}>Failed to load status</div>
+  if (loading) return <div className="scrape-ai-status">Loading...</div>
+  if (!status) return <div className="scrape-ai-status">Failed to load status</div>
 
-  const statusColor =
-    status.errorCount > 0 ? '#ef4444' : status.pendingCount > 0 ? '#eab308' : '#22c55e'
-  const statusText =
-    status.errorCount > 0
-      ? `${status.errorCount} Errors`
-      : status.pendingCount > 0
-        ? `${status.pendingCount} Pending`
-        : 'All Synced'
-
+  const pillClass = status.errorCount > 0 ? 'scrape-ai-pill--error'
+    : status.pendingCount > 0 ? 'scrape-ai-pill--warning'
+    : 'scrape-ai-pill--success'
+  const statusText = status.errorCount > 0 ? `${status.errorCount} Errors`
+    : status.pendingCount > 0 ? `${status.pendingCount} Pending`
+    : 'All Synced'
   const collectionCount = Object.keys(status.collections).length
 
   return (
-    <div style={styles.container}>
-      <div style={styles.row}>
-        <div style={styles.statusGroup}>
-          <span style={{ ...styles.pill, backgroundColor: statusColor }}>{statusText}</span>
-          <span style={styles.stat}>
+    <div className="scrape-ai-status">
+      <div className="scrape-ai-status__row">
+        <div className="scrape-ai-status__group">
+          <span className={`scrape-ai-pill ${pillClass}`}>{statusText}</span>
+          <span className="scrape-ai-status__stat">
             {status.totalEntries} pages across {collectionCount} collections
           </span>
         </div>
-
-        <div style={styles.rightGroup}>
+        <div className="scrape-ai-status__group">
           {status.lastRebuild && (
-            <span style={styles.timestamp}>
+            <span className="scrape-ai-status__timestamp">
               Last rebuild: {new Date(status.lastRebuild).toLocaleString()}
             </span>
           )}
           {status.aiEnabled && (
-            <span style={styles.aiPill}>AI: {status.aiApiCallCount} calls</span>
+            <span className="scrape-ai-pill scrape-ai-pill--info">AI: {status.aiApiCallCount} calls</span>
           )}
-          <button
-            style={styles.button}
-            onClick={handleRegenerateAll}
-            disabled={regenerating}
-          >
+          <button className="scrape-ai-btn scrape-ai-btn--primary" onClick={handleRegenerateAll} disabled={regenerating}>
             {regenerating ? 'Regenerating...' : 'Regenerate All'}
           </button>
         </div>
       </div>
     </div>
   )
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    padding: '16px 24px',
-    backgroundColor: 'var(--theme-elevation-50, #f8f8f8)',
-    borderBottom: '1px solid var(--theme-elevation-100, #e0e0e0)',
-    marginBottom: '24px',
-    borderRadius: '8px',
-  },
-  row: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap' as const,
-    gap: '12px',
-  },
-  statusGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  rightGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  pill: {
-    padding: '4px 12px',
-    borderRadius: '12px',
-    color: 'white',
-    fontSize: '13px',
-    fontWeight: 600,
-  },
-  aiPill: {
-    padding: '4px 12px',
-    borderRadius: '12px',
-    backgroundColor: '#8b5cf6',
-    color: 'white',
-    fontSize: '12px',
-  },
-  stat: {
-    fontSize: '14px',
-    color: 'var(--theme-elevation-600, #666)',
-  },
-  timestamp: {
-    fontSize: '12px',
-    color: 'var(--theme-elevation-400, #999)',
-  },
-  button: {
-    padding: '8px 16px',
-    backgroundColor: '#2563eb',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '13px',
-    fontWeight: 500,
-  },
 }

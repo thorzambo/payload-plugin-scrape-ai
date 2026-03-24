@@ -54,25 +54,25 @@ export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
   }
 
   return (
-    <div style={styles.container}>
-      <h3 style={styles.heading}>Endpoints & Access</h3>
+    <div className="scrape-ai-card">
+      <h3 className="scrape-ai-card__heading">Endpoints &amp; Access</h3>
 
-      <div style={styles.list}>
+      <div>
         {endpoints.map((ep) => (
-          <div key={ep.path} style={styles.row}>
-            <div style={styles.info}>
-              <code style={styles.path}>
+          <div key={ep.path} className="scrape-ai-endpoint">
+            <div className="scrape-ai-endpoint__info">
+              <code className="scrape-ai-endpoint__path">
                 {ep.method} {ep.path}
               </code>
-              <span style={styles.description}>{ep.description}</span>
+              <span className="scrape-ai-endpoint__description">{ep.description}</span>
             </div>
-            <div style={styles.actions}>
-              <button style={styles.button} onClick={() => handleCopy(ep.path)}>
+            <div className="scrape-ai-endpoint__actions">
+              <button className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small" onClick={() => handleCopy(ep.path)}>
                 {copied === ep.path ? 'Copied!' : 'Copy URL'}
               </button>
               {!ep.path.includes('{') && (
                 <button
-                  style={styles.button}
+                  className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small"
                   onClick={() => handleTest(ep.path)}
                   disabled={testingEndpoint === ep.path}
                 >
@@ -85,75 +85,23 @@ export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
       </div>
 
       {testResult && (
-        <div style={styles.testOutput}>
-          <h4 style={styles.subheading}>Response</h4>
-          <pre style={styles.codeBlock}>{testResult}</pre>
+        <div style={{ marginTop: 16 }}>
+          <h4 className="scrape-ai-card__subheading">Response</h4>
+          <pre className="scrape-ai-code">{testResult}</pre>
         </div>
       )}
 
-      <div style={styles.instructions}>
-        <h4 style={styles.subheading}>Integration Guide</h4>
-        <p style={styles.text}>
+      <div className="scrape-ai-guide">
+        <h4 className="scrape-ai-card__subheading" style={{ margin: '0 0 8px 0' }}>Integration Guide</h4>
+        <p className="scrape-ai-guide__text">
           Point AI agents to <code>{siteUrl}/api/llms.txt</code> as the entry point.
           The llms.txt file links to all available content in markdown format.
         </p>
-        <p style={styles.text}>
+        <p className="scrape-ai-guide__text">
           For programmatic access, use the <code>/api/ai/context?query=...</code> endpoint
           to search content by relevance.
         </p>
       </div>
     </div>
   )
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    padding: '20px',
-    backgroundColor: 'var(--theme-elevation-0, white)',
-    borderRadius: '8px',
-    border: '1px solid var(--theme-elevation-100, #e0e0e0)',
-  },
-  heading: { margin: '0 0 16px 0', fontSize: '16px', fontWeight: 600 },
-  subheading: { margin: '12px 0 8px 0', fontSize: '14px', fontWeight: 500 },
-  list: { display: 'flex', flexDirection: 'column' as const, gap: '8px' },
-  row: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 16px',
-    backgroundColor: 'var(--theme-elevation-50, #f8f8f8)',
-    borderRadius: '6px',
-    flexWrap: 'wrap' as const,
-    gap: '8px',
-  },
-  info: { display: 'flex', flexDirection: 'column' as const, gap: '2px' },
-  path: { fontSize: '13px', fontFamily: 'monospace', fontWeight: 500 },
-  description: { fontSize: '12px', color: 'var(--theme-elevation-400, #999)' },
-  actions: { display: 'flex', gap: '6px' },
-  button: {
-    padding: '4px 10px',
-    fontSize: '12px',
-    borderRadius: '4px',
-    border: '1px solid var(--theme-elevation-200, #ddd)',
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-  },
-  testOutput: { marginTop: '16px' },
-  codeBlock: {
-    padding: '12px',
-    backgroundColor: 'var(--theme-elevation-100, #f0f0f0)',
-    borderRadius: '6px',
-    fontSize: '12px',
-    overflow: 'auto',
-    maxHeight: '300px',
-    whiteSpace: 'pre-wrap' as const,
-    fontFamily: 'monospace',
-  },
-  instructions: {
-    marginTop: '20px',
-    padding: '16px',
-    backgroundColor: 'var(--theme-elevation-50, #f8f8f8)',
-    borderRadius: '6px',
-  },
-  text: { fontSize: '13px', margin: '4px 0', lineHeight: '1.5' },
 }

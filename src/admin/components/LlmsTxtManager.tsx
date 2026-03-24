@@ -84,12 +84,12 @@ export const LlmsTxtManager: React.FC = () => {
   }
 
   return (
-    <div style={styles.container}>
-      <h3 style={styles.heading}>llms.txt Manager</h3>
+    <div className="scrape-ai-card">
+      <h3 className="scrape-ai-card__heading">llms.txt Manager</h3>
 
       {priority.length > 0 && (
-        <div style={styles.priorityList}>
-          <h4 style={styles.subheading}>Priority Order (drag to reorder)</h4>
+        <div className="scrape-ai-priority-list">
+          <h4 className="scrape-ai-card__subheading" style={{ margin: '0 0 8px 0' }}>Priority Order (drag to reorder)</h4>
           {priority.map((entry, i) => (
             <div
               key={entry.slug}
@@ -97,15 +97,13 @@ export const LlmsTxtManager: React.FC = () => {
               onDragStart={() => handleDragStart(i)}
               onDragOver={(e) => handleDragOver(e, i)}
               onDragEnd={handleDragEnd}
-              style={{
-                ...styles.priorityItem,
-                opacity: dragIndex === i ? 0.5 : 1,
-              }}
+              className="scrape-ai-priority-item"
+              style={{ opacity: dragIndex === i ? 0.5 : 1 }}
             >
-              <span style={styles.dragHandle}>&#x2630;</span>
-              <span style={styles.entrySlug}>{entry.slug}</span>
-              <span style={styles.entrySection}>{entry.section}</span>
-              <label style={styles.optionalLabel}>
+              <span className="scrape-ai-priority-item__handle">&#x2630;</span>
+              <span className="scrape-ai-priority-item__slug">{entry.slug}</span>
+              <span className="scrape-ai-priority-item__section">{entry.section}</span>
+              <label className="scrape-ai-priority-item__optional">
                 <input
                   type="checkbox"
                   checked={entry.optional}
@@ -115,96 +113,31 @@ export const LlmsTxtManager: React.FC = () => {
               </label>
             </div>
           ))}
-          <button style={styles.saveButton} onClick={handleSave} disabled={saving}>
+          <button className="scrape-ai-btn scrape-ai-btn--primary" onClick={handleSave} disabled={saving} style={{ marginTop: 12 }}>
             {saving ? 'Saving...' : 'Save & Rebuild'}
           </button>
         </div>
       )}
 
-      <div style={styles.previewSection}>
-        <div style={styles.previewHeader}>
+      <div style={{ marginTop: 16 }}>
+        <div className="scrape-ai-preview-header">
           <button
-            style={!showFull ? styles.activeTab : styles.tab}
+            className={`scrape-ai-btn ${!showFull ? 'scrape-ai-btn--primary' : 'scrape-ai-btn--secondary'} scrape-ai-btn--small`}
             onClick={() => setShowFull(false)}
           >
             llms.txt
           </button>
           <button
-            style={showFull ? styles.activeTab : styles.tab}
+            className={`scrape-ai-btn ${showFull ? 'scrape-ai-btn--primary' : 'scrape-ai-btn--secondary'} scrape-ai-btn--small`}
             onClick={() => setShowFull(true)}
           >
             llms-full.txt
           </button>
         </div>
-        <pre style={styles.previewContent}>
+        <pre className="scrape-ai-code">
           {showFull ? fullPreview || 'No content yet' : preview || 'No content yet'}
         </pre>
       </div>
     </div>
   )
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    padding: '20px',
-    backgroundColor: 'var(--theme-elevation-0, white)',
-    borderRadius: '8px',
-    border: '1px solid var(--theme-elevation-100, #e0e0e0)',
-  },
-  heading: { margin: '0 0 16px 0', fontSize: '16px', fontWeight: 600 },
-  subheading: { margin: '0 0 8px 0', fontSize: '14px', fontWeight: 500 },
-  priorityList: { marginBottom: '20px' },
-  priorityItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '8px 12px',
-    marginBottom: '4px',
-    backgroundColor: 'var(--theme-elevation-50, #f8f8f8)',
-    borderRadius: '4px',
-    cursor: 'grab',
-  },
-  dragHandle: { fontSize: '14px', cursor: 'grab', color: '#999' },
-  entrySlug: { flex: 1, fontSize: '13px', fontFamily: 'monospace' },
-  entrySection: { fontSize: '12px', color: '#888' },
-  optionalLabel: { display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' },
-  saveButton: {
-    marginTop: '12px',
-    padding: '8px 16px',
-    backgroundColor: '#2563eb',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '13px',
-  },
-  previewSection: { marginTop: '16px' },
-  previewHeader: { display: 'flex', gap: '8px', marginBottom: '12px' },
-  tab: {
-    padding: '6px 14px',
-    fontSize: '12px',
-    border: '1px solid var(--theme-elevation-200, #ddd)',
-    borderRadius: '4px',
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-  },
-  activeTab: {
-    padding: '6px 14px',
-    fontSize: '12px',
-    border: '1px solid #2563eb',
-    borderRadius: '4px',
-    backgroundColor: '#2563eb',
-    color: 'white',
-    cursor: 'pointer',
-  },
-  previewContent: {
-    padding: '16px',
-    backgroundColor: 'var(--theme-elevation-50, #f8f8f8)',
-    borderRadius: '6px',
-    fontSize: '12px',
-    overflow: 'auto',
-    maxHeight: '500px',
-    whiteSpace: 'pre-wrap' as const,
-    fontFamily: 'monospace',
-  },
 }
