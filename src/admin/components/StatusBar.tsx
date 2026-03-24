@@ -144,8 +144,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   button: {
     padding: '8px 16px',
-    backgroundColor: 'var(--theme-elevation-900, #333)',
-    color: 'white',
+    backgroundColor: '#2563eb',
+    color: '#ffffff',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',

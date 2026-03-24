@@ -420,7 +420,7 @@ const styles: Record<string, React.CSSProperties> = {
   actions: { display: 'flex', gap: '8px', marginTop: '16px' },
   saveButton: {
     padding: '8px 16px',
-    backgroundColor: 'var(--theme-elevation-900, #333)',
+    backgroundColor: '#2563eb',
     color: 'white',
     border: 'none',
     borderRadius: '6px',

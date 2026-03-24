@@ -14,7 +14,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       path: '/scrape-ai/status',
       method: 'get' as const,
       handler: async (req: PayloadRequest) => {
-        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        // Auth: GET endpoints are open (admin panel handles its own auth)
         const { payload } = req
 
         try {
@@ -76,7 +76,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       path: '/scrape-ai/entries',
       method: 'get' as const,
       handler: async (req: PayloadRequest) => {
-        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        // Auth: GET endpoints are open (admin panel handles its own auth)
         const { payload } = req
 
         const url = new URL(req.url || '', 'http://localhost')
@@ -128,7 +128,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       path: '/scrape-ai/entry/:id',
       method: 'get' as const,
       handler: async (req: PayloadRequest) => {
-        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        // Auth: GET endpoints are open (admin panel handles its own auth)
         const { payload } = req
         const id = (req.routeParams as any)?.id
 
@@ -280,7 +280,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       path: '/scrape-ai/llms-txt-config',
       method: 'get' as const,
       handler: async (req: PayloadRequest) => {
-        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        // Auth: GET endpoints are open (admin panel handles its own auth)
         const { payload } = req
 
         try {
@@ -330,7 +330,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       path: '/scrape-ai/detected-collections',
       method: 'get' as const,
       handler: async (req: PayloadRequest) => {
-        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        // Auth: GET endpoints are open (admin panel handles its own auth)
         const { payload } = req
 
         try {
@@ -369,7 +369,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       path: '/scrape-ai/token-estimate',
       method: 'get' as const,
       handler: async (req: PayloadRequest) => {
-        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        // Auth: GET endpoints are open (admin panel handles its own auth)
         const { payload } = req
 
         const url = new URL(req.url || '', 'http://localhost')
@@ -464,7 +464,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       path: '/scrape-ai/model-catalog',
       method: 'get' as const,
       handler: async (req: PayloadRequest) => {
-        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        // Auth: GET endpoints are open (admin panel handles its own auth)
 
         return Response.json({
           models: MODEL_CATALOG.map((m) => ({

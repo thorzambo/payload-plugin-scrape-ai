@@ -102,7 +102,7 @@ const styles = {
     saveButton: {
         marginTop: '12px',
         padding: '8px 16px',
-        backgroundColor: 'var(--theme-elevation-900, #333)',
+        backgroundColor: '#2563eb',
         color: 'white',
         border: 'none',
         borderRadius: '6px',
@@ -122,9 +122,9 @@ const styles = {
     activeTab: {
         padding: '6px 14px',
         fontSize: '12px',
-        border: '1px solid var(--theme-elevation-900, #333)',
+        border: '1px solid #2563eb',
         borderRadius: '4px',
-        backgroundColor: 'var(--theme-elevation-900, #333)',
+        backgroundColor: '#2563eb',
         color: 'white',
         cursor: 'pointer',
     },

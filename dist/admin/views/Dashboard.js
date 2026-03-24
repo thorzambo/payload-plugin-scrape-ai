@@ -68,10 +68,10 @@ const styles = {
         padding: '10px 20px',
         fontSize: '14px',
         border: 'none',
-        borderBottom: '2px solid var(--theme-elevation-900, #333)',
+        borderBottom: '2px solid #2563eb',
         backgroundColor: 'transparent',
         cursor: 'pointer',
-        color: 'var(--theme-elevation-900, #333)',
+        color: 'var(--theme-text, #fff)',
         fontWeight: 600,
     },
     content: {
