@@ -373,6 +373,29 @@ function slateNodeToMarkdown(node: any): string {
       const src = node.url || node.value?.url || ''
       return `![${alt}](${src})`
     }
+    case 'code':
+      return `\`\`\`\n${childText}\n\`\`\``
+
+    case 'table': {
+      if (!children || children.length === 0) return ''
+      const rows: string[][] = []
+      for (const row of children) {
+        const cells: string[] = (row.children || []).map((cell: any) =>
+          slateInlineToMarkdown(cell.children || [])
+        )
+        rows.push(cells)
+      }
+      if (rows.length === 0) return ''
+      const maxCols = Math.max(...rows.map(r => r.length))
+      const lines: string[] = []
+      lines.push('| ' + (rows[0] || []).map(c => c || '').join(' | ') + ' |')
+      lines.push('| ' + Array(maxCols).fill('---').join(' | ') + ' |')
+      for (let i = 1; i < rows.length; i++) {
+        lines.push('| ' + rows[i].map(c => c || '').join(' | ') + ' |')
+      }
+      return lines.join('\n')
+    }
+
     default:
       return childText
   }
@@ -450,8 +473,27 @@ function extractBlocks(
 
       if (typeof val === 'string') {
         blockParts.push(val)
+      } else if (typeof val === 'number' || typeof val === 'boolean') {
+        blockParts.push(`**${formatFieldLabel(key)}:** ${val}`)
+      } else if (Array.isArray(val)) {
+        const arrayContent = val
+          .map((item) => {
+            if (typeof item === 'string') return item
+            if (typeof item === 'object' && item !== null) {
+              const richText = extractRichText(item, {} as Field)
+              if (richText) return richText
+              const texts: string[] = []
+              for (const [k, v] of Object.entries(item)) {
+                if (typeof v === 'string' && v && k !== 'id' && k !== 'blockType') texts.push(v)
+                if (typeof v === 'number' || typeof v === 'boolean') texts.push(`**${formatFieldLabel(k)}:** ${v}`)
+              }
+              return texts.join('\n')
+            }
+            return String(item)
+          })
+          .filter(Boolean)
+        if (arrayContent.length > 0) blockParts.push(arrayContent.join('\n'))
       } else if (typeof val === 'object') {
-        // Could be richText, nested object, etc.
         const richText = extractRichText(val, {} as Field)
         if (richText) blockParts.push(richText)
       }

@@ -10,9 +10,10 @@ export function generateJsonLd(params: {
   siteName: string
   description?: string
   lastModified?: string
+  createdAt?: string
   contentType?: string
 }): Record<string, unknown> {
-  const { title, slug, collection, siteUrl, siteName, description, lastModified } = params
+  const { title, slug, collection, siteUrl, siteName, description, lastModified, createdAt } = params
 
   const schemaType = inferSchemaType(collection, params.contentType)
   const canonicalUrl = `${siteUrl}/${slug}`
@@ -41,9 +42,7 @@ export function generateJsonLd(params: {
   switch (schemaType) {
     case 'Article':
     case 'BlogPosting':
-      if (lastModified) {
-        jsonLd.datePublished = lastModified
-      }
+      jsonLd.datePublished = createdAt || lastModified
       jsonLd.headline = title
       break
 

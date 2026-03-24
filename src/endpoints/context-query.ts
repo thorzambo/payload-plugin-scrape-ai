@@ -69,12 +69,6 @@ export function createContextQueryEndpoint(rateLimiter: RateLimiter, siteUrl: st
               score += 2
             }
 
-            // Summary or title-based body matches (1x weight)
-            // We avoid scoring against full markdown to reduce memory pressure
-            if (summary.toLowerCase().includes(termLower)) {
-              score += 1
-            }
-
             // Topic matches (4x weight)
             for (const topic of topics) {
               if (topic.toLowerCase().includes(termLower)) {
@@ -97,7 +91,7 @@ export function createContextQueryEndpoint(rateLimiter: RateLimiter, siteUrl: st
 
           if (score > 0) {
             // Normalize score to 0-1 range (rough approximation)
-            const maxPossibleScore = terms.length * (3 + 2 + 1 + 4 + 3 + 2) // 15 per term max
+            const maxPossibleScore = terms.length * (3 + 2 + 4 + 3 + 2) // 14 per term max
             const normalizedScore = Math.min(score / maxPossibleScore, 1)
 
             scored.push({

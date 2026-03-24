@@ -1,10 +1,11 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
 /**
- * Creates a HEAD handler that mirrors a GET handler's response headers.
+ * Creates a HEAD handler that returns standard headers without executing the full GET handler.
  *
  * WHY: ChatGPT, Perplexity, and many HTTP clients send HEAD first.
  * Without HEAD support, Payload returns 404 and the client gives up.
+ * We return static headers to avoid executing full DB queries for HEAD requests.
  */
 export function withHeadSupport(endpointConfig: Endpoint): Endpoint[] {
   return [
@@ -13,19 +14,14 @@ export function withHeadSupport(endpointConfig: Endpoint): Endpoint[] {
       path: endpointConfig.path,
       method: 'head' as const,
       handler: async (req: PayloadRequest): Promise<Response> => {
-        try {
-          const originalResponse = await endpointConfig.handler(req)
-          const headers: Record<string, string> = {}
-          originalResponse.headers.forEach((value: string, key: string) => {
-            headers[key] = value
-          })
-          return new Response(null, {
-            status: originalResponse.status,
-            headers,
-          })
-        } catch {
-          return new Response(null, { status: 200 })
-        }
+        return new Response(null, {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'public, max-age=60',
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
       },
     },
   ]

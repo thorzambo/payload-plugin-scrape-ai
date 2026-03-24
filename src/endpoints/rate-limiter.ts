@@ -4,20 +4,22 @@
 export class RateLimiter {
   private requests: Map<string, number[]> = new Map()
   private maxPerMinute: number
+  private cleanupTimer: ReturnType<typeof setInterval>
 
   constructor(maxPerMinute: number) {
     this.maxPerMinute = maxPerMinute
-
-    // Clean up old entries every minute
-    setInterval(() => this.cleanup(), 60000)
+    this.cleanupTimer = setInterval(() => this.cleanup(), 60000)
+    this.cleanupTimer.unref()
   }
 
-  /**
-   * Check if a request from the given IP is allowed.
-   */
+  destroy(): void {
+    clearInterval(this.cleanupTimer)
+    this.requests.clear()
+  }
+
   check(ip: string): boolean {
     const now = Date.now()
-    const windowStart = now - 60000 // 1 minute window
+    const windowStart = now - 60000
 
     let timestamps = this.requests.get(ip)
     if (!timestamps) {
@@ -25,7 +27,6 @@ export class RateLimiter {
       this.requests.set(ip, timestamps)
     }
 
-    // Remove expired timestamps
     const valid = timestamps.filter((t) => t > windowStart)
     this.requests.set(ip, valid)
 

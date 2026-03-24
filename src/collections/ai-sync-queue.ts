@@ -5,6 +5,12 @@ export const aiSyncQueueCollection: CollectionConfig = {
   admin: {
     hidden: true,
   },
+  access: {
+    read: ({ req }) => Boolean(req.user),
+    create: ({ req }) => Boolean(req.user),
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => Boolean(req.user),
+  },
   fields: [
     {
       name: 'jobType',

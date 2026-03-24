@@ -47,13 +47,16 @@ export function structureContent(params: {
 
   // Generate JSON-LD
   const lastModified = (doc.updatedAt || doc.createdAt || new Date().toISOString()) as string
+  const description = extractDescription(doc)
   const jsonLd = generateJsonLd({
     title,
     slug: originalSlug,
     collection: collectionSlug,
     siteUrl,
     siteName,
+    description,
     lastModified,
+    createdAt: (doc.createdAt || new Date().toISOString()) as string,
   })
 
   // Build frontmatter
@@ -120,6 +123,17 @@ function extractSlug(doc: Record<string, unknown>): string {
   return String(doc.id || 'unknown')
 }
 
+function extractDescription(doc: Record<string, unknown>): string | undefined {
+  for (const key of ['description', 'excerpt', 'summary']) {
+    if (typeof doc[key] === 'string' && doc[key]) return doc[key] as string
+  }
+  const meta = doc.meta as Record<string, unknown> | undefined
+  if (meta && typeof meta.description === 'string' && meta.description) {
+    return meta.description
+  }
+  return undefined
+}
+
 export function toUrlSlug(slug: string): string {
   return slug.replace(/\//g, '-')
 }
@@ -171,18 +185,26 @@ function buildFrontmatter(data: Record<string, unknown>): string {
       } else {
         lines.push(`${key}:`)
         for (const item of value) {
-          lines.push(`  - "${item}"`)
+          lines.push(`  - "${escapeYamlString(String(item))}"`)
         }
       }
     } else if (typeof value === 'boolean') {
       lines.push(`${key}: ${value}`)
     } else {
-      const escaped = String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-      lines.push(`${key}: "${escaped}"`)
+      lines.push(`${key}: "${escapeYamlString(String(value))}"`)
     }
   }
   lines.push('---')
   return lines.join('\n')
+}
+
+function escapeYamlString(str: string): string {
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
 }
 
 function buildRelatedSection(

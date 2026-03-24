@@ -11,7 +11,7 @@ export function startScheduler(
   payload: Payload,
   pluginOptions: ResolvedPluginConfig,
   aiProvider: IAiProvider | null,
-): void {
+): () => void {
   const debounceMs = pluginOptions.sync.debounceMs
 
   payload.logger.info(`[scrape-ai] Scheduler started (interval: ${debounceMs}ms)`)
@@ -55,7 +55,12 @@ export function startScheduler(
       const resetDate = (aiConfig as any)?.aiApiCallCountResetDate
       const now = new Date()
 
-      if (!resetDate || new Date(resetDate).getMonth() !== now.getMonth()) {
+      const resetDateObj = resetDate ? new Date(resetDate) : null
+      const needsReset = !resetDateObj ||
+        resetDateObj.getMonth() !== now.getMonth() ||
+        resetDateObj.getFullYear() !== now.getFullYear()
+
+      if (needsReset) {
         await payload.updateGlobal({
           slug: 'ai-config',
           data: {
@@ -70,4 +75,11 @@ export function startScheduler(
     }
   }, 60 * 60 * 1000)
   resetInterval.unref()
+
+  return () => {
+    clearInterval(queueInterval)
+    clearInterval(recoveryInterval)
+    clearInterval(resetInterval)
+    payload.logger.info('[scrape-ai] Scheduler stopped')
+  }
 }
