@@ -13,12 +13,16 @@ import { createSitemapJsonEndpoint } from './endpoints/sitemap-json'
 import { createStructuredDataEndpoint } from './endpoints/structured-data'
 import { createContextQueryEndpoint } from './endpoints/context-query'
 import { createAdminEndpoints } from './endpoints/admin-api'
+import { createWellKnownEndpoint } from './endpoints/well-known'
+import { createRobotsTxtEndpoint } from './endpoints/robots-txt'
 import { RateLimiter } from './endpoints/rate-limiter'
 import { startScheduler } from './sync/scheduler'
 import { runInitialSync } from './sync/initial-sync'
 import { resolveAiProvider } from './ai/provider'
 
 export type { ScrapeAiPluginOptions } from './types'
+export { generateHeadTags, getDiscoveryLinks } from './discovery/head-tags'
+export { withScrapeAi } from './next'
 
 export const scrapeAiPlugin =
   (options: ScrapeAiPluginOptions): Plugin =>
@@ -91,6 +95,8 @@ export const scrapeAiPlugin =
       createContentMarkdownEndpoint(rateLimiter),
       createStructuredDataEndpoint(rateLimiter),
       createContextQueryEndpoint(rateLimiter, resolvedConfig.siteUrl),
+      createWellKnownEndpoint(resolvedConfig.siteUrl),
+      createRobotsTxtEndpoint(resolvedConfig.siteUrl),
       ...createAdminEndpoints(resolvedConfig, options),
     ]
 

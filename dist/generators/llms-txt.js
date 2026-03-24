@@ -76,6 +76,13 @@ export async function generateLlmsTxt(params) {
         lines.push(`> ${siteDescription}`);
         lines.push('');
     }
+    // Discovery section — helps AI agents navigate
+    lines.push(`## Navigation`);
+    lines.push(`- [Full Content Index](${siteUrl}/llms-full.txt): Complete listing of all ${entries.length} pages`);
+    lines.push(`- [Content Sitemap](${siteUrl}/ai/sitemap.json): Structured content graph with relationships`);
+    lines.push(`- [Search Content](${siteUrl}/ai/context?query=): Query content by relevance`);
+    lines.push(`- [Discovery Manifest](${siteUrl}/.well-known/ai-plugin.json): Machine-readable endpoint catalog`);
+    lines.push('');
     // Regular sections
     for (const section of sections) {
         const items = sectionEntries[section.name];

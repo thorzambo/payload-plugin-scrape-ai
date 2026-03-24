@@ -135,7 +135,53 @@ export const plugins: Plugin[] = [
 ]
 ```
 
-### 3. Restart your dev server
+### 3. Enable root-level AI discoverability (recommended)
+
+Wrap your Next.js config with `withScrapeAi` to serve AI content at root-level URLs where agents actually look:
+
+```javascript
+// next.config.mjs
+import { withScrapeAi } from 'payload-plugin-scrape-ai/next'
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // ... your existing config
+}
+
+export default withScrapeAi(nextConfig)
+```
+
+This adds rewrites so AI agents find your content at standard locations:
+
+| Without wrapper (hidden) | With wrapper (discoverable) |
+|---|---|
+| `/api/llms.txt` | **`/llms.txt`** |
+| `/api/llms-full.txt` | **`/llms-full.txt`** |
+| `/api/ai/sitemap.json` | **`/ai/sitemap.json`** |
+| `/api/ai/context?query=...` | **`/ai/context?query=...`** |
+| `/api/ai/pages/home.md` | **`/ai/pages/home.md`** |
+| *(none)* | **`/.well-known/ai-plugin.json`** |
+
+### 4. Add discovery hints to your HTML (optional)
+
+Add these tags to your site's `<head>` so AI agents can discover the content index from any page:
+
+```typescript
+import { generateHeadTags } from 'payload-plugin-scrape-ai'
+
+// Returns <link> and <meta> tags as a string
+const tags = generateHeadTags('https://your-website.com')
+```
+
+Or add these manually to your layout:
+
+```html
+<link rel="ai-content" href="https://your-website.com/llms.txt" type="text/markdown">
+<meta name="ai-content-index" content="https://your-website.com/llms.txt">
+<meta name="ai-plugin" content="https://your-website.com/.well-known/ai-plugin.json">
+```
+
+### 5. Restart your dev server
 
 ```bash
 npm run dev
@@ -143,9 +189,9 @@ npm run dev
 pnpm dev
 ```
 
-### 4. Visit the dashboard
+### 6. Visit the dashboard
 
-Go to **`/admin/scrape-ai`** in your Payload admin panel. You'll see the "Scrape AI" link in the sidebar.
+Go to **`/admin/scrape-ai`** in your Payload admin panel.
 
 On first load, the plugin will:
 1. Create `ai-content` and `ai-sync-queue` collections in your database
@@ -153,7 +199,7 @@ On first load, the plugin will:
 3. Auto-detect content collections (or use the ones you specified)
 4. Run an initial sync of all existing documents
 5. Start the background scheduler for ongoing sync
-6. Serve content at `/api/llms.txt` and other endpoints
+6. Serve content at `/llms.txt`, `/ai/*`, and `/.well-known/ai-plugin.json`
 
 ---
 
@@ -202,14 +248,15 @@ scrapeAiPlugin({
 
 All endpoints are public by design (that's the point — AI agents need access).
 
-| Endpoint | Content-Type | Description |
-|----------|-------------|-------------|
-| `GET /api/llms.txt` | `text/markdown` | Curated content index |
-| `GET /api/llms-full.txt` | `text/markdown` | Complete content listing |
-| `GET /api/ai/:collection/:slug.md` | `text/markdown` | Individual page markdown |
-| `GET /api/ai/sitemap.json` | `application/json` | Content graph with hierarchy |
-| `GET /api/ai/structured/:collection/:slug.json` | `application/json` | JSON-LD per entry |
-| `GET /api/ai/context?query=...&limit=5` | `application/json` | Relevance-scored search |
+| Root URL (with `withScrapeAi`) | Fallback (`/api/` always works) | Content-Type | Description |
+|---|---|---|---|
+| **`GET /llms.txt`** | `GET /api/llms.txt` | `text/markdown` | Curated content index — **start here** |
+| **`GET /llms-full.txt`** | `GET /api/llms-full.txt` | `text/markdown` | Complete content listing |
+| **`GET /ai/:collection/:slug.md`** | `GET /api/ai/:collection/:slug.md` | `text/markdown` | Individual page markdown |
+| **`GET /ai/sitemap.json`** | `GET /api/ai/sitemap.json` | `application/json` | Content graph with hierarchy |
+| **`GET /ai/structured/:collection/:slug.json`** | `GET /api/ai/structured/:collection/:slug.json` | `application/json` | JSON-LD per entry |
+| **`GET /ai/context?query=...&limit=5`** | `GET /api/ai/context?query=...&limit=5` | `application/json` | Relevance-scored search |
+| **`GET /.well-known/ai-plugin.json`** | `GET /api/scrape-ai/well-known` | `application/json` | Discovery manifest |
 
 ### Locale Support
 

@@ -19,6 +19,11 @@
     "./NavLink": {
       "import": "./dist/admin/components/NavLink.js",
       "types": "./dist/admin/components/NavLink.d.ts"
+    },
+    "./next": {
+      "import": "./dist/next.js",
+      "require": "./dist/next.js",
+      "types": "./dist/next.d.ts"
     }
   },
   "scripts": {

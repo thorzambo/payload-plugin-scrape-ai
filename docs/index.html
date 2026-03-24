@@ -335,12 +335,13 @@
         <table class="tbl">
           <thead><tr><th>Endpoint</th><th>Type</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>GET /api/llms.txt</code></td><td><span class="tag">text/markdown</span></td><td>Curated content index</td></tr>
-            <tr><td><code>GET /api/llms-full.txt</code></td><td><span class="tag">text/markdown</span></td><td>Complete content listing</td></tr>
-            <tr><td><code>GET /api/ai/:collection/:slug.md</code></td><td><span class="tag">text/markdown</span></td><td>Individual page markdown</td></tr>
-            <tr><td><code>GET /api/ai/sitemap.json</code></td><td><span class="tag">application/json</span></td><td>Content graph &amp; hierarchy</td></tr>
-            <tr><td><code>GET /api/ai/structured/:collection/:slug.json</code></td><td><span class="tag">application/json</span></td><td>JSON-LD structured data</td></tr>
-            <tr><td><code>GET /api/ai/context?query=...&limit=5</code></td><td><span class="tag">application/json</span></td><td>Relevance-scored search</td></tr>
+            <tr><td><code>GET /llms.txt</code></td><td><span class="tag">text/markdown</span></td><td>Curated content index &mdash; <strong style="color:var(--ac)">start here</strong></td></tr>
+            <tr><td><code>GET /llms-full.txt</code></td><td><span class="tag">text/markdown</span></td><td>Complete content listing</td></tr>
+            <tr><td><code>GET /ai/:collection/:slug.md</code></td><td><span class="tag">text/markdown</span></td><td>Individual page markdown</td></tr>
+            <tr><td><code>GET /ai/sitemap.json</code></td><td><span class="tag">application/json</span></td><td>Content graph &amp; hierarchy</td></tr>
+            <tr><td><code>GET /ai/structured/:collection/:slug.json</code></td><td><span class="tag">application/json</span></td><td>JSON-LD structured data</td></tr>
+            <tr><td><code>GET /ai/context?query=...&limit=5</code></td><td><span class="tag">application/json</span></td><td>Relevance-scored search</td></tr>
+            <tr><td><code>GET /.well-known/ai-plugin.json</code></td><td><span class="tag">application/json</span></td><td>Discovery manifest</td></tr>
           </tbody>
         </table>
       </div>
@@ -375,11 +376,15 @@ npm install <span class="s">github:thorzambo/payload-plugin-scrape-ai</span>
   ],
 })</div></div>
         <div class="sr sr-d2">
-          <p class="xs" style="margin-bottom:8px;">3. Restart your dev server</p>
-          <div class="code-block">npm run dev  <span class="c"># or: pnpm dev</span></div>
+          <p class="xs" style="margin-bottom:8px;">3. Enable root-level AI discoverability</p>
+          <div class="code-block"><span class="c">// next.config.mjs</span>
+<span class="k">import</span> { <span class="f">withScrapeAi</span> } <span class="k">from</span> <span class="s">'payload-plugin-scrape-ai/next'</span>
+
+<span class="k">export default</span> <span class="f">withScrapeAi</span>(nextConfig)</div>
+          <p class="xs" style="margin-top:8px;color:var(--g3);">Maps <code style="font-family:var(--mono);color:var(--ac);font-size:11px">/llms.txt</code> and <code style="font-family:var(--mono);color:var(--ac);font-size:11px">/ai/*</code> to the plugin endpoints. Without this, AI agents can't find your content.</p>
         </div>
         <div class="sr sr-d3">
-          <p class="xs" style="margin-bottom:8px;">4. Visit the dashboard</p>
+          <p class="xs" style="margin-bottom:8px;">4. Restart and visit the dashboard</p>
           <p class="b" style="font-size:14px;">Go to <code style="font-family:var(--mono);color:var(--ac);font-size:12px">/admin/scrape-ai</code> in your Payload admin panel. The "Scrape AI" link appears in the sidebar.</p>
         </div>
         <div class="card sr sr-d4" style="margin-top:8px;padding:20px 24px;">
