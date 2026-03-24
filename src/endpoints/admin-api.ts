@@ -150,7 +150,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const { payload } = req
 
         let body: any = {}
-        try { body = await req.json() } catch { /* empty body */ }
+        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
         try {
           if (body.all) {
             // Bulk delete all non-aggregate entries
@@ -194,7 +194,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const { payload } = req
 
         let body: any = {}
-        try { body = await req.json() } catch { /* empty body */ }
+        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
         try {
           const { collection: slug, enabled } = body
 
@@ -228,7 +228,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const { payload } = req
 
         let body: any = {}
-        try { body = await req.json() } catch { /* empty body */ }
+        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
         try {
           const data: Record<string, any> = {}
 
@@ -306,7 +306,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const { payload } = req
 
         let body: any = {}
-        try { body = await req.json() } catch { /* empty body */ }
+        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
         try {
           const data: Record<string, any> = {}
 
