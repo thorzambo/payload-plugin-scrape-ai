@@ -90,13 +90,13 @@ const scrapeAiPlugin = (options) => (incomingConfig) => {
             views: {
                 ...(config.admin?.components?.views || {}),
                 scrapeAi: {
-                    Component: 'payload-plugin-scrape-ai/dist/admin/views/Dashboard',
+                    Component: 'payload-plugin-scrape-ai/client#default',
                     path: '/scrape-ai',
                 },
             },
             afterNavLinks: [
                 ...(config.admin?.components?.afterNavLinks || []),
-                'payload-plugin-scrape-ai/dist/admin/components/NavLink',
+                'payload-plugin-scrape-ai/NavLink#default',
             ],
         },
     };
