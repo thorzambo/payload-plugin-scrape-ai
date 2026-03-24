@@ -2,6 +2,7 @@ import type { PayloadRequest } from 'payload'
 import type { ResolvedPluginConfig } from '../types'
 import { detectContentCollections } from '../detection/smart-detect'
 import { createAiProvider } from '../ai/provider'
+import { estimateJob, MODEL_CATALOG, formatTokens, formatCost } from '../ai/token-estimator'
 
 /**
  * Create all authenticated admin API endpoints for the dashboard.
@@ -360,6 +361,124 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         } catch (error: any) {
           return Response.json({ error: error.message }, { status: 500 })
         }
+      },
+    },
+
+    // GET /api/scrape-ai/token-estimate
+    {
+      path: '/scrape-ai/token-estimate',
+      method: 'get' as const,
+      handler: async (req: PayloadRequest) => {
+        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        const { payload } = req
+
+        const url = new URL(req.url || '', 'http://localhost')
+        const providerFilter = url.searchParams.get('provider') as 'openai' | 'anthropic' | null
+
+        try {
+          // Fetch all ai-content entries
+          const allContent = await payload.find({
+            collection: 'ai-content',
+            where: { sourceCollection: { not_equals: '__aggregate' } },
+            limit: 10000,
+          })
+
+          const documents = allContent.docs.map((doc: any) => ({
+            title: doc.title || '',
+            markdown: doc.markdown || '',
+            sourceCollection: doc.sourceCollection || '',
+            sourceDocId: doc.sourceDocId || '',
+            hasAiMeta: Boolean(doc.aiMeta && Object.keys(doc.aiMeta).length > 0),
+          }))
+
+          const estimate = estimateJob(documents, providerFilter || undefined)
+
+          // Format for the dashboard
+          return Response.json({
+            totalDocuments: estimate.totalDocuments,
+            documentsNeedingEnrichment: estimate.documentsNeedingEnrichment,
+            totals: {
+              totalInputTokens: estimate.totals.totalInputTokens,
+              totalOutputTokens: estimate.totals.totalOutputTokens,
+              totalTokens: estimate.totals.totalTokens,
+              maxSingleRequestTokens: estimate.totals.maxSingleRequestTokens,
+              formatted: {
+                totalInputTokens: formatTokens(estimate.totals.totalInputTokens),
+                totalOutputTokens: formatTokens(estimate.totals.totalOutputTokens),
+                totalTokens: formatTokens(estimate.totals.totalTokens),
+                maxSingleRequest: formatTokens(estimate.totals.maxSingleRequestTokens),
+              },
+            },
+            costEstimates: estimate.costEstimates.map((c) => ({
+              modelId: c.model.id,
+              modelName: c.model.name,
+              provider: c.model.provider,
+              tier: c.model.tier,
+              contextWindow: c.model.contextWindow,
+              contextWindowFormatted: formatTokens(c.model.contextWindow),
+              inputCost: c.inputCost,
+              outputCost: c.outputCost,
+              totalCost: c.totalCost,
+              totalCostFormatted: formatCost(c.totalCost),
+              canHandle: c.canHandle,
+              recommended: c.recommended,
+              reason: c.reason,
+              notes: c.model.notes,
+            })),
+            recommendation: estimate.recommendation
+              ? {
+                  modelId: estimate.recommendation.model.id,
+                  modelName: estimate.recommendation.model.name,
+                  provider: estimate.recommendation.model.provider,
+                  totalCost: estimate.recommendation.totalCost,
+                  totalCostFormatted: formatCost(estimate.recommendation.totalCost),
+                  reason: estimate.recommendation.reason,
+                }
+              : null,
+            // Per-document breakdown (top 10 largest by token count)
+            largestDocuments: estimate.perDocumentEstimates
+              .sort((a, b) => b.contentTokens - a.contentTokens)
+              .slice(0, 10)
+              .map((d) => ({
+                title: d.title,
+                sourceCollection: d.sourceCollection,
+                contentTokens: d.contentTokens,
+                contentTokensFormatted: formatTokens(d.contentTokens),
+                totalInputTokens: d.totalInputTokens,
+                totalOutputTokens: d.totalOutputTokens,
+                callsBreakdown: {
+                  summary: `${formatTokens(d.calls.summary.inputTokens)} in / ${formatTokens(d.calls.summary.outputTokens)} out`,
+                  entities: `${formatTokens(d.calls.entities.inputTokens)} in / ${formatTokens(d.calls.entities.outputTokens)} out`,
+                  chunks: `${formatTokens(d.calls.chunks.inputTokens)} in / ${formatTokens(d.calls.chunks.outputTokens)} out`,
+                },
+              })),
+          })
+        } catch (error: any) {
+          return Response.json({ error: error.message }, { status: 500 })
+        }
+      },
+    },
+
+    // GET /api/scrape-ai/model-catalog
+    {
+      path: '/scrape-ai/model-catalog',
+      method: 'get' as const,
+      handler: async (req: PayloadRequest) => {
+        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+        return Response.json({
+          models: MODEL_CATALOG.map((m) => ({
+            id: m.id,
+            name: m.name,
+            provider: m.provider,
+            contextWindow: m.contextWindow,
+            contextWindowFormatted: formatTokens(m.contextWindow),
+            inputPricePerMTok: m.inputPricePerMTok,
+            outputPricePerMTok: m.outputPricePerMTok,
+            tier: m.tier,
+            notes: m.notes,
+          })),
+        })
       },
     },
   ]
