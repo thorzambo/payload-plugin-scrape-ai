@@ -16,6 +16,7 @@ import { createAdminEndpoints } from './endpoints/admin-api'
 import { createWellKnownEndpoint } from './endpoints/well-known'
 import { createRobotsTxtEndpoint, createMergedRobotsTxtEndpoint } from './endpoints/robots-txt'
 import { createSitemapXmlEndpoint } from './endpoints/sitemap-xml'
+import { withHeadSupport } from './endpoints/head-support'
 import { RateLimiter } from './endpoints/rate-limiter'
 import { startScheduler } from './sync/scheduler'
 import { runInitialSync } from './sync/initial-sync'
@@ -90,8 +91,8 @@ export const scrapeAiPlugin =
     // --- Register public endpoints ---
     const rateLimiter = new RateLimiter(resolvedConfig.sync.rateLimitPerMinute)
 
-    config.endpoints = [
-      ...(config.endpoints ?? []),
+    // All public AI endpoints get HEAD support (ChatGPT/Perplexity send HEAD first)
+    const publicEndpoints = [
       createLlmsTxtEndpoint(rateLimiter),
       createLlmsFullTxtEndpoint(rateLimiter),
       createSitemapJsonEndpoint(rateLimiter),
@@ -102,6 +103,11 @@ export const scrapeAiPlugin =
       createRobotsTxtEndpoint(resolvedConfig.siteUrl),
       createMergedRobotsTxtEndpoint(resolvedConfig.siteUrl),
       createSitemapXmlEndpoint(resolvedConfig.siteUrl),
+    ]
+
+    config.endpoints = [
+      ...(config.endpoints ?? []),
+      ...publicEndpoints.flatMap((ep) => withHeadSupport(ep)),
       ...createAdminEndpoints(resolvedConfig, options),
     ]
 
