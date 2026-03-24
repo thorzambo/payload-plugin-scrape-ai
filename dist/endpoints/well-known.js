@@ -22,12 +22,12 @@ export function createWellKnownEndpoint(siteUrl) {
                     llms_txt: {
                         url: `${siteUrl}/llms.txt`,
                         description: 'Curated content index following the llms.txt standard. START HERE.',
-                        content_type: 'text/markdown',
+                        content_type: 'text/plain',
                     },
                     llms_full_txt: {
                         url: `${siteUrl}/llms-full.txt`,
                         description: 'Complete listing of all content, organized by collection.',
-                        content_type: 'text/markdown',
+                        content_type: 'text/plain',
                     },
                     sitemap: {
                         url: `${siteUrl}/ai/sitemap.json`,
@@ -47,7 +47,7 @@ export function createWellKnownEndpoint(siteUrl) {
                     page_content: {
                         url: `${siteUrl}/ai/{collection}/{slug}.md`,
                         description: 'Individual page content as markdown with YAML frontmatter.',
-                        content_type: 'text/markdown',
+                        content_type: 'text/plain',
                     },
                     structured_data: {
                         url: `${siteUrl}/ai/structured/{collection}/{slug}.json`,

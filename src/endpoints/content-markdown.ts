@@ -52,7 +52,7 @@ export function createContentMarkdownEndpoint(rateLimiter: RateLimiter) {
         return new Response(content, {
           status: 200,
           headers: {
-            'Content-Type': 'text/markdown; charset=utf-8',
+            'Content-Type': 'text/plain; charset=utf-8',
             'Cache-Control': 'public, max-age=60',
             ...(lastSynced ? { ETag: `"${new Date(lastSynced).getTime()}"` } : {}),
           },
