@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { Button } from '@payloadcms/ui'
+import { Pill } from '@payloadcms/ui'
 
 interface StatusData {
   totalEntries: number
@@ -52,9 +54,9 @@ export const StatusBar: React.FC = () => {
   if (loading) return <div className="scrape-ai-status">Loading...</div>
   if (!status) return <div className="scrape-ai-status">Failed to load status</div>
 
-  const pillClass = status.errorCount > 0 ? 'scrape-ai-pill--error'
-    : status.pendingCount > 0 ? 'scrape-ai-pill--warning'
-    : 'scrape-ai-pill--success'
+  const pillStyle = status.errorCount > 0 ? 'error'
+    : status.pendingCount > 0 ? 'warning'
+    : 'success' as const
   const statusText = status.errorCount > 0 ? `${status.errorCount} Errors`
     : status.pendingCount > 0 ? `${status.pendingCount} Pending`
     : 'All Synced'
@@ -64,7 +66,7 @@ export const StatusBar: React.FC = () => {
     <div className="scrape-ai-status">
       <div className="scrape-ai-status__row">
         <div className="scrape-ai-status__group">
-          <span className={`scrape-ai-pill ${pillClass}`}>{statusText}</span>
+          <Pill pillStyle={pillStyle}>{statusText}</Pill>
           <span className="scrape-ai-status__stat">
             {status.totalEntries} pages across {collectionCount} collections
           </span>
@@ -76,11 +78,11 @@ export const StatusBar: React.FC = () => {
             </span>
           )}
           {status.aiEnabled && (
-            <span className="scrape-ai-pill scrape-ai-pill--info">AI: {status.aiApiCallCount} calls</span>
+            <Pill pillStyle="dark">AI: {status.aiApiCallCount} calls</Pill>
           )}
-          <button className="scrape-ai-btn scrape-ai-btn--primary" onClick={handleRegenerateAll} disabled={regenerating}>
+          <Button buttonStyle="primary" size="small" onClick={handleRegenerateAll} disabled={regenerating}>
             {regenerating ? 'Regenerating...' : 'Regenerate All'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

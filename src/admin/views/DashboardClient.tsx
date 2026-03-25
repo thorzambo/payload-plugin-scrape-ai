@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Gutter } from '@payloadcms/ui'
+import { SetStepNav } from '@payloadcms/ui'
 import { StatusBar } from '../components/StatusBar'
 import { CollectionToggles } from '../components/CollectionToggles'
 import { ContentTable } from '../components/ContentTable'
@@ -24,7 +26,9 @@ export const DashboardClient: React.FC = () => {
   ]
 
   return (
-    <div>
+    <Gutter>
+      <SetStepNav nav={[{ label: 'Scrape AI' }]} />
+
       <header className="scrape-ai__header">
         <h1 className="scrape-ai__title">Scrape AI</h1>
         <p className="scrape-ai__description">AI-friendly content generation dashboard</p>
@@ -51,7 +55,7 @@ export const DashboardClient: React.FC = () => {
         {activeTab === 'ai-settings' && <AiSettings />}
         {activeTab === 'endpoints' && <EndpointsPanel siteUrl={siteUrl} />}
       </div>
-    </div>
+    </Gutter>
   )
 }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Button } from '@payloadcms/ui'
 
 interface EndpointInfo {
   path: string
@@ -67,17 +68,18 @@ export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
               <span className="scrape-ai-endpoint__description">{ep.description}</span>
             </div>
             <div className="scrape-ai-endpoint__actions">
-              <button className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small" onClick={() => handleCopy(ep.path)}>
+              <Button buttonStyle="secondary" size="small" onClick={() => handleCopy(ep.path)}>
                 {copied === ep.path ? 'Copied!' : 'Copy URL'}
-              </button>
+              </Button>
               {!ep.path.includes('{') && (
-                <button
-                  className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small"
+                <Button
+                  buttonStyle="secondary"
+                  size="small"
                   onClick={() => handleTest(ep.path)}
                   disabled={testingEndpoint === ep.path}
                 >
                   {testingEndpoint === ep.path ? 'Testing...' : 'Test'}
-                </button>
+                </Button>
               )}
             </div>
           </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { Button } from '@payloadcms/ui'
 
 interface PriorityEntry {
   slug: string
@@ -113,26 +114,28 @@ export const LlmsTxtManager: React.FC = () => {
               </label>
             </div>
           ))}
-          <button className="scrape-ai-btn scrape-ai-btn--primary" onClick={handleSave} disabled={saving} style={{ marginTop: 12 }}>
+          <Button buttonStyle="primary" size="small" onClick={handleSave} disabled={saving} className="scrape-ai-priority-save">
             {saving ? 'Saving...' : 'Save & Rebuild'}
-          </button>
+          </Button>
         </div>
       )}
 
       <div style={{ marginTop: 16 }}>
         <div className="scrape-ai-preview-header">
-          <button
-            className={`scrape-ai-btn ${!showFull ? 'scrape-ai-btn--primary' : 'scrape-ai-btn--secondary'} scrape-ai-btn--small`}
+          <Button
+            buttonStyle={!showFull ? 'primary' : 'secondary'}
+            size="small"
             onClick={() => setShowFull(false)}
           >
             llms.txt
-          </button>
-          <button
-            className={`scrape-ai-btn ${showFull ? 'scrape-ai-btn--primary' : 'scrape-ai-btn--secondary'} scrape-ai-btn--small`}
+          </Button>
+          <Button
+            buttonStyle={showFull ? 'primary' : 'secondary'}
+            size="small"
             onClick={() => setShowFull(true)}
           >
             llms-full.txt
-          </button>
+          </Button>
         </div>
         <pre className="scrape-ai-code">
           {showFull ? fullPreview || 'No content yet' : preview || 'No content yet'}

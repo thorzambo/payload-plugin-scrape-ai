@@ -107,51 +107,14 @@
   color: var(--theme-elevation-400, #999);
 }
 
-/* Pills */
-.scrape-ai-pill {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  color: white;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1;
+/* Inline pill helper (for pills placed inline after text) */
+.scrape-ai-inline-pill {
+  margin-left: 8px;
 }
 
-.scrape-ai-pill--success { background: var(--theme-success-500, #22c55e); }
-.scrape-ai-pill--warning { background: #eab308; }
-.scrape-ai-pill--error { background: var(--theme-error-500, #ef4444); }
-.scrape-ai-pill--info { background: #8b5cf6; }
-
-/* Buttons */
-.scrape-ai-btn {
-  padding: 8px 16px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  font-family: inherit;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.scrape-ai-btn:hover { opacity: 0.9; }
-.scrape-ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.scrape-ai-btn--primary {
-  background: var(--theme-success-500, #22c55e);
-  color: white;
-}
-
-.scrape-ai-btn--secondary {
-  background: transparent;
-  border: 1px solid var(--theme-elevation-250, #ccc);
-  color: var(--theme-text, #333);
-}
-
-.scrape-ai-btn--small {
-  padding: 4px 10px;
-  font-size: 0.75rem;
+/* Priority save button spacing */
+.scrape-ai-priority-save {
+  margin-top: 12px;
 }
 
 /* Table */
@@ -341,30 +304,7 @@
   gap: 8px;
 }
 
-/* Badges */
-.scrape-ai-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.625rem;
-  font-weight: 700;
-}
-
-.scrape-ai-badge--success {
-  background: var(--theme-success-500, #22c55e);
-  color: white;
-}
-
-.scrape-ai-badge--draft {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.scrape-ai-badge--tier {
-  color: white;
-  font-size: 0.6875rem;
-  font-weight: 600;
-}
+/* Badges are handled by native Payload Pill component */
 
 /* Status dot */
 .scrape-ai-status-dot {
@@ -408,19 +348,7 @@
   overflow: visible;
 }
 
-/* Pagination */
-.scrape-ai-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.scrape-ai-pagination__info {
-  font-size: 0.8125rem;
-  color: var(--theme-elevation-500, #888);
-}
+/* Pagination wrapper -- native Payload Pagination component is used */
 
 /* Collection toggles */
 .scrape-ai-toggles {

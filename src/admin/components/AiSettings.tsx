@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { Button } from '@payloadcms/ui'
+import { Pill } from '@payloadcms/ui'
 
 interface CostEstimate {
   modelId: string; modelName: string; provider: string; tier: string
@@ -20,7 +22,11 @@ interface TokenEstimate {
   largestDocuments: Array<{ title: string; sourceCollection: string; contentTokens: number; contentTokensFormatted: string; callsBreakdown: { summary: string; entities: string; chunks: string } }>
 }
 
-const tierColors: Record<string, string> = { budget: '#22c55e', standard: '#3b82f6', premium: '#8b5cf6' }
+const tierPillStyle: Record<string, 'success' | 'light' | 'dark'> = {
+  budget: 'success',
+  standard: 'light',
+  premium: 'dark',
+}
 
 export const AiSettings: React.FC = () => {
   const [aiEnabled, setAiEnabled] = useState(false)
@@ -109,8 +115,12 @@ export const AiSettings: React.FC = () => {
       </div>
 
       <div className="scrape-ai-actions">
-        <button className="scrape-ai-btn scrape-ai-btn--primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Settings'}</button>
-        <button className="scrape-ai-btn scrape-ai-btn--secondary" onClick={handleTest} disabled={testing}>{testing ? 'Testing...' : 'Test Connection'}</button>
+        <Button buttonStyle="primary" size="small" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving...' : 'Save Settings'}
+        </Button>
+        <Button buttonStyle="secondary" size="small" onClick={handleTest} disabled={testing}>
+          {testing ? 'Testing...' : 'Test Connection'}
+        </Button>
       </div>
 
       {testResult && (
@@ -124,9 +134,9 @@ export const AiSettings: React.FC = () => {
       <div className="scrape-ai-estimate">
         <div className="scrape-ai-estimate__header">
           <h4 className="scrape-ai-card__subheading" style={{ margin: 0 }}>Token Estimation &amp; Model Recommendation</h4>
-          <button className="scrape-ai-btn scrape-ai-btn--primary" onClick={fetchEstimate} disabled={estimating}>
+          <Button buttonStyle="primary" size="small" onClick={fetchEstimate} disabled={estimating}>
             {estimating ? 'Estimating...' : estimate ? 'Re-estimate' : 'Estimate Tokens'}
-          </button>
+          </Button>
         </div>
         <p className="scrape-ai-estimate__hint">Analyzes your content to estimate total AI tokens needed, then recommends the cheapest model that can handle your workload.</p>
 
@@ -163,7 +173,9 @@ export const AiSettings: React.FC = () => {
                   <strong>Recommended: {estimate.recommendation.modelName}</strong>
                   <span style={{ marginLeft: 8, color: '#666' }}>({estimate.recommendation.provider}) — {estimate.recommendation.reason}</span>
                 </div>
-                <button className="scrape-ai-btn scrape-ai-btn--primary" onClick={() => handleApplyRecommendation(estimate.recommendation!.modelId, estimate.recommendation!.provider)}>Apply This Model</button>
+                <Button buttonStyle="primary" size="small" onClick={() => handleApplyRecommendation(estimate.recommendation!.modelId, estimate.recommendation!.provider)}>
+                  Apply This Model
+                </Button>
               </div>
             )}
 
@@ -175,13 +187,16 @@ export const AiSettings: React.FC = () => {
               <tbody>
                 {estimate.costEstimates.map((c) => (
                   <tr key={c.modelId} style={{ opacity: c.canHandle ? 1 : 0.5, backgroundColor: c.recommended ? '#f0fdf4' : 'transparent' }}>
-                    <td><strong>{c.modelName}</strong>{c.recommended && <span className="scrape-ai-badge scrape-ai-badge--success" style={{ marginLeft: 8 }}>BEST VALUE</span>}</td>
+                    <td>
+                      <strong>{c.modelName}</strong>
+                      {c.recommended && <Pill pillStyle="success" size="small" className="scrape-ai-inline-pill">BEST VALUE</Pill>}
+                    </td>
                     <td>{c.provider}</td>
-                    <td><span className="scrape-ai-badge scrape-ai-badge--tier" style={{ backgroundColor: tierColors[c.tier] || '#999' }}>{c.tier}</span></td>
+                    <td><Pill pillStyle={tierPillStyle[c.tier] || 'light'} size="small">{c.tier}</Pill></td>
                     <td>{c.contextWindowFormatted}</td>
                     <td><strong>{c.totalCostFormatted}</strong></td>
                     <td>{c.canHandle ? <span style={{ color: '#22c55e' }}>{c.reason || 'Compatible'}</span> : <span style={{ color: '#ef4444' }}>{c.reason}</span>}</td>
-                    <td>{c.canHandle && <button className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small" onClick={() => handleApplyRecommendation(c.modelId, c.provider)}>Use</button>}</td>
+                    <td>{c.canHandle && <Button buttonStyle="secondary" size="small" onClick={() => handleApplyRecommendation(c.modelId, c.provider)}>Use</Button>}</td>
                   </tr>
                 ))}
               </tbody>

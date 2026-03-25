@@ -1,6 +1,9 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { Button } from '@payloadcms/ui'
+import { Pagination } from '@payloadcms/ui'
+import { Pill } from '@payloadcms/ui'
 
 interface Entry {
   id: string
@@ -20,12 +23,12 @@ interface EntryDetail {
   aiMeta?: any
 }
 
-const statusColors: Record<string, string> = {
-  synced: '#22c55e',
-  pending: '#eab308',
-  processing: '#3b82f6',
-  error: '#ef4444',
-  'error-permanent': '#991b1b',
+const statusPillStyle: Record<string, 'success' | 'warning' | 'error' | 'dark' | 'light'> = {
+  synced: 'success',
+  pending: 'warning',
+  processing: 'light',
+  error: 'error',
+  'error-permanent': 'error',
 }
 
 export const ContentTable: React.FC = () => {
@@ -114,36 +117,40 @@ export const ContentTable: React.FC = () => {
                   <tr style={{ cursor: 'pointer' }} onClick={() => handleRowClick(entry.id)}>
                     <td>
                       {entry.title}
-                      {entry.isDraft && <span className="scrape-ai-badge scrape-ai-badge--draft" style={{ marginLeft: 8 }}>DRAFT</span>}
+                      {entry.isDraft && <Pill pillStyle="warning" size="small" className="scrape-ai-inline-pill">DRAFT</Pill>}
                     </td>
                     <td>{entry.sourceCollection}</td>
                     <td>
-                      <span className="scrape-ai-status-dot" style={{ backgroundColor: statusColors[entry.status] || '#999' }} />
-                      {entry.status}
+                      <Pill pillStyle={statusPillStyle[entry.status] || 'light'} size="small">
+                        {entry.status}
+                      </Pill>
                     </td>
-                    <td>{entry.lastSynced ? new Date(entry.lastSynced).toLocaleString() : '—'}</td>
-                    <td>{entry.hasAiMeta ? 'Yes' : '—'}</td>
+                    <td>{entry.lastSynced ? new Date(entry.lastSynced).toLocaleString() : '\u2014'}</td>
+                    <td>{entry.hasAiMeta ? 'Yes' : '\u2014'}</td>
                     <td>
-                      <button
-                        className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small"
+                      <Button
+                        buttonStyle="secondary"
+                        size="small"
                         onClick={(e) => { e.stopPropagation(); handleRegenerate([entry.id]) }}
                       >
                         Regenerate
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                   {selectedId === entry.id && detail && (
                     <tr>
                       <td colSpan={6} className="scrape-ai-detail">
                         <div className="scrape-ai-detail__header">
-                          <button
-                            className={`scrape-ai-btn ${viewMode === 'rendered' ? 'scrape-ai-btn--primary' : 'scrape-ai-btn--secondary'} scrape-ai-btn--small`}
+                          <Button
+                            buttonStyle={viewMode === 'rendered' ? 'primary' : 'secondary'}
+                            size="small"
                             onClick={() => setViewMode('rendered')}
-                          >Rendered</button>
-                          <button
-                            className={`scrape-ai-btn ${viewMode === 'raw' ? 'scrape-ai-btn--primary' : 'scrape-ai-btn--secondary'} scrape-ai-btn--small`}
+                          >Rendered</Button>
+                          <Button
+                            buttonStyle={viewMode === 'raw' ? 'primary' : 'secondary'}
+                            size="small"
                             onClick={() => setViewMode('raw')}
-                          >Raw Markdown</button>
+                          >Raw Markdown</Button>
                         </div>
                         <pre className="scrape-ai-code">
                           {viewMode === 'raw'
@@ -170,11 +177,13 @@ export const ContentTable: React.FC = () => {
             </tbody>
           </table>
 
-          <div className="scrape-ai-pagination">
-            <button className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</button>
-            <span className="scrape-ai-pagination__info">Page {page} of {totalPages}</span>
-            <button className="scrape-ai-btn scrape-ai-btn--secondary scrape-ai-btn--small" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Next</button>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            hasNextPage={page < totalPages}
+            hasPrevPage={page > 1}
+            onChange={setPage}
+          />
         </>
       )}
     </div>
