@@ -165,13 +165,10 @@ export const scrapeAiPlugin =
       // Start background scheduler
       const stopScheduler = startScheduler(payload, resolvedConfig)
 
-      // Register cleanup on process exit
-      const cleanup = () => {
-        stopScheduler()
-      }
-      process.on('beforeExit', cleanup)
-      process.on('SIGTERM', cleanup)
-      process.on('SIGINT', cleanup)
+      // Register cleanup on process exit (once to prevent listener accumulation)
+      process.once('beforeExit', () => stopScheduler())
+      process.once('SIGTERM', () => { stopScheduler(); process.exit(0) })
+      process.once('SIGINT', () => { stopScheduler(); process.exit(0) })
 
       payload.logger.info('[scrape-ai] Plugin initialized successfully')
     }

@@ -14,22 +14,14 @@ export function createAfterDeleteHook(
     try {
       const collectionSlug = collection.slug
 
-      // Find and delete matching ai-content entries (all locales)
-      const existing = await payload.find({
+      // Bulk delete matching ai-content entries (all locales)
+      await payload.delete({
         collection: 'ai-content',
         where: {
           sourceCollection: { equals: collectionSlug },
           sourceDocId: { equals: String(doc.id) },
         },
-        limit: 100,
       })
-
-      for (const entry of existing.docs) {
-        await payload.delete({
-          collection: 'ai-content',
-          id: entry.id,
-        })
-      }
 
       // Queue aggregate rebuild (deduplicated — skip if one is already pending)
       const existingRebuild = await payload.find({
