@@ -34,21 +34,15 @@ export const aiConfigGlobal: GlobalConfig = {
     },
     {
       name: 'llmsTxtPriority',
-      type: 'array',
+      type: 'json',
       defaultValue: [],
-      fields: [
-        { name: 'slug', type: 'text', required: true },
-        { name: 'section', type: 'text', required: true },
-        { name: 'optional', type: 'checkbox', defaultValue: false },
-      ],
     },
     {
       name: 'llmsTxtSections',
-      type: 'array',
-      defaultValue: [],
-      fields: [
-        { name: 'name', type: 'text', required: true },
-        { name: 'label', type: 'text', required: true },
+      type: 'json',
+      defaultValue: [
+        { name: 'pages', label: 'Pages' },
+        { name: 'posts', label: 'Blog' },
       ],
     },
     {

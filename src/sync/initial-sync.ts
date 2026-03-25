@@ -84,7 +84,7 @@ export async function runInitialSync(
               jsonLd: transformResult.jsonLd,
               status: 'synced',
               parentSlug: transformResult.parentSlug || null,
-              relatedSlugs: transformResult.relatedSlugs.map((s) => ({ slug: s })),
+              relatedSlugs: transformResult.relatedSlugs,
               locale: transformResult.locale || null,
               isDraft: transformResult.isDraft,
               lastSynced: new Date().toISOString(),

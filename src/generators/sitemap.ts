@@ -49,7 +49,7 @@ export async function generateAiSitemap(params: {
     const slug = (entry as any).slug as string
     const title = (entry as any).title as string
     const parentSlug = (entry as any).parentSlug as string | undefined
-    const relatedSlugs = ((entry as any).relatedSlugs || []).map((r: any) => r.slug) as string[]
+    const relatedSlugs = ((entry as any).relatedSlugs || []) as string[]
     const aiMeta = (entry as any).aiMeta as any
     const lastSynced = (entry as any).lastSynced as string
     const jsonLd = (entry as any).jsonLd as any

@@ -55,7 +55,7 @@ export function createAfterChangeHook(
         jsonLd: result.jsonLd,
         status: 'synced' as const,
         parentSlug: result.parentSlug || null,
-        relatedSlugs: result.relatedSlugs.map((s) => ({ slug: s })),
+        relatedSlugs: result.relatedSlugs,
         locale: locale || null,
         isDraft: result.isDraft,
         lastSynced: new Date().toISOString(),

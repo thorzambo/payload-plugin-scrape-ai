@@ -72,7 +72,7 @@ export async function retryErrors(
           errorMessage: null,
           retryCount: 0,
           parentSlug: result.parentSlug || null,
-          relatedSlugs: result.relatedSlugs.map((s) => ({ slug: s })),
+          relatedSlugs: result.relatedSlugs,
           isDraft: result.isDraft,
           lastSynced: new Date().toISOString(),
         },
