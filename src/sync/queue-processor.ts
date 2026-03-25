@@ -155,7 +155,7 @@ async function processEnrichJobs(
         const currentCount = aiConfig?.aiApiCallCount || 0
         await payload.updateGlobal({
           slug: 'ai-config',
-          data: { aiApiCallCount: currentCount + 3 }, // 3 calls per enrichment (summary, entities, chunks)
+          data: { aiApiCallCount: currentCount + 1 }, // 1 batched call per enrichment
         })
       } catch {
         // Non-critical
