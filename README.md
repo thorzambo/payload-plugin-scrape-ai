@@ -9,6 +9,8 @@
 
 Auto-generates AI-friendly content mirrors of your entire site — [llms.txt](https://llmstxt.org/), structured markdown, JSON-LD, content relationship graphs, and a context search API. Everything stays in sync as content changes.
 
+![CleanShot 2026-03-25 at 09 55 19@2x](https://github.com/user-attachments/assets/4aa74433-6a10-46e0-8023-fdd4f0603a44)
+
 ---
 
 ## What It Generates
@@ -151,6 +153,8 @@ Uses a single batched API call per document. The built-in **Token Estimator** (A
 |----------|-------------|---------------|
 | OpenAI | `gpt-4.1-nano` | `gpt-4.1-mini` |
 | Anthropic | `claude-haiku-4-5` | `claude-sonnet-4-6` |
+
+![CleanShot 2026-03-25 at 09 52 36@2x](https://github.com/user-attachments/assets/80cfdf91-7fef-4522-ac10-d323ea469a9d)
 
 ---
 
