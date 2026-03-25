@@ -10,7 +10,6 @@ export async function retryErrors(payload, pluginOptions) {
         where: {
             status: { equals: 'error' },
             retryCount: { less_than: 3 },
-            sourceCollection: { not_equals: '__aggregate' },
         },
         limit: 10,
     });

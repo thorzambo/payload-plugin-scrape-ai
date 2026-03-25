@@ -49,9 +49,8 @@ export async function generateLlmsTxt(params: {
     { name: 'posts', label: 'Blog' },
   ]
 
-  // Query all synced, non-aggregate, non-draft entries
+  // Query all synced, non-draft entries
   const entries = await fetchAllContent(payload, {
-    sourceCollection: { not_equals: '__aggregate' },
     status: { equals: 'synced' },
     isDraft: { equals: false },
   }, 'title')

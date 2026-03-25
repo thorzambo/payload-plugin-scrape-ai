@@ -1,5 +1,7 @@
+import { en } from './translations/en';
 import { createAiContentCollection } from './collections/ai-content';
 import { createAiSyncQueueCollection } from './collections/ai-sync-queue';
+import { createAiAggregatesCollection } from './collections/ai-aggregates';
 import { aiConfigGlobal } from './globals/ai-config';
 import { detectContentCollections } from './detection/smart-detect';
 import { createAfterChangeHook } from './hooks/afterChange';
@@ -44,6 +46,7 @@ export const scrapeAiPlugin = (options) => (incomingConfig) => {
         ...(config.collections || []),
         createAiContentCollection(options.aiContentOverrides),
         createAiSyncQueueCollection(options.aiSyncQueueOverrides),
+        createAiAggregatesCollection(options.aiAggregatesOverrides),
     ];
     config.globals = [
         ...(config.globals || []),
@@ -108,6 +111,17 @@ export const scrapeAiPlugin = (options) => (incomingConfig) => {
                 ...(config.admin?.components?.afterNavLinks || []),
                 'payload-plugin-scrape-ai/NavLink#default',
             ],
+        },
+    };
+    // --- Merge i18n translations ---
+    config.i18n = {
+        ...config.i18n,
+        translations: {
+            ...config.i18n?.translations,
+            en: {
+                ...(config.i18n?.translations?.en || {}),
+                ...en,
+            },
         },
     };
     // --- Extend onInit ---

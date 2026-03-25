@@ -40,7 +40,6 @@ export function createSitemapXmlEndpoint(siteUrl) {
                     const batch = await payload.find({
                         collection: 'ai-content',
                         where: {
-                            sourceCollection: { not_equals: '__aggregate' },
                             status: { equals: 'synced' },
                         },
                         limit: 100,

@@ -1,20 +1,34 @@
 /**
+ * Resolve a URL that may be relative to an absolute URL.
+ * If siteUrl is provided and the URL is a relative path (starts with /),
+ * prepend the siteUrl to make it absolute.
+ */
+function resolveUrl(url, siteUrl) {
+    if (!url)
+        return '';
+    if (url.startsWith('http://') || url.startsWith('https://'))
+        return url;
+    if (siteUrl && url.startsWith('/'))
+        return `${siteUrl}${url}`;
+    return url;
+}
+/**
  * Stage 1: Extract document content into clean markdown.
  * Traverses all fields recursively, converting each type to markdown.
  */
-export function extractDocument(doc, collectionConfig, payload) {
+export function extractDocument(doc, collectionConfig, payload, siteUrl) {
     const parts = [];
     const fields = collectionConfig.fields || [];
     const skipFields = new Set(['id', 'createdAt', 'updatedAt', '_status', '__v']);
     for (const field of fields) {
-        const fieldParts = extractField(field, doc, skipFields, payload, 1);
+        const fieldParts = extractField(field, doc, skipFields, payload, 1, siteUrl);
         if (fieldParts) {
             parts.push(fieldParts);
         }
     }
     return parts.filter(Boolean).join('\n\n');
 }
-function extractField(field, doc, skipFields, payload, depth) {
+function extractField(field, doc, skipFields, payload, depth, siteUrl) {
     // Skip UI-only and unnamed fields
     if (!('name' in field) && !('type' in field))
         return null;
@@ -24,7 +38,7 @@ function extractField(field, doc, skipFields, payload, depth) {
     if ('type' in field) {
         if (field.type === 'row' || field.type === 'collapsible') {
             if ('fields' in field && Array.isArray(field.fields)) {
-                return extractFieldGroup(field.fields, doc, skipFields, payload, depth);
+                return extractFieldGroup(field.fields, doc, skipFields, payload, depth, siteUrl);
             }
             return null;
         }
@@ -33,13 +47,13 @@ function extractField(field, doc, skipFields, payload, depth) {
             for (const tab of field.tabs) {
                 if (tab.label && tab.fields) {
                     const heading = '#'.repeat(Math.min(depth + 1, 6));
-                    const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth + 1);
+                    const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth + 1, siteUrl);
                     if (content) {
                         tabParts.push(`${heading} ${tab.label}\n\n${content}`);
                     }
                 }
                 else if (tab.fields) {
-                    const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth);
+                    const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth, siteUrl);
                     if (content)
                         tabParts.push(content);
                 }
@@ -58,7 +72,7 @@ function extractField(field, doc, skipFields, payload, depth) {
     const fieldType = field.type;
     switch (fieldType) {
         case 'richText':
-            return extractRichText(value, field);
+            return extractRichText(value, field, siteUrl);
         case 'text':
         case 'textarea':
         case 'email':
@@ -76,12 +90,12 @@ function extractField(field, doc, skipFields, payload, depth) {
         case 'upload':
             return extractRelationship(value, name);
         case 'blocks':
-            return extractBlocks(value, skipFields, payload, depth);
+            return extractBlocks(value, skipFields, payload, depth, siteUrl);
         case 'array':
-            return extractArray(value, field, skipFields, payload, depth);
+            return extractArray(value, field, skipFields, payload, depth, siteUrl);
         case 'group':
             if (typeof value === 'object' && value !== null && 'fields' in field) {
-                return extractFieldGroup(field.fields, value, skipFields, payload, depth);
+                return extractFieldGroup(field.fields, value, skipFields, payload, depth, siteUrl);
             }
             return null;
         case 'json':
@@ -97,27 +111,27 @@ function extractField(field, doc, skipFields, payload, depth) {
             return String(value);
     }
 }
-function extractFieldGroup(fields, doc, skipFields, payload, depth) {
+function extractFieldGroup(fields, doc, skipFields, payload, depth, siteUrl) {
     const parts = [];
     for (const field of fields) {
-        const content = extractField(field, doc, skipFields, payload, depth);
+        const content = extractField(field, doc, skipFields, payload, depth, siteUrl);
         if (content)
             parts.push(content);
     }
     return parts.length > 0 ? parts.join('\n\n') : null;
 }
-function extractRichText(value, field) {
+function extractRichText(value, _field, siteUrl) {
     if (!value)
         return null;
     // Detect Lexical vs Slate based on value structure
     if (typeof value === 'object' && value !== null) {
         // Lexical format: { root: { children: [...] } }
         if ('root' in value && typeof value.root === 'object') {
-            return lexicalToMarkdown(value.root);
+            return lexicalToMarkdown(value.root, siteUrl);
         }
         // Slate format: array of nodes
         if (Array.isArray(value)) {
-            return slateToMarkdown(value);
+            return slateToMarkdown(value, siteUrl);
         }
     }
     // Fallback: if it's a string, return as-is
@@ -126,32 +140,32 @@ function extractRichText(value, field) {
     return null;
 }
 // --- Lexical to Markdown ---
-function lexicalToMarkdown(root) {
+function lexicalToMarkdown(root, siteUrl) {
     if (!root || !root.children)
         return '';
-    return lexicalChildrenToMarkdown(root.children).trim();
+    return lexicalChildrenToMarkdown(root.children, siteUrl).trim();
 }
-function lexicalChildrenToMarkdown(children) {
+function lexicalChildrenToMarkdown(children, siteUrl) {
     if (!Array.isArray(children))
         return '';
-    return children.map(lexicalNodeToMarkdown).filter(Boolean).join('\n\n');
+    return children.map((node) => lexicalNodeToMarkdown(node, siteUrl)).filter(Boolean).join('\n\n');
 }
-function lexicalNodeToMarkdown(node) {
+function lexicalNodeToMarkdown(node, siteUrl) {
     if (!node)
         return '';
     switch (node.type) {
         case 'paragraph':
-            return lexicalInlineChildrenToMarkdown(node.children || []);
+            return lexicalInlineChildrenToMarkdown(node.children || [], siteUrl);
         case 'heading': {
             const level = parseInt(node.tag?.replace('h', '') || '1', 10);
             const prefix = '#'.repeat(Math.min(level, 6));
-            const text = lexicalInlineChildrenToMarkdown(node.children || []);
+            const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl);
             return `${prefix} ${text}`;
         }
         case 'list': {
             const items = (node.children || [])
                 .map((item, i) => {
-                const text = lexicalInlineChildrenToMarkdown(item.children || []);
+                const text = lexicalInlineChildrenToMarkdown(item.children || [], siteUrl);
                 const prefix = node.listType === 'number' ? `${i + 1}.` : '-';
                 return `${prefix} ${text}`;
             })
@@ -159,45 +173,45 @@ function lexicalNodeToMarkdown(node) {
             return items;
         }
         case 'listitem':
-            return lexicalInlineChildrenToMarkdown(node.children || []);
+            return lexicalInlineChildrenToMarkdown(node.children || [], siteUrl);
         case 'quote': {
-            const text = lexicalInlineChildrenToMarkdown(node.children || []);
+            const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl);
             return text
                 .split('\n')
                 .map((line) => `> ${line}`)
                 .join('\n');
         }
         case 'code': {
-            const text = lexicalInlineChildrenToMarkdown(node.children || []);
+            const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl);
             const language = node.language || '';
             return `\`\`\`${language}\n${text}\n\`\`\``;
         }
         case 'horizontalrule':
             return '---';
         case 'link': {
-            const text = lexicalInlineChildrenToMarkdown(node.children || []);
-            const url = node.fields?.url || node.url || '#';
+            const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl);
+            const url = resolveUrl(node.fields?.url || node.url || '#', siteUrl);
             return `[${text}](${url})`;
         }
         case 'image': {
             const alt = node.altText || node.alt || '';
-            const src = node.src || '';
+            const src = resolveUrl(node.src || '', siteUrl);
             return `![${alt}](${src})`;
         }
         case 'upload': {
             const alt = node.value?.alt || node.value?.filename || '';
-            const src = node.value?.url || '';
+            const src = resolveUrl(node.value?.url || '', siteUrl);
             return `![${alt}](${src})`;
         }
         case 'table': {
-            return lexicalTableToMarkdown(node);
+            return lexicalTableToMarkdown(node, siteUrl);
         }
         case 'linebreak':
             return '\n';
         default:
             // Recurse into children for unknown container nodes
             if (node.children && Array.isArray(node.children)) {
-                return lexicalChildrenToMarkdown(node.children);
+                return lexicalChildrenToMarkdown(node.children, siteUrl);
             }
             // Text node
             if (node.text !== undefined) {
@@ -206,14 +220,14 @@ function lexicalNodeToMarkdown(node) {
             return '';
     }
 }
-function lexicalInlineChildrenToMarkdown(children) {
+function lexicalInlineChildrenToMarkdown(children, siteUrl) {
     if (!Array.isArray(children))
         return '';
     return children
         .map((child) => {
         if (child.text !== undefined)
             return formatLexicalText(child);
-        return lexicalNodeToMarkdown(child);
+        return lexicalNodeToMarkdown(child, siteUrl);
     })
         .join('');
 }
@@ -233,7 +247,7 @@ function formatLexicalText(node) {
         text = `~~${text}~~`;
     return text;
 }
-function lexicalTableToMarkdown(node) {
+function lexicalTableToMarkdown(node, siteUrl) {
     if (!node.children || !Array.isArray(node.children))
         return '';
     const rows = [];
@@ -242,7 +256,7 @@ function lexicalTableToMarkdown(node) {
             continue;
         const cells = [];
         for (const cell of row.children) {
-            cells.push(lexicalInlineChildrenToMarkdown(cell.children || []));
+            cells.push(lexicalInlineChildrenToMarkdown(cell.children || [], siteUrl));
         }
         rows.push(cells);
     }
@@ -260,12 +274,12 @@ function lexicalTableToMarkdown(node) {
     return lines.join('\n');
 }
 // --- Slate to Markdown ---
-function slateToMarkdown(nodes) {
+function slateToMarkdown(nodes, siteUrl) {
     if (!Array.isArray(nodes))
         return '';
-    return nodes.map(slateNodeToMarkdown).filter(Boolean).join('\n\n');
+    return nodes.map((node) => slateNodeToMarkdown(node, siteUrl)).filter(Boolean).join('\n\n');
 }
-function slateNodeToMarkdown(node) {
+function slateNodeToMarkdown(node, siteUrl) {
     if (!node)
         return '';
     // Text leaf node
@@ -273,7 +287,7 @@ function slateNodeToMarkdown(node) {
         return formatSlateText(node);
     }
     const children = node.children || [];
-    const childText = slateInlineToMarkdown(children);
+    const childText = slateInlineToMarkdown(children, siteUrl);
     switch (node.type) {
         case 'h1':
             return `# ${childText}`;
@@ -294,22 +308,22 @@ function slateNodeToMarkdown(node) {
                 .join('\n');
         case 'ul':
             return children
-                .map((item) => `- ${slateInlineToMarkdown(item.children || [])}`)
+                .map((item) => `- ${slateInlineToMarkdown(item.children || [], siteUrl)}`)
                 .join('\n');
         case 'ol':
             return children
-                .map((item, i) => `${i + 1}. ${slateInlineToMarkdown(item.children || [])}`)
+                .map((item, i) => `${i + 1}. ${slateInlineToMarkdown(item.children || [], siteUrl)}`)
                 .join('\n');
         case 'li':
-            return slateInlineToMarkdown(children);
+            return slateInlineToMarkdown(children, siteUrl);
         case 'link': {
-            const url = node.url || '#';
+            const url = resolveUrl(node.url || '#', siteUrl);
             return `[${childText}](${url})`;
         }
         case 'upload':
         case 'image': {
             const alt = node.alt || node.value?.alt || '';
-            const src = node.url || node.value?.url || '';
+            const src = resolveUrl(node.url || node.value?.url || '', siteUrl);
             return `![${alt}](${src})`;
         }
         case 'code':
@@ -319,7 +333,7 @@ function slateNodeToMarkdown(node) {
                 return '';
             const rows = [];
             for (const row of children) {
-                const cells = (row.children || []).map((cell) => slateInlineToMarkdown(cell.children || []));
+                const cells = (row.children || []).map((cell) => slateInlineToMarkdown(cell.children || [], siteUrl));
                 rows.push(cells);
             }
             if (rows.length === 0)
@@ -337,14 +351,14 @@ function slateNodeToMarkdown(node) {
             return childText;
     }
 }
-function slateInlineToMarkdown(children) {
+function slateInlineToMarkdown(children, siteUrl) {
     if (!Array.isArray(children))
         return '';
     return children
         .map((child) => {
         if (child.text !== undefined)
             return formatSlateText(child);
-        return slateNodeToMarkdown(child);
+        return slateNodeToMarkdown(child, siteUrl);
     })
         .join('');
 }
@@ -389,7 +403,7 @@ function extractRelationship(value, fieldName) {
     // ID reference (string)
     return `**${formatFieldLabel(fieldName)}:** ${value}`;
 }
-function extractBlocks(blocks, skipFields, payload, depth) {
+function extractBlocks(blocks, skipFields, payload, depth, siteUrl) {
     if (!Array.isArray(blocks) || blocks.length === 0)
         return null;
     const parts = [];
@@ -414,7 +428,7 @@ function extractBlocks(blocks, skipFields, payload, depth) {
                     if (typeof item === 'string')
                         return item;
                     if (typeof item === 'object' && item !== null) {
-                        const richText = extractRichText(item, {});
+                        const richText = extractRichText(item, undefined, siteUrl);
                         if (richText)
                             return richText;
                         const texts = [];
@@ -433,7 +447,7 @@ function extractBlocks(blocks, skipFields, payload, depth) {
                     blockParts.push(arrayContent.join('\n'));
             }
             else if (typeof val === 'object') {
-                const richText = extractRichText(val, {});
+                const richText = extractRichText(val, undefined, siteUrl);
                 if (richText)
                     blockParts.push(richText);
             }
@@ -444,14 +458,14 @@ function extractBlocks(blocks, skipFields, payload, depth) {
     }
     return parts.length > 0 ? parts.join('\n\n') : null;
 }
-function extractArray(items, field, skipFields, payload, depth) {
+function extractArray(items, field, skipFields, payload, depth, siteUrl) {
     if (!Array.isArray(items) || items.length === 0)
         return null;
     if (!('fields' in field))
         return null;
     const parts = [];
     for (const item of items) {
-        const content = extractFieldGroup(field.fields, item, skipFields, payload, depth + 1);
+        const content = extractFieldGroup(field.fields, item, skipFields, payload, depth + 1, siteUrl);
         if (content)
             parts.push(content);
     }

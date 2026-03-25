@@ -22,7 +22,6 @@ async function fetchAllContent(payload, where, sort) {
 export async function generateAiSitemap(params) {
     const { payload, siteUrl, siteName } = params;
     const entries = await fetchAllContent(payload, {
-        sourceCollection: { not_equals: '__aggregate' },
         status: { equals: 'synced' },
     }, 'sourceCollection');
     // Group by collection

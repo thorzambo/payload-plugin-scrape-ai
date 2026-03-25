@@ -1,5 +1,17 @@
 import { createAiProvider } from '../ai/provider';
 import { estimateJob, MODEL_CATALOG, formatTokens, formatCost } from '../ai/token-estimator';
+/** Safely parse request body — handles missing/invalid json gracefully */
+async function parseBody(req) {
+    try {
+        if (typeof req.json === 'function') {
+            return await req.json() || {};
+        }
+        return {};
+    }
+    catch {
+        return {};
+    }
+}
 /**
  * Create all authenticated admin API endpoints for the dashboard.
  */
@@ -16,18 +28,16 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                     const [allEntries, pendingEntries, errorEntries, aiConfig] = await Promise.all([
                         payload.find({
                             collection: 'ai-content',
-                            where: { sourceCollection: { not_equals: '__aggregate' } },
                             limit: 0,
                         }),
                         payload.find({
                             collection: 'ai-content',
-                            where: { sourceCollection: { not_equals: '__aggregate' }, status: { equals: 'pending' } },
+                            where: { status: { equals: 'pending' } },
                             limit: 0,
                         }),
                         payload.find({
                             collection: 'ai-content',
                             where: {
-                                sourceCollection: { not_equals: '__aggregate' },
                                 status: { in: ['error', 'error-permanent'] },
                             },
                             limit: 0,
@@ -77,9 +87,7 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10), 100);
                 const collection = url.searchParams.get('collection');
                 const status = url.searchParams.get('status');
-                const where = {
-                    sourceCollection: { not_equals: '__aggregate' },
-                };
+                const where = {};
                 if (collection)
                     where.sourceCollection = { equals: collection };
                 if (status)
@@ -140,17 +148,13 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 if (!req.user)
                     return Response.json({ error: 'Unauthorized' }, { status: 401 });
                 const { payload } = req;
-                let body = {};
-                try {
-                    body = await req.json();
-                }
-                catch { /* empty body */ }
+                const body = await parseBody(req);
                 try {
                     if (body.all) {
-                        // Bulk delete all non-aggregate entries
+                        // Bulk delete all ai-content entries
                         const result = await payload.delete({
                             collection: 'ai-content',
-                            where: { sourceCollection: { not_equals: '__aggregate' } },
+                            where: {},
                         });
                         // Queue initial re-sync
                         await payload.create({
@@ -185,11 +189,7 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 if (!req.user)
                     return Response.json({ error: 'Unauthorized' }, { status: 401 });
                 const { payload } = req;
-                let body = {};
-                try {
-                    body = await req.json();
-                }
-                catch { /* empty body */ }
+                const body = await parseBody(req);
                 try {
                     const { collection: slug, enabled } = body;
                     if (!slug || typeof enabled !== 'boolean') {
@@ -218,11 +218,7 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 if (!req.user)
                     return Response.json({ error: 'Unauthorized' }, { status: 401 });
                 const { payload } = req;
-                let body = {};
-                try {
-                    body = await req.json();
-                }
-                catch { /* empty body */ }
+                const body = await parseBody(req);
                 try {
                     const data = {};
                     if (typeof body.aiEnabled === 'boolean')
@@ -294,11 +290,7 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 if (!req.user)
                     return Response.json({ error: 'Unauthorized' }, { status: 401 });
                 const { payload } = req;
-                let body = {};
-                try {
-                    body = await req.json();
-                }
-                catch { /* empty body */ }
+                const body = await parseBody(req);
                 try {
                     const data = {};
                     if (body.priority)
@@ -329,7 +321,7 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                     const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
                     const enabledCollections = aiConfig?.enabledCollections || {};
                     // Get all non-plugin collections
-                    const allCollections = Object.keys(payload.collections).filter((slug) => !['ai-content', 'ai-sync-queue'].includes(slug));
+                    const allCollections = Object.keys(payload.collections).filter((slug) => !['ai-content', 'ai-sync-queue', 'ai-aggregates'].includes(slug));
                     const result = await Promise.all(allCollections.map(async (slug) => {
                         const count = await payload.find({
                             collection: slug,
@@ -366,7 +358,6 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                     while (hasMore) {
                         const batch = await payload.find({
                             collection: 'ai-content',
-                            where: { sourceCollection: { not_equals: '__aggregate' } },
                             limit: 100,
                             page,
                         });
@@ -468,6 +459,65 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                         notes: m.notes,
                     })),
                 });
+            },
+        },
+        // GET /api/scrape-ai/health
+        {
+            path: '/scrape-ai/health',
+            method: 'get',
+            handler: async (req) => {
+                const { payload } = req;
+                const isAuthenticated = Boolean(req.user);
+                try {
+                    // Queue depth (always visible)
+                    const pendingJobs = await payload.find({
+                        collection: 'ai-sync-queue',
+                        where: { status: { equals: 'pending' } },
+                        limit: 0,
+                    });
+                    const processingJobs = await payload.find({
+                        collection: 'ai-sync-queue',
+                        where: { status: { equals: 'processing' } },
+                        limit: 0,
+                    });
+                    // Basic health info (public)
+                    const health = {
+                        status: 'ok',
+                        timestamp: new Date().toISOString(),
+                        queue: {
+                            pending: pendingJobs.totalDocs,
+                            processing: processingJobs.totalDocs,
+                        },
+                    };
+                    // Detailed info (authenticated only)
+                    if (isAuthenticated) {
+                        const [errorEntries, aiConfig] = await Promise.all([
+                            payload.find({
+                                collection: 'ai-content',
+                                where: { status: { in: ['error', 'error-permanent'] } },
+                                limit: 0,
+                            }),
+                            payload.findGlobal({ slug: 'ai-config' }).catch(() => null),
+                        ]);
+                        const typedConfig = aiConfig;
+                        health.errors = {
+                            count: errorEntries.totalDocs,
+                        };
+                        health.ai = {
+                            enabled: typedConfig?.aiEnabled || false,
+                            provider: typedConfig?.aiProvider || null,
+                            model: typedConfig?.aiModel || null,
+                            apiCallsThisMonth: typedConfig?.aiApiCallCount || 0,
+                        };
+                        health.lastAggregateRebuild = typedConfig?.lastAggregateRebuild || null;
+                    }
+                    return Response.json(health, {
+                        headers: { 'Cache-Control': 'no-cache' },
+                    });
+                }
+                catch (error) {
+                    return Response.json({ status: 'error', message: error.message }, { status: 500, headers: { 'Cache-Control': 'no-cache' } });
+                }
             },
         },
     ];

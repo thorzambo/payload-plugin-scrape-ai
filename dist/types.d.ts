@@ -30,6 +30,7 @@ export interface ScrapeAiPluginOptions {
     enabled?: boolean;
     aiContentOverrides?: CollectionOverrides;
     aiSyncQueueOverrides?: CollectionOverrides;
+    aiAggregatesOverrides?: CollectionOverrides;
 }
 export interface ResolvedPluginConfig {
     enabledCollections: string[];
@@ -69,6 +70,14 @@ export interface AiSyncQueueDoc {
     createdAt: string;
     processedAt?: string;
     errorMessage?: string;
+}
+export interface AiAggregateDoc {
+    id: string;
+    key: string;
+    content?: string;
+    lastGenerated?: string;
+    createdAt: string;
+    updatedAt: string;
 }
 export interface AiConfigGlobal {
     enabledCollections: Record<string, boolean>;

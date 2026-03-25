@@ -24,7 +24,6 @@ async function fetchAllContent(payload, where, sort) {
 export async function generateLlmsFullTxt(params) {
     const { payload, siteUrl, siteName, siteDescription } = params;
     const entries = await fetchAllContent(payload, {
-        sourceCollection: { not_equals: '__aggregate' },
         status: { equals: 'synced' },
         isDraft: { equals: false },
     }, 'sourceCollection');

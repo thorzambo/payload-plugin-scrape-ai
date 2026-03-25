@@ -17,9 +17,8 @@ export function createContextQueryEndpoint(rateLimiter, siteUrl) {
             }
             const limit = Math.min(Math.max(parseInt(limitParam || '5', 10) || 5, 1), 20);
             try {
-                // Query all synced non-aggregate entries
+                // Query all synced entries
                 const whereClause = {
-                    sourceCollection: { not_equals: '__aggregate' },
                     status: { equals: 'synced' },
                 };
                 if (collectionFilter) {

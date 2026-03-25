@@ -37,11 +37,12 @@ export function structureContent(params) {
         createdAt: (doc.createdAt || new Date().toISOString()),
     });
     // Build frontmatter
+    const canonicalUrl = `${siteUrl}/${originalSlug}`.slice(0, 2048);
     const frontmatter = {
         title,
         slug: originalSlug,
         collection: collectionSlug,
-        canonicalUrl: `${siteUrl}/${originalSlug}`,
+        canonicalUrl,
         lastModified,
         contentType: jsonLd['@type'] || 'CreativeWork',
     };
@@ -69,7 +70,7 @@ export function structureContent(params) {
         title,
         slug: urlSlug,
         urlSlug,
-        canonicalUrl: `${siteUrl}/${originalSlug}`,
+        canonicalUrl: `${siteUrl}/${originalSlug}`.slice(0, 2048),
         parentSlug: parentSlug ? toUrlSlug(parentSlug) : undefined,
         relatedSlugs,
         jsonLd,

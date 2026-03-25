@@ -24,9 +24,8 @@ export function createContextQueryEndpoint(rateLimiter: RateLimiter, siteUrl: st
       const limit = Math.min(Math.max(parseInt(limitParam || '5', 10) || 5, 1), 20)
 
       try {
-        // Query all synced non-aggregate entries
+        // Query all synced entries
         const whereClause: Record<string, any> = {
-          sourceCollection: { not_equals: '__aggregate' },
           status: { equals: 'synced' },
         }
         if (collectionFilter) {

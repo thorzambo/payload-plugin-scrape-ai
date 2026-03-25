@@ -1,2 +1,2 @@
-export type { ScrapeAiPluginOptions, AiProviderConfig, SyncConfig, ResolvedPluginConfig, AiContentDoc, AiSyncQueueDoc, AiConfigGlobal, AiMeta, TransformResult, PipelineContext, IAiProvider, ContextQueryResult, ContextQueryResponse, FieldsOverride, CollectionOverrides, } from './types';
+export type { ScrapeAiPluginOptions, AiProviderConfig, SyncConfig, ResolvedPluginConfig, AiContentDoc, AiSyncQueueDoc, AiAggregateDoc, AiConfigGlobal, AiMeta, TransformResult, PipelineContext, IAiProvider, ContextQueryResult, ContextQueryResponse, FieldsOverride, CollectionOverrides, } from './types';
 //# sourceMappingURL=types-export.d.ts.map

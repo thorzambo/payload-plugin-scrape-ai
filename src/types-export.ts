@@ -5,6 +5,7 @@ export type {
   ResolvedPluginConfig,
   AiContentDoc,
   AiSyncQueueDoc,
+  AiAggregateDoc,
   AiConfigGlobal,
   AiMeta,
   TransformResult,

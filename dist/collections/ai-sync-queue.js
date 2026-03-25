@@ -4,6 +4,7 @@ export function createAiSyncQueueCollection(overrides) {
             name: 'jobType',
             type: 'select',
             required: true,
+            index: true,
             options: [
                 { label: 'Rebuild Aggregates', value: 'rebuild-aggregates' },
                 { label: 'Sync Document', value: 'sync-document' },
@@ -23,6 +24,7 @@ export function createAiSyncQueueCollection(overrides) {
             name: 'status',
             type: 'select',
             required: true,
+            index: true,
             defaultValue: 'pending',
             options: [
                 { label: 'Pending', value: 'pending' },
