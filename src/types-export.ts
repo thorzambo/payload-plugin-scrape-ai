@@ -1,0 +1,15 @@
+export type {
+  ScrapeAiPluginOptions,
+  AiProviderConfig,
+  SyncConfig,
+  ResolvedPluginConfig,
+  AiContentDoc,
+  AiSyncQueueDoc,
+  AiConfigGlobal,
+  AiMeta,
+  TransformResult,
+  PipelineContext,
+  IAiProvider,
+  ContextQueryResult,
+  ContextQueryResponse,
+} from './types'

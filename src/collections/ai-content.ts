@@ -1,3 +1,13 @@
+/**
+ * AI Content collection — stores generated content mirrors.
+ *
+ * Production: create compound index on (sourceCollection, sourceDocId)
+ * for optimal query performance:
+ *   db['ai-content'].createIndex({ sourceCollection: 1, sourceDocId: 1 })
+ *
+ * For very large sites (>1MB markdown per doc), consider external storage.
+ * MongoDB's 16MB document limit applies to the full document.
+ */
 import type { CollectionConfig } from 'payload'
 
 export const aiContentCollection: CollectionConfig = {
@@ -51,6 +61,7 @@ export const aiContentCollection: CollectionConfig = {
       name: 'status',
       type: 'select',
       required: true,
+      index: true,
       defaultValue: 'pending',
       options: [
         { label: 'Pending', value: 'pending' },
@@ -84,11 +95,13 @@ export const aiContentCollection: CollectionConfig = {
     {
       name: 'locale',
       type: 'text',
+      index: true,
     },
     {
       name: 'isDraft',
       type: 'checkbox',
       defaultValue: false,
+      index: true,
     },
     {
       name: 'lastSynced',

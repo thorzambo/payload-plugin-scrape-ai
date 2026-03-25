@@ -8,31 +8,43 @@
   "files": [
     "dist"
   ],
+  "sideEffects": ["*.css"],
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "import": "./dist/types-export.js",
+      "types": "./dist/types-export.d.ts",
+      "default": "./dist/types-export.js"
     },
     "./client": {
       "import": "./dist/admin/views/DashboardClient.js",
-      "types": "./dist/admin/views/DashboardClient.d.ts"
+      "types": "./dist/admin/views/DashboardClient.d.ts",
+      "default": "./dist/admin/views/DashboardClient.js"
     },
     "./rsc": {
       "react-server": "./dist/admin/views/ScrapeAiView.js",
       "import": "./dist/admin/views/ScrapeAiView.js",
-      "types": "./dist/admin/views/ScrapeAiView.d.ts"
+      "types": "./dist/admin/views/ScrapeAiView.d.ts",
+      "default": "./dist/admin/views/ScrapeAiView.js"
     },
     "./NavLink": {
       "import": "./dist/admin/components/NavLink.js",
-      "types": "./dist/admin/components/NavLink.d.ts"
+      "types": "./dist/admin/components/NavLink.d.ts",
+      "default": "./dist/admin/components/NavLink.js"
     },
     "./discovery": {
       "import": "./dist/discovery/index.js",
-      "types": "./dist/discovery/index.d.ts"
+      "types": "./dist/discovery/index.d.ts",
+      "default": "./dist/discovery/index.js"
     },
     "./next": {
       "import": "./dist/next.js",
-      "types": "./dist/next.d.ts"
+      "types": "./dist/next.d.ts",
+      "default": "./dist/next.js"
     }
   },
   "scripts": {
