@@ -506,6 +506,41 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
       },
     },
 
+    // GET /api/scrape-ai/dead-letter
+    {
+      path: '/scrape-ai/dead-letter',
+      method: 'get' as const,
+      handler: async (req: PayloadRequest) => {
+        if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        const { payload } = req
+
+        try {
+          const result = await payload.find({
+            collection: 'ai-content',
+            where: { status: { equals: 'error-permanent' } },
+            limit: 50,
+            sort: '-updatedAt',
+          })
+
+          return Response.json({
+            docs: result.docs.map((doc: any) => ({
+              id: doc.id,
+              title: doc.title,
+              slug: doc.slug,
+              sourceCollection: doc.sourceCollection,
+              sourceDocId: doc.sourceDocId,
+              errorMessage: doc.errorMessage,
+              retryCount: doc.retryCount,
+              lastSynced: doc.lastSynced,
+            })),
+            totalDocs: result.totalDocs,
+          })
+        } catch (error: any) {
+          return Response.json({ error: error.message }, { status: 500 })
+        }
+      },
+    },
+
     // GET /api/scrape-ai/health
     {
       path: '/scrape-ai/health',

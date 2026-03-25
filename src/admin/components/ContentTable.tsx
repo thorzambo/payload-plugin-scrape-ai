@@ -29,6 +29,17 @@ const statusPillStyle: Record<string, 'success' | 'warning' | 'error' | 'dark' |
   'error-permanent': 'error',
 }
 
+interface DeadLetterEntry {
+  id: string
+  title: string
+  slug: string
+  sourceCollection: string
+  sourceDocId: string
+  errorMessage?: string
+  retryCount: number
+  lastSynced: string
+}
+
 export const ContentTable: React.FC = () => {
   const [entries, setEntries] = useState<Entry[]>([])
   const [totalDocs, setTotalDocs] = useState(0)
@@ -39,6 +50,8 @@ export const ContentTable: React.FC = () => {
   const [detail, setDetail] = useState<EntryDetail | null>(null)
   const [viewMode, setViewMode] = useState<'rendered' | 'raw'>('rendered')
   const [filterStatus, setFilterStatus] = useState('')
+  const [deadLetterEntries, setDeadLetterEntries] = useState<DeadLetterEntry[]>([])
+  const [deadLetterCount, setDeadLetterCount] = useState(0)
 
   const fetchEntries = async () => {
     setLoading(true)
@@ -55,7 +68,18 @@ export const ContentTable: React.FC = () => {
     } catch {} finally { setLoading(false) }
   }
 
-  useEffect(() => { fetchEntries() }, [page, filterStatus])
+  const fetchDeadLetter = async () => {
+    try {
+      const res = await fetch('/api/scrape-ai/dead-letter', { credentials: 'include' })
+      if (res.ok) {
+        const data = await res.json() as any
+        setDeadLetterEntries(data.docs || [])
+        setDeadLetterCount(data.totalDocs || 0)
+      }
+    } catch {}
+  }
+
+  useEffect(() => { fetchEntries(); fetchDeadLetter() }, [page, filterStatus])
 
   const handleRowClick = async (id: string) => {
     if (selectedId === id) { setSelectedId(null); setDetail(null); return }
@@ -102,6 +126,37 @@ export const ContentTable: React.FC = () => {
           />
         </div>
       </div>
+
+      {deadLetterCount > 0 && (
+        <Collapsible header={`Dead Letter Queue (${deadLetterCount} permanent errors)`} initCollapsed={true} className="scrape-ai-collapsible">
+          <table className="scrape-ai-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Collection</th>
+                <th>Error</th>
+                <th>Retries</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {deadLetterEntries.map((entry) => (
+                <tr key={entry.id}>
+                  <td>{entry.title}</td>
+                  <td>{entry.sourceCollection}</td>
+                  <td><span className="scrape-ai-status--incompatible">{entry.errorMessage || 'Unknown error'}</span></td>
+                  <td>{entry.retryCount}</td>
+                  <td>
+                    <Button type="button" buttonStyle="secondary" size="small" onClick={() => handleRegenerate([entry.id])}>
+                      Retry
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Collapsible>
+      )}
 
       {loading ? <ShimmerEffect /> : (
         <>
