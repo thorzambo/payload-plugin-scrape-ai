@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Button, CheckboxInput } from '@payloadcms/ui';
+import { Button } from '@payloadcms/ui';
 export const LlmsTxtManager = ()=>{
     const [priority, setPriority] = useState([]);
     const [sections, setSections] = useState([]);
@@ -105,13 +105,13 @@ export const LlmsTxtManager = ()=>{
             className: "scrape-ai-priority-item__slug"
         }, entry.slug), /*#__PURE__*/ React.createElement("span", {
             className: "scrape-ai-priority-item__section"
-        }, entry.section), /*#__PURE__*/ React.createElement(CheckboxInput, {
-            checked: entry.optional,
-            onToggle: ()=>toggleOptional(i),
-            label: "Optional",
-            name: `optional-${entry.slug}`,
+        }, entry.section), /*#__PURE__*/ React.createElement("label", {
             className: "scrape-ai-priority-item__optional"
-        }))), /*#__PURE__*/ React.createElement(Button, {
+        }, /*#__PURE__*/ React.createElement("input", {
+            type: "checkbox",
+            checked: entry.optional,
+            onChange: ()=>toggleOptional(i)
+        }), "Optional"))), /*#__PURE__*/ React.createElement(Button, {
         type: "button",
         buttonStyle: "primary",
         size: "small",

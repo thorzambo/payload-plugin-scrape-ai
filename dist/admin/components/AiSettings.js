@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Banner, Button, CheckboxInput, Pill, SelectInput, TextInput } from '@payloadcms/ui';
+import { Banner, Button, Pill } from '@payloadcms/ui';
 const tierPillStyle = {
     budget: 'success',
     standard: 'light',
@@ -101,34 +101,27 @@ export const AiSettings = ()=>{
         className: "scrape-ai-card__heading"
     }, "AI Enrichment Settings"), /*#__PURE__*/ React.createElement("div", {
         className: "scrape-ai-field"
-    }, /*#__PURE__*/ React.createElement(CheckboxInput, {
+    }, /*#__PURE__*/ React.createElement("label", {
+        className: "scrape-ai-field__label scrape-ai-field__label--inline"
+    }, /*#__PURE__*/ React.createElement("input", {
+        type: "checkbox",
         checked: aiEnabled,
-        onToggle: (e)=>setAiEnabled(e.target.checked),
-        label: "Enable AI Enrichment",
-        name: "aiEnabled"
-    })), /*#__PURE__*/ React.createElement("div", {
+        onChange: (e)=>setAiEnabled(e.target.checked)
+    }), "Enable AI Enrichment")), /*#__PURE__*/ React.createElement("div", {
         className: "scrape-ai-field"
-    }, /*#__PURE__*/ React.createElement(SelectInput, {
-        path: "provider",
-        name: "provider",
-        label: "Provider",
+    }, /*#__PURE__*/ React.createElement("label", {
+        className: "scrape-ai-field__label"
+    }, "Provider"), /*#__PURE__*/ React.createElement("select", {
+        className: "scrape-ai-field__select",
         value: provider,
-        options: [
-            {
-                label: 'OpenAI',
-                value: 'openai'
-            },
-            {
-                label: 'Anthropic',
-                value: 'anthropic'
-            }
-        ],
-        onChange: (opt)=>{
-            if (opt && !Array.isArray(opt)) setProvider(String(opt.value));
-            else setProvider('');
-        },
-        placeholder: "Select provider..."
-    })), /*#__PURE__*/ React.createElement("div", {
+        onChange: (e)=>setProvider(e.target.value)
+    }, /*#__PURE__*/ React.createElement("option", {
+        value: ""
+    }, "Select provider..."), /*#__PURE__*/ React.createElement("option", {
+        value: "openai"
+    }, "OpenAI"), /*#__PURE__*/ React.createElement("option", {
+        value: "anthropic"
+    }, "Anthropic"))), /*#__PURE__*/ React.createElement("div", {
         className: "scrape-ai-field"
     }, /*#__PURE__*/ React.createElement("label", {
         className: "scrape-ai-field__label"
@@ -140,11 +133,12 @@ export const AiSettings = ()=>{
         placeholder: "Enter API key (leave blank to keep current)"
     })), /*#__PURE__*/ React.createElement("div", {
         className: "scrape-ai-field"
-    }, /*#__PURE__*/ React.createElement(TextInput, {
-        path: "model",
-        label: "Model",
+    }, /*#__PURE__*/ React.createElement("label", {
+        className: "scrape-ai-field__label"
+    }, "Model"), /*#__PURE__*/ React.createElement("input", {
+        type: "text",
+        className: "scrape-ai-field__input",
         value: model,
-        hasMany: false,
         onChange: (e)=>setModel(e.target.value),
         placeholder: "e.g., gpt-4.1-nano or claude-haiku-4-5-20251001"
     }), /*#__PURE__*/ React.createElement("span", {
@@ -172,10 +166,7 @@ export const AiSettings = ()=>{
     }, /*#__PURE__*/ React.createElement("div", {
         className: "scrape-ai-estimate__header"
     }, /*#__PURE__*/ React.createElement("h4", {
-        className: "scrape-ai-card__subheading",
-        style: {
-            margin: 0
-        }
+        className: "scrape-ai-card__subheading scrape-ai-m-0"
     }, "Token Estimation & Model Recommendation"), /*#__PURE__*/ React.createElement(Button, {
         type: "button",
         buttonStyle: "primary",

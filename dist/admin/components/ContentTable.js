@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Button, Collapsible, Pagination, Pill, SelectInput, ShimmerEffect } from '@payloadcms/ui';
+import { Button, Collapsible, Pagination, Pill } from '@payloadcms/ui';
 const statusPillStyle = {
     synced: 'success',
     pending: 'warning',
@@ -98,43 +98,24 @@ export const ContentTable = ()=>{
         className: "scrape-ai-card__heading"
     }, "Content Entries (", totalDocs, ")"), /*#__PURE__*/ React.createElement("div", {
         className: "scrape-ai-filters"
-    }, /*#__PURE__*/ React.createElement(SelectInput, {
-        path: "filterStatus",
-        name: "filterStatus",
+    }, /*#__PURE__*/ React.createElement("select", {
+        className: "scrape-ai-field__select scrape-ai-field__select--compact",
         value: filterStatus,
-        options: [
-            {
-                label: 'All Statuses',
-                value: ''
-            },
-            {
-                label: 'Synced',
-                value: 'synced'
-            },
-            {
-                label: 'Pending',
-                value: 'pending'
-            },
-            {
-                label: 'Error',
-                value: 'error'
-            },
-            {
-                label: 'Permanent Error',
-                value: 'error-permanent'
-            }
-        ],
-        onChange: (opt)=>{
-            const val = opt && !Array.isArray(opt) ? String(opt.value) : '';
-            setFilterStatus(val);
+        onChange: (e)=>{
+            setFilterStatus(e.target.value);
             setPage(1);
-        },
-        isClearable: false,
-        style: {
-            width: 'auto',
-            minWidth: '160px'
         }
-    }))), deadLetterCount > 0 && /*#__PURE__*/ React.createElement(Collapsible, {
+    }, /*#__PURE__*/ React.createElement("option", {
+        value: ""
+    }, "All Statuses"), /*#__PURE__*/ React.createElement("option", {
+        value: "synced"
+    }, "Synced"), /*#__PURE__*/ React.createElement("option", {
+        value: "pending"
+    }, "Pending"), /*#__PURE__*/ React.createElement("option", {
+        value: "error"
+    }, "Error"), /*#__PURE__*/ React.createElement("option", {
+        value: "error-permanent"
+    }, "Permanent Error")))), deadLetterCount > 0 && /*#__PURE__*/ React.createElement(Collapsible, {
         header: `Dead Letter Queue (${deadLetterCount} permanent errors)`,
         initCollapsed: true,
         className: "scrape-ai-collapsible"
@@ -151,7 +132,9 @@ export const ContentTable = ()=>{
             onClick: ()=>handleRegenerate([
                     entry.id
                 ])
-        }, "Retry"))))))), loading ? /*#__PURE__*/ React.createElement(ShimmerEffect, null) : /*#__PURE__*/ React.createElement(React.Fragment, null, /*#__PURE__*/ React.createElement("table", {
+        }, "Retry"))))))), loading ? /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-loading"
+    }, "Loading entries...") : /*#__PURE__*/ React.createElement(React.Fragment, null, /*#__PURE__*/ React.createElement("table", {
         className: "scrape-ai-table"
     }, /*#__PURE__*/ React.createElement("thead", null, /*#__PURE__*/ React.createElement("tr", null, /*#__PURE__*/ React.createElement("th", null, "Title"), /*#__PURE__*/ React.createElement("th", null, "Collection"), /*#__PURE__*/ React.createElement("th", null, "Status"), /*#__PURE__*/ React.createElement("th", null, "Last Synced"), /*#__PURE__*/ React.createElement("th", null, "AI"), /*#__PURE__*/ React.createElement("th", null, "Actions"))), /*#__PURE__*/ React.createElement("tbody", null, entries.map((entry)=>/*#__PURE__*/ React.createElement(React.Fragment, {
             key: entry.id

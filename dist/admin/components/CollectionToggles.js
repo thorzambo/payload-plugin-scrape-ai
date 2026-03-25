@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Pill, ShimmerEffect } from '@payloadcms/ui';
+import { Pill } from '@payloadcms/ui';
 export const CollectionToggles = ()=>{
     const [collections, setCollections] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +37,9 @@ export const CollectionToggles = ()=>{
             })
         });
     };
-    if (loading) return /*#__PURE__*/ React.createElement(ShimmerEffect, null);
+    if (loading) return /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-loading"
+    }, "Loading collections...");
     return(// R3: Custom card container — Payload's Card component is a clickable navigation
     // card (title + optional action) and does not support arbitrary children content.
     // Styled via .scrape-ai-card using only Payload CSS tokens for theme adaptation.

@@ -520,4 +520,24 @@
 /* Utility: compact subheading */
 .scrape-ai-subheading--compact { margin: 0 0 8px 0; }
 
+/* Utility: zero margin */
+.scrape-ai-m-0 { margin: 0; }
+
+/* Utility: compact select (auto-width for filter dropdowns) */
+.scrape-ai-field__select--compact { width: auto; min-width: 160px; }
+
+/* Loading placeholder */
+.scrape-ai-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--theme-elevation-500);
+  font-size: 0.875rem;
+}
+
+/* Error boundary detail message */
+.scrape-ai-error-detail {
+  font-size: 0.8125rem;
+  margin: 4px 0 0 0;
+}
+
 } /* end @layer payload-plugin-scrape-ai */
