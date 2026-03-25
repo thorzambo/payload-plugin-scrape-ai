@@ -19,7 +19,6 @@ import { createSitemapXmlEndpoint } from './endpoints/sitemap-xml'
 import { withHeadSupport } from './endpoints/head-support'
 import { RateLimiter } from './endpoints/rate-limiter'
 import { startScheduler } from './sync/scheduler'
-import { resolveAiProvider } from './ai/provider'
 
 export type { ScrapeAiPluginOptions } from './types'
 export { generateHeadTags, getDiscoveryLinks } from './discovery/head-tags'
@@ -157,15 +156,6 @@ export const scrapeAiPlugin =
         payload.logger.warn(`[scrape-ai] Could not initialize ai-config: ${error.message}`)
       }
 
-      // Resolve AI provider
-      let aiProvider = null
-      try {
-        const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
-        aiProvider = await resolveAiProvider(options.ai, aiConfig)
-      } catch {
-        aiProvider = options.ai ? await resolveAiProvider(options.ai) : null
-      }
-
       // Queue initial sync (non-blocking)
       await payload.create({
         collection: 'ai-sync-queue',
@@ -173,7 +163,7 @@ export const scrapeAiPlugin =
       })
 
       // Start background scheduler
-      startScheduler(payload, resolvedConfig, aiProvider)
+      startScheduler(payload, resolvedConfig)
 
       payload.logger.info('[scrape-ai] Plugin initialized successfully')
     }

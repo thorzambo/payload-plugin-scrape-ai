@@ -1,5 +1,5 @@
 import type { Payload } from 'payload'
-import type { ResolvedPluginConfig, IAiProvider } from '../types'
+import type { ResolvedPluginConfig } from '../types'
 import { processQueue } from './queue-processor'
 import { retryErrors } from './error-recovery'
 
@@ -10,7 +10,6 @@ import { retryErrors } from './error-recovery'
 export function startScheduler(
   payload: Payload,
   pluginOptions: ResolvedPluginConfig,
-  aiProvider: IAiProvider | null,
 ): () => void {
   const debounceMs = pluginOptions.sync.debounceMs
 
@@ -23,7 +22,7 @@ export function startScheduler(
     isProcessing = true
 
     try {
-      await processQueue(payload, pluginOptions, aiProvider)
+      await processQueue(payload, pluginOptions)
     } catch (error: any) {
       payload.logger.error(`[scrape-ai] Queue processing error: ${error.message}`)
     } finally {
