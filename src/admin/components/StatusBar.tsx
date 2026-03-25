@@ -44,8 +44,21 @@ export const StatusBar: React.FC = () => {
         credentials: 'include',
         body: JSON.stringify({ all: true }),
       })
-      await fetchStatus()
-    } finally {
+      // Poll aggressively until entries reappear (sync runs on scheduler tick)
+      let attempts = 0
+      const pollUntilReady = setInterval(async () => {
+        attempts++
+        const res = await fetch('/api/scrape-ai/status', { credentials: 'include' })
+        if (res.ok) {
+          const data = await res.json() as StatusData
+          setStatus(data)
+          if (data.totalEntries > 0 || attempts >= 30) {
+            clearInterval(pollUntilReady)
+            setRegenerating(false)
+          }
+        }
+      }, 2000)
+    } catch {
       setRegenerating(false)
     }
   }
@@ -53,11 +66,13 @@ export const StatusBar: React.FC = () => {
   if (loading) return <Banner type="default">Loading...</Banner>
   if (!status) return <Banner type="error">Failed to load status</Banner>
 
-  const bannerType = status.errorCount > 0 ? 'error'
+  const bannerType = regenerating ? 'info'
+    : status.errorCount > 0 ? 'error'
     : status.pendingCount > 0 ? 'info'
     : 'success' as const
 
-  const statusText = status.errorCount > 0 ? `${status.errorCount} Errors`
+  const statusText = regenerating ? 'Regenerating...'
+    : status.errorCount > 0 ? `${status.errorCount} Errors`
     : status.pendingCount > 0 ? `${status.pendingCount} Pending`
     : 'All Synced'
   const collectionCount = Object.keys(status.collections).length
