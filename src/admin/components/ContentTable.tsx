@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button, Collapsible, Pagination, Pill } from '@payloadcms/ui'
+import { Button, Collapsible, Pagination, Pill, ShimmerEffect } from '@payloadcms/ui'
 
 interface Entry {
   id: string
@@ -96,7 +96,7 @@ export const ContentTable: React.FC = () => {
         </div>
       </div>
 
-      {loading ? <div>Loading...</div> : (
+      {loading ? <ShimmerEffect /> : (
         <>
           <table className="scrape-ai-table">
             <thead>
