@@ -6,6 +6,7 @@ import { runInitialSync } from './initial-sync'
 import { generateLlmsTxt } from '../generators/llms-txt'
 import { generateLlmsFullTxt } from '../generators/llms-full-txt'
 import { generateAiSitemap } from '../generators/sitemap'
+import { invalidateCache } from '../cache/aggregate-cache'
 
 /**
  * Process pending jobs from the ai-sync-queue.
@@ -224,9 +225,12 @@ async function processRebuildJobs(
     ])
 
     // Upsert aggregate entries
-    await upsertAggregate(payload, '__llms-txt', 'llms.txt', llmsTxt)
-    await upsertAggregate(payload, '__llms-full-txt', 'llms-full.txt', llmsFullTxt)
-    await upsertAggregate(payload, '__sitemap-json', 'sitemap.json', JSON.stringify(sitemap, null, 2))
+    await upsertAggregate(payload, '__llms-txt', llmsTxt)
+    await upsertAggregate(payload, '__llms-full-txt', llmsFullTxt)
+    await upsertAggregate(payload, '__sitemap-json', JSON.stringify(sitemap, null, 2))
+
+    // Invalidate in-memory cache so next request fetches fresh data
+    invalidateCache()
 
     // Update last rebuild timestamp
     await payload.updateGlobal({
@@ -271,39 +275,24 @@ async function cleanupOldJobs(payload: Payload): Promise<void> {
 
 async function upsertAggregate(
   payload: Payload,
-  sourceDocId: string,
-  title: string,
+  key: string,
   content: string,
 ): Promise<void> {
   const existing = await payload.find({
-    collection: 'ai-content',
-    where: {
-      sourceCollection: { equals: '__aggregate' },
-      sourceDocId: { equals: sourceDocId },
-    },
+    collection: 'ai-aggregates',
+    where: { key: { equals: key } },
     limit: 1,
   })
 
   const data = {
-    sourceCollection: '__aggregate',
-    sourceDocId,
-    slug: sourceDocId,
-    title,
-    markdown: content,
-    status: 'synced' as const,
-    lastSynced: new Date().toISOString(),
+    key,
+    content,
+    lastGenerated: new Date().toISOString(),
   }
 
   if (existing.docs.length > 0) {
-    await payload.update({
-      collection: 'ai-content',
-      id: existing.docs[0].id,
-      data,
-    })
+    await payload.update({ collection: 'ai-aggregates', id: existing.docs[0].id, data })
   } else {
-    await payload.create({
-      collection: 'ai-content',
-      data,
-    })
+    await payload.create({ collection: 'ai-aggregates', data })
   }
 }

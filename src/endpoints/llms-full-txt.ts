@@ -1,5 +1,6 @@
 import type { PayloadRequest } from 'payload'
 import { RateLimiter, getClientIp, rateLimitedResponse } from './rate-limiter'
+import { getCached, setCache } from '../cache/aggregate-cache'
 
 export function createLlmsFullTxtEndpoint(rateLimiter: RateLimiter) {
   return {
@@ -10,15 +11,23 @@ export function createLlmsFullTxtEndpoint(rateLimiter: RateLimiter) {
         return rateLimitedResponse()
       }
 
+      const cached = getCached('llms-full-txt')
+      if (cached) {
+        return new Response(cached, {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'public, max-age=300, s-maxage=600',
+          },
+        })
+      }
+
       const { payload } = req
 
       try {
         const result = await payload.find({
-          collection: 'ai-content',
-          where: {
-            sourceCollection: { equals: '__aggregate' },
-            sourceDocId: { equals: '__llms-full-txt' },
-          },
+          collection: 'ai-aggregates',
+          where: { key: { equals: '__llms-full-txt' } },
           limit: 1,
         })
 
@@ -29,15 +38,17 @@ export function createLlmsFullTxtEndpoint(rateLimiter: RateLimiter) {
           })
         }
 
-        const content = (result.docs[0] as any).markdown || ''
-        const lastSynced = (result.docs[0] as any).lastSynced || ''
+        const content = (result.docs[0] as any).content || ''
+        const lastGenerated = (result.docs[0] as any).lastGenerated || ''
+
+        setCache('llms-full-txt', content)
 
         return new Response(content, {
           status: 200,
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
             'Cache-Control': 'public, max-age=300, s-maxage=600',
-            ...(lastSynced ? { ETag: `"${new Date(lastSynced).getTime()}"` } : {}),
+            ...(lastGenerated ? { ETag: `"${new Date(lastGenerated).getTime()}"` } : {}),
           },
         })
       } catch (error: any) {
