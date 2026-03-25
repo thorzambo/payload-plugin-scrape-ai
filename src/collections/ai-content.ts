@@ -39,6 +39,7 @@ export function createAiContentCollection(overrides?: CollectionOverrides): Coll
     {
       name: 'canonicalUrl',
       type: 'text',
+      maxLength: 2048,
     },
     {
       name: 'markdown',

@@ -60,11 +60,12 @@ export function structureContent(params: {
   })
 
   // Build frontmatter
+  const canonicalUrl = `${siteUrl}/${originalSlug}`.slice(0, 2048)
   const frontmatter: Record<string, unknown> = {
     title,
     slug: originalSlug,
     collection: collectionSlug,
-    canonicalUrl: `${siteUrl}/${originalSlug}`,
+    canonicalUrl,
     lastModified,
     contentType: jsonLd['@type'] || 'CreativeWork',
   }
@@ -94,7 +95,7 @@ export function structureContent(params: {
     title,
     slug: urlSlug,
     urlSlug,
-    canonicalUrl: `${siteUrl}/${originalSlug}`,
+    canonicalUrl: `${siteUrl}/${originalSlug}`.slice(0, 2048),
     parentSlug: parentSlug ? toUrlSlug(parentSlug) : undefined,
     relatedSlugs,
     jsonLd,
