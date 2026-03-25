@@ -78,14 +78,14 @@ export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
       </div>
 
       {testResult && (
-        <div style={{ marginTop: 16 }}>
+        <div className="scrape-ai-mt-16">
           <h4 className="scrape-ai-card__subheading">Response</h4>
           <pre className="scrape-ai-code">{testResult}</pre>
         </div>
       )}
 
       <div className="scrape-ai-guide">
-        <h4 className="scrape-ai-card__subheading" style={{ margin: '0 0 8px 0' }}>Integration Guide</h4>
+        <h4 className="scrape-ai-card__subheading scrape-ai-subheading--compact">Integration Guide</h4>
         <p className="scrape-ai-guide__text">
           Point AI agents to <code>{siteUrl}/api/llms.txt</code> as the entry point.
           The llms.txt file links to all available content in markdown format.

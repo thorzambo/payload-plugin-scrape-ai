@@ -90,7 +90,7 @@ export const LlmsTxtManager: React.FC = () => {
 
       {priority.length > 0 && (
         <div className="scrape-ai-priority-list">
-          <h4 className="scrape-ai-card__subheading" style={{ margin: '0 0 8px 0' }}>Priority Order (drag to reorder)</h4>
+          <h4 className="scrape-ai-card__subheading scrape-ai-subheading--compact">Priority Order (drag to reorder)</h4>
           {priority.map((entry, i) => (
             <div
               key={entry.slug}
@@ -120,7 +120,7 @@ export const LlmsTxtManager: React.FC = () => {
         </div>
       )}
 
-      <div style={{ marginTop: 16 }}>
+      <div className="scrape-ai-mt-16">
         <div className="scrape-ai-preview-header">
           <Button
             type="button"

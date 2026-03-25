@@ -141,7 +141,7 @@ export const AiSettings: React.FC = () => {
         <p className="scrape-ai-estimate__hint">Analyzes your content to estimate total AI tokens needed, then recommends the cheapest model that can handle your workload.</p>
 
         {estimate && (
-          <div style={{ marginTop: 16 }}>
+          <div className="scrape-ai-mt-16">
             <div className="scrape-ai-summary-grid">
               <div className="scrape-ai-summary-card">
                 <span className="scrape-ai-summary-card__label">Documents</span>
@@ -171,7 +171,7 @@ export const AiSettings: React.FC = () => {
               <div className="scrape-ai-recommend">
                 <div>
                   <strong>Recommended: {estimate.recommendation.modelName}</strong>
-                  <span style={{ marginLeft: 8, color: '#666' }}>({estimate.recommendation.provider}) — {estimate.recommendation.reason}</span>
+                  <span className="scrape-ai-recommendation__detail">({estimate.recommendation.provider}) — {estimate.recommendation.reason}</span>
                 </div>
                 <Button type="button" buttonStyle="primary" size="small" onClick={() => handleApplyRecommendation(estimate.recommendation!.modelId, estimate.recommendation!.provider)}>
                   Apply This Model
@@ -186,7 +186,7 @@ export const AiSettings: React.FC = () => {
               </thead>
               <tbody>
                 {estimate.costEstimates.map((c) => (
-                  <tr key={c.modelId} style={{ opacity: c.canHandle ? 1 : 0.5, backgroundColor: c.recommended ? '#f0fdf4' : 'transparent' }}>
+                  <tr key={c.modelId} className={`${!c.canHandle ? 'scrape-ai-row--disabled' : ''} ${c.recommended ? 'scrape-ai-row--recommended' : ''}`.trim()}>
                     <td>
                       <strong>{c.modelName}</strong>
                       {c.recommended && <Pill pillStyle="success" size="small" className="scrape-ai-inline-pill">BEST VALUE</Pill>}
@@ -195,7 +195,7 @@ export const AiSettings: React.FC = () => {
                     <td><Pill pillStyle={tierPillStyle[c.tier] || 'light'} size="small">{c.tier}</Pill></td>
                     <td>{c.contextWindowFormatted}</td>
                     <td><strong>{c.totalCostFormatted}</strong></td>
-                    <td>{c.canHandle ? <span style={{ color: '#22c55e' }}>{c.reason || 'Compatible'}</span> : <span style={{ color: '#ef4444' }}>{c.reason}</span>}</td>
+                    <td>{c.canHandle ? <span className="scrape-ai-status--compatible">{c.reason || 'Compatible'}</span> : <span className="scrape-ai-status--incompatible">{c.reason}</span>}</td>
                     <td>{c.canHandle && <Button type="button" buttonStyle="secondary" size="small" onClick={() => handleApplyRecommendation(c.modelId, c.provider)}>Use</Button>}</td>
                   </tr>
                 ))}

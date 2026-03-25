@@ -112,7 +112,7 @@ export const ContentTable: React.FC = () => {
             <tbody>
               {entries.map((entry) => (
                 <React.Fragment key={entry.id}>
-                  <tr style={{ cursor: 'pointer' }} onClick={() => handleRowClick(entry.id)}>
+                  <tr className="scrape-ai-row--clickable" onClick={() => handleRowClick(entry.id)}>
                     <td>
                       {entry.title}
                       {entry.isDraft && <Pill pillStyle="warning" size="small" className="scrape-ai-inline-pill">DRAFT</Pill>}
