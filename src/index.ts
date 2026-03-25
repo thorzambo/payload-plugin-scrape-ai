@@ -1,5 +1,6 @@
 import type { Config, Plugin } from 'payload'
 import type { ScrapeAiPluginOptions, ResolvedPluginConfig, AiConfigGlobal } from './types'
+import { en } from './translations/en'
 import { createAiContentCollection } from './collections/ai-content'
 import { createAiSyncQueueCollection } from './collections/ai-sync-queue'
 import { aiConfigGlobal } from './globals/ai-config'
@@ -124,6 +125,18 @@ export const scrapeAiPlugin =
           ...((config.admin?.components?.afterNavLinks as any[]) || []),
           'payload-plugin-scrape-ai/NavLink#default',
         ],
+      },
+    }
+
+    // --- Merge i18n translations ---
+    config.i18n = {
+      ...config.i18n,
+      translations: {
+        ...config.i18n?.translations,
+        en: {
+          ...(config.i18n?.translations?.en || {}),
+          ...en,
+        },
       },
     }
 
