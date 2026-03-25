@@ -1,17 +1,8 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
+import type { CollectionOverrides } from '../types'
 
-export const aiSyncQueueCollection: CollectionConfig = {
-  slug: 'ai-sync-queue',
-  admin: {
-    hidden: true,
-  },
-  access: {
-    read: ({ req }) => Boolean(req.user),
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
-  },
-  fields: [
+export function createAiSyncQueueCollection(overrides?: CollectionOverrides): CollectionConfig {
+  const defaultFields: Field[] = [
     {
       name: 'jobType',
       type: 'select',
@@ -51,5 +42,24 @@ export const aiSyncQueueCollection: CollectionConfig = {
       name: 'errorMessage',
       type: 'text',
     },
-  ],
+  ]
+
+  return {
+    slug: 'ai-sync-queue',
+    admin: {
+      hidden: true,
+      ...(overrides?.admin || {}),
+    },
+    access: {
+      read: ({ req }) => Boolean(req.user),
+      create: ({ req }) => Boolean(req.user),
+      update: ({ req }) => Boolean(req.user),
+      delete: ({ req }) => Boolean(req.user),
+      ...(overrides?.access || {}),
+    },
+    hooks: {
+      ...(overrides?.hooks || {}),
+    },
+    fields: overrides?.fields ? overrides.fields({ defaultFields }) : defaultFields,
+  }
 }

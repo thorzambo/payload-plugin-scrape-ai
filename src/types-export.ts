@@ -12,4 +12,6 @@ export type {
   IAiProvider,
   ContextQueryResult,
   ContextQueryResponse,
+  FieldsOverride,
+  CollectionOverrides,
 } from './types'

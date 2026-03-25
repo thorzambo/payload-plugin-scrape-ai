@@ -8,20 +8,11 @@
  * For very large sites (>1MB markdown per doc), consider external storage.
  * MongoDB's 16MB document limit applies to the full document.
  */
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
+import type { CollectionOverrides } from '../types'
 
-export const aiContentCollection: CollectionConfig = {
-  slug: 'ai-content',
-  admin: {
-    hidden: true,
-  },
-  access: {
-    read: () => true,
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
-  },
-  fields: [
+export function createAiContentCollection(overrides?: CollectionOverrides): CollectionConfig {
+  const defaultFields: Field[] = [
     {
       name: 'sourceCollection',
       type: 'text',
@@ -107,5 +98,24 @@ export const aiContentCollection: CollectionConfig = {
       name: 'lastSynced',
       type: 'date',
     },
-  ],
+  ]
+
+  return {
+    slug: 'ai-content',
+    admin: {
+      hidden: true,
+      ...(overrides?.admin || {}),
+    },
+    access: {
+      read: () => true,
+      create: ({ req }) => Boolean(req.user),
+      update: ({ req }) => Boolean(req.user),
+      delete: ({ req }) => Boolean(req.user),
+      ...(overrides?.access || {}),
+    },
+    hooks: {
+      ...(overrides?.hooks || {}),
+    },
+    fields: overrides?.fields ? overrides.fields({ defaultFields }) : defaultFields,
+  }
 }

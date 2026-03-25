@@ -1,7 +1,7 @@
 import type { Config, Plugin } from 'payload'
 import type { ScrapeAiPluginOptions, ResolvedPluginConfig, AiConfigGlobal } from './types'
-import { aiContentCollection } from './collections/ai-content'
-import { aiSyncQueueCollection } from './collections/ai-sync-queue'
+import { createAiContentCollection } from './collections/ai-content'
+import { createAiSyncQueueCollection } from './collections/ai-sync-queue'
 import { aiConfigGlobal } from './globals/ai-config'
 import { detectContentCollections } from './detection/smart-detect'
 import { createAfterChangeHook } from './hooks/afterChange'
@@ -52,8 +52,8 @@ export const scrapeAiPlugin =
     // Always add collections and global for schema consistency
     config.collections = [
       ...(config.collections || []),
-      aiContentCollection,
-      aiSyncQueueCollection,
+      createAiContentCollection(options.aiContentOverrides),
+      createAiSyncQueueCollection(options.aiSyncQueueOverrides),
     ]
     config.globals = [
       ...(config.globals || []),
