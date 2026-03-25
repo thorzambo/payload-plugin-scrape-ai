@@ -46,14 +46,20 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
           const collectionCounts: Record<string, number> = {}
           // We can't group-by with Payload local API, so we query per collection
           const enabledCollections = typedAiConfig?.enabledCollections || {}
-          for (const slug of Object.keys(enabledCollections)) {
-            if (!enabledCollections[slug]) continue
-            const count = await payload.find({
-              collection: 'ai-content',
-              where: { sourceCollection: { equals: slug } },
-              limit: 0,
-            })
-            collectionCounts[slug] = count.totalDocs
+          const enabledSlugs = Object.keys(enabledCollections).filter(slug => enabledCollections[slug])
+
+          const countResults = await Promise.all(
+            enabledSlugs.map(slug =>
+              payload.find({
+                collection: 'ai-content',
+                where: { sourceCollection: { equals: slug } },
+                limit: 0,
+              }).then(result => ({ slug, count: result.totalDocs }))
+            )
+          )
+
+          for (const { slug, count } of countResults) {
+            collectionCounts[slug] = count
           }
 
           return Response.json({
