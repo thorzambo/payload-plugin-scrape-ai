@@ -33,18 +33,16 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
           const [allEntries, pendingEntries, errorEntries, aiConfig] = await Promise.all([
             payload.find({
               collection: 'ai-content',
-              where: { sourceCollection: { not_equals: '__aggregate' } },
               limit: 0,
             }),
             payload.find({
               collection: 'ai-content',
-              where: { sourceCollection: { not_equals: '__aggregate' }, status: { equals: 'pending' } },
+              where: { status: { equals: 'pending' } },
               limit: 0,
             }),
             payload.find({
               collection: 'ai-content',
               where: {
-                sourceCollection: { not_equals: '__aggregate' },
                 status: { in: ['error', 'error-permanent'] },
               },
               limit: 0,
@@ -105,9 +103,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const collection = url.searchParams.get('collection')
         const status = url.searchParams.get('status')
 
-        const where: Record<string, any> = {
-          sourceCollection: { not_equals: '__aggregate' },
-        }
+        const where: Record<string, any> = {}
         if (collection) where.sourceCollection = { equals: collection }
         if (status) where.status = { equals: status }
 
@@ -172,10 +168,10 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const body = await parseBody(req)
         try {
           if (body.all) {
-            // Bulk delete all non-aggregate entries
+            // Bulk delete all ai-content entries
             const result = await payload.delete({
               collection: 'ai-content',
-              where: { sourceCollection: { not_equals: '__aggregate' } },
+              where: {},
             })
             // Queue initial re-sync
             await payload.create({
@@ -358,7 +354,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
 
           // Get all non-plugin collections
           const allCollections = Object.keys(payload.collections).filter(
-            (slug) => !['ai-content', 'ai-sync-queue'].includes(slug),
+            (slug) => !['ai-content', 'ai-sync-queue', 'ai-aggregates'].includes(slug),
           )
 
           const result = await Promise.all(
@@ -403,7 +399,6 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
           while (hasMore) {
             const batch = await payload.find({
               collection: 'ai-content',
-              where: { sourceCollection: { not_equals: '__aggregate' } },
               limit: 100,
               page,
             })
@@ -508,6 +503,75 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
             notes: m.notes,
           })),
         })
+      },
+    },
+
+    // GET /api/scrape-ai/health
+    {
+      path: '/scrape-ai/health',
+      method: 'get' as const,
+      handler: async (req: PayloadRequest) => {
+        const { payload } = req
+        const isAuthenticated = Boolean(req.user)
+
+        try {
+          // Queue depth (always visible)
+          const pendingJobs = await payload.find({
+            collection: 'ai-sync-queue',
+            where: { status: { equals: 'pending' } },
+            limit: 0,
+          })
+
+          const processingJobs = await payload.find({
+            collection: 'ai-sync-queue',
+            where: { status: { equals: 'processing' } },
+            limit: 0,
+          })
+
+          // Basic health info (public)
+          const health: Record<string, any> = {
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+            queue: {
+              pending: pendingJobs.totalDocs,
+              processing: processingJobs.totalDocs,
+            },
+          }
+
+          // Detailed info (authenticated only)
+          if (isAuthenticated) {
+            const [errorEntries, aiConfig] = await Promise.all([
+              payload.find({
+                collection: 'ai-content',
+                where: { status: { in: ['error', 'error-permanent'] } },
+                limit: 0,
+              }),
+              payload.findGlobal({ slug: 'ai-config' }).catch(() => null),
+            ])
+
+            const typedConfig = aiConfig as any
+
+            health.errors = {
+              count: errorEntries.totalDocs,
+            }
+            health.ai = {
+              enabled: typedConfig?.aiEnabled || false,
+              provider: typedConfig?.aiProvider || null,
+              model: typedConfig?.aiModel || null,
+              apiCallsThisMonth: typedConfig?.aiApiCallCount || 0,
+            }
+            health.lastAggregateRebuild = typedConfig?.lastAggregateRebuild || null
+          }
+
+          return Response.json(health, {
+            headers: { 'Cache-Control': 'no-cache' },
+          })
+        } catch (error: any) {
+          return Response.json(
+            { status: 'error', message: error.message },
+            { status: 500, headers: { 'Cache-Control': 'no-cache' } },
+          )
+        }
       },
     },
   ]
