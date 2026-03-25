@@ -21,9 +21,9 @@
       "default": "./dist/types-export.js"
     },
     "./client": {
-      "import": "./dist/admin/views/DashboardClient.js",
-      "types": "./dist/admin/views/DashboardClient.d.ts",
-      "default": "./dist/admin/views/DashboardClient.js"
+      "import": "./dist/admin/client.js",
+      "types": "./dist/admin/client.d.ts",
+      "default": "./dist/admin/client.js"
     },
     "./rsc": {
       "react-server": "./dist/admin/views/ScrapeAiView.js",
