@@ -4,6 +4,18 @@ import { detectContentCollections } from '../detection/smart-detect'
 import { createAiProvider } from '../ai/provider'
 import { estimateJob, MODEL_CATALOG, formatTokens, formatCost } from '../ai/token-estimator'
 
+/** Safely parse request body — handles missing/invalid json gracefully */
+async function parseBody(req: PayloadRequest): Promise<Record<string, any>> {
+  try {
+    if (typeof req.json === 'function') {
+      return await req.json() || {}
+    }
+    return {}
+  } catch {
+    return {}
+  }
+}
+
 /**
  * Create all authenticated admin API endpoints for the dashboard.
  */
@@ -157,8 +169,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
         const { payload } = req
 
-        let body: any = {}
-        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
+        const body = await parseBody(req)
         try {
           if (body.all) {
             // Bulk delete all non-aggregate entries
@@ -201,8 +212,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
         const { payload } = req
 
-        let body: any = {}
-        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
+        const body = await parseBody(req)
         try {
           const { collection: slug, enabled } = body
 
@@ -235,8 +245,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
         const { payload } = req
 
-        let body: any = {}
-        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
+        const body = await parseBody(req)
         try {
           const data: Record<string, any> = {}
 
@@ -313,8 +322,7 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
         const { payload } = req
 
-        let body: any = {}
-        try { body = await (req.json as () => Promise<any>)() } catch { /* empty body */ }
+        const body = await parseBody(req)
         try {
           const data: Record<string, any> = {}
 
