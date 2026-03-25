@@ -1,5 +1,8 @@
 # payload-plugin-scrape-ai
 
+![CleanShot 2026-03-25 at 12 18 31@2x](https://github.com/user-attachments/assets/06fde4e6-182b-469b-90fb-29a430e7eee4)
+
+
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/thorzambo?style=flat&logo=github&label=Sponsor&color=1F1F25)](https://github.com/sponsors/thorzambo)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/leozamba19s)
 [![Payload CMS](https://img.shields.io/badge/Payload%20CMS-v3-20C5D9?style=flat)](https://payloadcms.com)
