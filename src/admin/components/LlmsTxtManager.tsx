@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button } from '@payloadcms/ui'
+import { Button, CheckboxInput } from '@payloadcms/ui'
 
 interface PriorityEntry {
   slug: string
@@ -104,14 +104,13 @@ export const LlmsTxtManager: React.FC = () => {
               <span className="scrape-ai-priority-item__handle">&#x2630;</span>
               <span className="scrape-ai-priority-item__slug">{entry.slug}</span>
               <span className="scrape-ai-priority-item__section">{entry.section}</span>
-              <label className="scrape-ai-priority-item__optional">
-                <input
-                  type="checkbox"
-                  checked={entry.optional}
-                  onChange={() => toggleOptional(i)}
-                />
-                Optional
-              </label>
+              <CheckboxInput
+                checked={entry.optional}
+                onToggle={() => toggleOptional(i)}
+                label="Optional"
+                name={`optional-${entry.slug}`}
+                className="scrape-ai-priority-item__optional"
+              />
             </div>
           ))}
           <Button type="button" buttonStyle="primary" size="small" onClick={handleSave} disabled={saving} className="scrape-ai-priority-save">

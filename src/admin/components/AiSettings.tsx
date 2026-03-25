@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button } from '@payloadcms/ui'
-import { Pill } from '@payloadcms/ui'
+import { Button, CheckboxInput, Pill, SelectInput, TextInput } from '@payloadcms/ui'
 
 interface CostEstimate {
   modelId: string; modelName: string; provider: string; tier: string
@@ -88,19 +87,30 @@ export const AiSettings: React.FC = () => {
       <h3 className="scrape-ai-card__heading">AI Enrichment Settings</h3>
 
       <div className="scrape-ai-field">
-        <label className="scrape-ai-field__label scrape-ai-field__label--inline">
-          <input type="checkbox" checked={aiEnabled} onChange={(e) => setAiEnabled(e.target.checked)} className="scrape-ai-field__checkbox" />
-          Enable AI Enrichment
-        </label>
+        <CheckboxInput
+          checked={aiEnabled}
+          onToggle={(e) => setAiEnabled(e.target.checked)}
+          label="Enable AI Enrichment"
+          name="aiEnabled"
+        />
       </div>
 
       <div className="scrape-ai-field">
-        <label className="scrape-ai-field__label">Provider</label>
-        <select className="scrape-ai-field__select" value={provider} onChange={(e) => setProvider(e.target.value)}>
-          <option value="">Select provider...</option>
-          <option value="openai">OpenAI</option>
-          <option value="anthropic">Anthropic</option>
-        </select>
+        <SelectInput
+          path="provider"
+          name="provider"
+          label="Provider"
+          value={provider}
+          options={[
+            { label: 'OpenAI', value: 'openai' },
+            { label: 'Anthropic', value: 'anthropic' },
+          ]}
+          onChange={(opt) => {
+            if (opt && !Array.isArray(opt)) setProvider(String(opt.value))
+            else setProvider('')
+          }}
+          placeholder="Select provider..."
+        />
       </div>
 
       <div className="scrape-ai-field">
@@ -109,8 +119,14 @@ export const AiSettings: React.FC = () => {
       </div>
 
       <div className="scrape-ai-field">
-        <label className="scrape-ai-field__label">Model</label>
-        <input type="text" className="scrape-ai-field__input" value={model} onChange={(e) => setModel(e.target.value)} placeholder="e.g., gpt-4.1-nano or claude-haiku-4-5-20251001" />
+        <TextInput
+          path="model"
+          label="Model"
+          value={model}
+          hasMany={false}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setModel(e.target.value)}
+          placeholder="e.g., gpt-4.1-nano or claude-haiku-4-5-20251001"
+        />
         <span className="scrape-ai-field__hint">Use the token estimator below to find the best model for your content.</span>
       </div>
 

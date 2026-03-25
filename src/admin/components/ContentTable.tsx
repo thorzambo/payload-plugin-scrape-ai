@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button, Collapsible, Pagination, Pill, ShimmerEffect } from '@payloadcms/ui'
+import { Button, Collapsible, Pagination, Pill, SelectInput, ShimmerEffect } from '@payloadcms/ui'
 
 interface Entry {
   id: string
@@ -81,18 +81,25 @@ export const ContentTable: React.FC = () => {
       <div className="scrape-ai-header-row">
         <h3 className="scrape-ai-card__heading">Content Entries ({totalDocs})</h3>
         <div className="scrape-ai-filters">
-          <select
-            className="scrape-ai-field__select"
+          <SelectInput
+            path="filterStatus"
+            name="filterStatus"
             value={filterStatus}
-            onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
-            style={{ width: 'auto' }}
-          >
-            <option value="">All Statuses</option>
-            <option value="synced">Synced</option>
-            <option value="pending">Pending</option>
-            <option value="error">Error</option>
-            <option value="error-permanent">Permanent Error</option>
-          </select>
+            options={[
+              { label: 'All Statuses', value: '' },
+              { label: 'Synced', value: 'synced' },
+              { label: 'Pending', value: 'pending' },
+              { label: 'Error', value: 'error' },
+              { label: 'Permanent Error', value: 'error-permanent' },
+            ]}
+            onChange={(opt) => {
+              const val = opt && !Array.isArray(opt) ? String(opt.value) : ''
+              setFilterStatus(val)
+              setPage(1)
+            }}
+            isClearable={false}
+            style={{ width: 'auto', minWidth: '160px' }}
+          />
         </div>
       </div>
 
