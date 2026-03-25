@@ -76,7 +76,7 @@ export function createWellKnownEndpoint(siteUrl: string) {
       return Response.json(manifest, {
         status: 200,
         headers: {
-          'Cache-Control': 'public, max-age=3600',
+          'Cache-Control': 'public, max-age=3600, s-maxage=86400',
           'Access-Control-Allow-Origin': '*',
         },
       })

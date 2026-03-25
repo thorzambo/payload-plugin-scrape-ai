@@ -77,7 +77,7 @@ export function createSitemapXmlEndpoint(siteUrl: string) {
           status: 200,
           headers: {
             'Content-Type': 'application/xml; charset=utf-8',
-            'Cache-Control': 'public, max-age=3600',
+            'Cache-Control': 'public, max-age=3600, s-maxage=86400',
           },
         })
       } catch (error: any) {

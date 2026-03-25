@@ -53,7 +53,7 @@ export function createContentMarkdownEndpoint(rateLimiter: RateLimiter) {
           status: 200,
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
-            'Cache-Control': 'public, max-age=60',
+            'Cache-Control': 'public, max-age=60, s-maxage=300',
             ...(lastSynced ? { ETag: `"${new Date(lastSynced).getTime()}"` } : {}),
           },
         })
