@@ -18,6 +18,44 @@ export function generateHeadTags(siteUrl: string): string {
 }
 
 /**
+ * Generate Next.js Metadata object for AI discovery.
+ *
+ * Preferred approach for Next.js App Router — spread into your layout's metadata export
+ * or merge into generateMetadata(). ScrapeAiMeta is available for Pages Router or
+ * manual <head> injection.
+ *
+ * Usage in app/layout.tsx:
+ *   import { generateAiMetadata } from 'payload-plugin-scrape-ai/discovery'
+ *
+ *   export const metadata = {
+ *     ...generateAiMetadata('https://example.com'),
+ *     title: 'My Site',
+ *   }
+ *
+ *   // Or inside generateMetadata():
+ *   export async function generateMetadata() {
+ *     return { ...generateAiMetadata('https://example.com'), title: 'My Site' }
+ *   }
+ */
+export function generateAiMetadata(siteUrl: string): Record<string, any> {
+  const url = siteUrl.replace(/\/$/, '')
+  return {
+    other: {
+      'ai-content': `${url}/llms.txt`,
+      'ai-content-full': `${url}/llms-full.txt`,
+      'ai-sitemap': `${url}/ai/sitemap.json`,
+      'ai-plugin': `${url}/.well-known/ai-plugin.json`,
+    },
+    alternates: {
+      types: {
+        'text/plain': `${url}/llms.txt`,
+        'application/json': `${url}/.well-known/ai-plugin.json`,
+      },
+    },
+  }
+}
+
+/**
  * Returns structured data for the head tags, useful for
  * programmatic insertion in React/Next.js apps.
  */

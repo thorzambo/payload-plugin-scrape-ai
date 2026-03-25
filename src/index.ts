@@ -23,7 +23,7 @@ import { RateLimiter } from './endpoints/rate-limiter'
 import { startScheduler } from './sync/scheduler'
 
 export type { ScrapeAiPluginOptions } from './types'
-export { generateHeadTags, getDiscoveryLinks } from './discovery/head-tags'
+export { generateHeadTags, getDiscoveryLinks, generateAiMetadata } from './discovery/head-tags'
 export { ScrapeAiMeta } from './discovery/ScrapeAiMeta'
 export { ScrapeAiFooterTag } from './discovery/ScrapeAiFooterTag'
 export { withScrapeAi } from './next'
