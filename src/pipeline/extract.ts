@@ -143,7 +143,7 @@ function extractFieldGroup(
   return parts.length > 0 ? parts.join('\n\n') : null
 }
 
-function extractRichText(value: unknown, field: Field): string | null {
+function extractRichText(value: unknown, _field?: Field): string | null {
   if (!value) return null
 
   // Detect Lexical vs Slate based on value structure
@@ -480,7 +480,7 @@ function extractBlocks(
           .map((item) => {
             if (typeof item === 'string') return item
             if (typeof item === 'object' && item !== null) {
-              const richText = extractRichText(item, {} as Field)
+              const richText = extractRichText(item)
               if (richText) return richText
               const texts: string[] = []
               for (const [k, v] of Object.entries(item)) {
@@ -494,7 +494,7 @@ function extractBlocks(
           .filter(Boolean)
         if (arrayContent.length > 0) blockParts.push(arrayContent.join('\n'))
       } else if (typeof val === 'object') {
-        const richText = extractRichText(val, {} as Field)
+        const richText = extractRichText(val)
         if (richText) blockParts.push(richText)
       }
     }
