@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button, CheckboxInput, Pill, SelectInput, TextInput } from '@payloadcms/ui'
+import { Banner, Button, CheckboxInput, Pill, SelectInput, TextInput } from '@payloadcms/ui'
 
 interface CostEstimate {
   modelId: string; modelName: string; provider: string; tier: string
@@ -140,9 +140,9 @@ export const AiSettings: React.FC = () => {
       </div>
 
       {testResult && (
-        <div className={`scrape-ai-alert ${testResult.success ? 'scrape-ai-alert--success' : 'scrape-ai-alert--error'}`}>
+        <Banner type={testResult.success ? 'success' : 'error'}>
           {testResult.message}
-        </div>
+        </Banner>
       )}
 
       <div className="scrape-ai-stats">API calls this month: <strong>{apiCallCount}</strong></div>

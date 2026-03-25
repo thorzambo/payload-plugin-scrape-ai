@@ -193,24 +193,6 @@
   margin-top: 16px;
 }
 
-/* Alert/result box */
-.scrape-ai-alert {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border-radius: 4px;
-  font-size: 0.8125rem;
-}
-
-.scrape-ai-alert--success {
-  background: var(--theme-success-100, #dcfce7);
-  color: var(--theme-success-900, #166534);
-}
-
-.scrape-ai-alert--error {
-  background: var(--theme-error-100, #fee2e2);
-  color: var(--theme-error-900, #991b1b);
-}
-
 /* Stats box */
 .scrape-ai-stats {
   margin-top: 16px;
