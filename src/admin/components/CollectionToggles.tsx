@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { Pill } from '@payloadcms/ui'
 
 interface CollectionInfo {
   slug: string
@@ -47,15 +48,12 @@ export const CollectionToggles: React.FC = () => {
               <span className="scrape-ai-toggle-row__name">{c.label || c.slug}</span>
               <span className="scrape-ai-toggle-row__count">{c.docCount} documents</span>
             </div>
-            <label className="scrape-ai-toggle-row__toggle">
-              <input
-                type="checkbox"
-                checked={c.enabled}
-                onChange={(e) => handleToggle(c.slug, e.target.checked)}
-                className="scrape-ai-field__checkbox"
-              />
-              <span>{c.enabled ? 'Enabled' : 'Disabled'}</span>
-            </label>
+            <Pill
+              pillStyle={c.enabled ? 'success' : 'light-gray'}
+              onClick={() => handleToggle(c.slug, !c.enabled)}
+            >
+              {c.enabled ? 'Enabled' : 'Disabled'}
+            </Pill>
           </div>
         ))}
       </div>

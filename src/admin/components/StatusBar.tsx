@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button } from '@payloadcms/ui'
-import { Pill } from '@payloadcms/ui'
+import { Banner, Button, Pill } from '@payloadcms/ui'
 
 interface StatusData {
   totalEntries: number
@@ -51,22 +50,25 @@ export const StatusBar: React.FC = () => {
     }
   }
 
-  if (loading) return <div className="scrape-ai-status">Loading...</div>
-  if (!status) return <div className="scrape-ai-status">Failed to load status</div>
+  if (loading) return <Banner type="default">Loading...</Banner>
+  if (!status) return <Banner type="error">Failed to load status</Banner>
 
-  const pillStyle = status.errorCount > 0 ? 'error'
-    : status.pendingCount > 0 ? 'warning'
+  const bannerType = status.errorCount > 0 ? 'error'
+    : status.pendingCount > 0 ? 'info'
     : 'success' as const
+
   const statusText = status.errorCount > 0 ? `${status.errorCount} Errors`
     : status.pendingCount > 0 ? `${status.pendingCount} Pending`
     : 'All Synced'
   const collectionCount = Object.keys(status.collections).length
 
   return (
-    <div className="scrape-ai-status">
+    <Banner type={bannerType}>
       <div className="scrape-ai-status__row">
         <div className="scrape-ai-status__group">
-          <Pill pillStyle={pillStyle}>{statusText}</Pill>
+          <Pill pillStyle={status.errorCount > 0 ? 'error' : status.pendingCount > 0 ? 'warning' : 'success'}>
+            {statusText}
+          </Pill>
           <span className="scrape-ai-status__stat">
             {status.totalEntries} pages across {collectionCount} collections
           </span>
@@ -85,6 +87,6 @@ export const StatusBar: React.FC = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </Banner>
   )
 }

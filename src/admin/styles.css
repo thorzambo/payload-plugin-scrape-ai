@@ -74,14 +74,7 @@
   color: var(--theme-text, #333);
 }
 
-/* Status bar */
-.scrape-ai-status {
-  padding: 16px 24px;
-  background: var(--theme-elevation-50, #f8f8f8);
-  border: 1px solid var(--theme-elevation-150, #e0e0e0);
-  border-radius: 4px;
-  margin-bottom: 24px;
-}
+/* Status bar — Banner component provides outer styling */
 
 .scrape-ai-status__row {
   display: flex;
@@ -189,11 +182,7 @@
   margin-top: 4px;
 }
 
-.scrape-ai-field__checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
+/* Checkbox styling removed — using Pill component for toggles */
 
 /* Actions row */
 .scrape-ai-actions {
@@ -382,13 +371,7 @@
   color: var(--theme-elevation-400, #999);
 }
 
-.scrape-ai-toggle-row__toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 0.8125rem;
-}
+/* Toggle row — Pill component handles enabled/disabled state */
 
 /* Endpoints panel */
 .scrape-ai-endpoint {
@@ -520,4 +503,9 @@
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
+}
+
+/* Collapsible sections in detail pane */
+.scrape-ai-collapsible {
+  margin-top: 12px;
 }

@@ -1,9 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button } from '@payloadcms/ui'
-import { Pagination } from '@payloadcms/ui'
-import { Pill } from '@payloadcms/ui'
+import { Button, Collapsible, Pagination, Pill } from '@payloadcms/ui'
 
 interface Entry {
   id: string
@@ -158,16 +156,14 @@ export const ContentTable: React.FC = () => {
                             : (detail as any).markdown?.replace(/^---[\s\S]*?---\n*/m, '') || 'No content'}
                         </pre>
                         {(detail as any).jsonLd && (
-                          <details style={{ marginTop: 12 }}>
-                            <summary>JSON-LD</summary>
+                          <Collapsible header="JSON-LD" initCollapsed={true} className="scrape-ai-collapsible">
                             <pre className="scrape-ai-code">{JSON.stringify((detail as any).jsonLd, null, 2)}</pre>
-                          </details>
+                          </Collapsible>
                         )}
                         {(detail as any).aiMeta && (
-                          <details style={{ marginTop: 12 }}>
-                            <summary>AI Metadata</summary>
+                          <Collapsible header="AI Metadata" initCollapsed={true} className="scrape-ai-collapsible">
                             <pre className="scrape-ai-code">{JSON.stringify((detail as any).aiMeta, null, 2)}</pre>
-                          </details>
+                          </Collapsible>
                         )}
                       </td>
                     </tr>

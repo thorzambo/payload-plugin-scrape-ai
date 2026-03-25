@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@payloadcms/ui'
+import { Button, CopyToClipboard } from '@payloadcms/ui'
 
 interface EndpointInfo {
   path: string
@@ -12,7 +12,6 @@ interface EndpointInfo {
 export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
   const [testingEndpoint, setTestingEndpoint] = useState<string | null>(null)
   const [testResult, setTestResult] = useState<string | null>(null)
-  const [copied, setCopied] = useState<string | null>(null)
 
   const endpoints: EndpointInfo[] = [
     { path: '/api/llms.txt', method: 'GET', description: 'Curated AI-friendly index' },
@@ -26,13 +25,6 @@ export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
       description: 'JSON-LD structured data',
     },
   ]
-
-  const handleCopy = async (path: string) => {
-    const url = `${siteUrl}${path}`
-    await navigator.clipboard.writeText(url)
-    setCopied(path)
-    setTimeout(() => setCopied(null), 2000)
-  }
 
   const handleTest = async (path: string) => {
     setTestingEndpoint(path)
@@ -68,9 +60,7 @@ export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
               <span className="scrape-ai-endpoint__description">{ep.description}</span>
             </div>
             <div className="scrape-ai-endpoint__actions">
-              <Button buttonStyle="secondary" size="small" onClick={() => handleCopy(ep.path)}>
-                {copied === ep.path ? 'Copied!' : 'Copy URL'}
-              </Button>
+              <CopyToClipboard value={`${siteUrl}${ep.path}`} defaultMessage="Copy URL" successMessage="Copied!" />
               {!ep.path.includes('{') && (
                 <Button
                   buttonStyle="secondary"
