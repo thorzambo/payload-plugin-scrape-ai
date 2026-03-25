@@ -1,0 +1,511 @@
+/* Payload CMS native styling for Scrape AI plugin */
+
+.scrape-ai__header {
+  margin-bottom: 24px;
+}
+
+.scrape-ai__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: var(--theme-text, #333);
+}
+
+.scrape-ai__description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--theme-elevation-500, #888);
+}
+
+.scrape-ai__tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--theme-elevation-150, #e0e0e0);
+}
+
+.scrape-ai__tab {
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  color: var(--theme-elevation-500, #888);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.scrape-ai__tab:hover {
+  color: var(--theme-text, #333);
+}
+
+.scrape-ai__tab--active {
+  color: var(--theme-text, #333);
+  border-bottom-color: var(--theme-success-500, #22c55e);
+  font-weight: 600;
+}
+
+.scrape-ai__content {
+  min-height: 400px;
+}
+
+/* Card */
+.scrape-ai-card {
+  padding: 20px;
+  background: var(--theme-elevation-0, #fff);
+  border: 1px solid var(--theme-elevation-150, #e0e0e0);
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.scrape-ai-card__heading {
+  margin: 0 0 16px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--theme-text, #333);
+}
+
+.scrape-ai-card__subheading {
+  margin: 20px 0 10px 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--theme-text, #333);
+}
+
+/* Status bar — Banner component provides outer styling */
+
+.scrape-ai-status__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.scrape-ai-status__group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scrape-ai-status__stat {
+  font-size: 0.875rem;
+  color: var(--theme-elevation-600, #666);
+}
+
+.scrape-ai-status__timestamp {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-400, #999);
+}
+
+/* Inline pill helper (for pills placed inline after text) */
+.scrape-ai-inline-pill {
+  margin-left: 8px;
+}
+
+/* Priority save button spacing */
+.scrape-ai-priority-save {
+  margin-top: 12px;
+}
+
+/* Table */
+.scrape-ai-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.scrape-ai-table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--theme-elevation-150, #e0e0e0);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--theme-elevation-500, #888);
+}
+
+.scrape-ai-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--theme-elevation-100, #f0f0f0);
+  color: var(--theme-text, #333);
+}
+
+.scrape-ai-table tr:hover td {
+  background: var(--theme-elevation-50, #fafafa);
+}
+
+/* Form fields */
+.scrape-ai-field {
+  margin-bottom: 12px;
+}
+
+.scrape-ai-field__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--theme-text, #333);
+}
+
+.scrape-ai-field__label--inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scrape-ai-field__input,
+.scrape-ai-field__select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--theme-elevation-250, #ddd);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: var(--theme-input-bg, #fff);
+  color: var(--theme-text, #333);
+  box-sizing: border-box;
+}
+
+.scrape-ai-field__input:focus,
+.scrape-ai-field__select:focus {
+  outline: none;
+  border-color: var(--theme-success-500, #22c55e);
+}
+
+.scrape-ai-field__hint {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-400, #999);
+  margin-top: 4px;
+}
+
+/* Checkbox styling removed — using Pill component for toggles */
+
+/* Actions row */
+.scrape-ai-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* Alert/result box */
+.scrape-ai-alert {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+}
+
+.scrape-ai-alert--success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.scrape-ai-alert--error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Stats box */
+.scrape-ai-stats {
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: var(--theme-elevation-50, #f8f8f8);
+  border-radius: 4px;
+  font-size: 0.8125rem;
+}
+
+/* Estimate section */
+.scrape-ai-estimate {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--theme-elevation-50, #fafafa);
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-100, #e8e8e8);
+}
+
+.scrape-ai-estimate__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scrape-ai-estimate__hint {
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-500, #777);
+  margin: 8px 0 0 0;
+}
+
+/* Summary grid */
+.scrape-ai-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.scrape-ai-summary-card {
+  padding: 14px;
+  background: var(--theme-elevation-0, white);
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-100, #e0e0e0);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scrape-ai-summary-card--highlight {
+  border-color: var(--theme-success-500, #22c55e);
+  border-width: 2px;
+}
+
+.scrape-ai-summary-card__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.scrape-ai-summary-card__value {
+  font-size: 1.375rem;
+  font-weight: 700;
+}
+
+.scrape-ai-summary-card__detail {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* Recommend banner */
+.scrape-ai-recommend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Badges are handled by native Payload Pill component */
+
+/* Status dot */
+.scrape-ai-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Detail pane */
+.scrape-ai-detail {
+  padding: 16px;
+  background: var(--theme-elevation-50, #f8f8f8);
+}
+
+.scrape-ai-detail__header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.scrape-ai-code {
+  padding: 12px;
+  background: var(--theme-elevation-100, #f0f0f0);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  overflow: auto;
+  max-height: 400px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.scrape-ai-code--inline {
+  padding: 0;
+  background: none;
+  font-size: 0.6875rem;
+  color: #666;
+  max-height: none;
+  overflow: visible;
+}
+
+/* Pagination wrapper -- native Payload Pagination component is used */
+
+/* Collection toggles */
+.scrape-ai-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scrape-ai-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--theme-elevation-50, #f8f8f8);
+  border-radius: 4px;
+}
+
+.scrape-ai-toggle-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scrape-ai-toggle-row__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.scrape-ai-toggle-row__count {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-400, #999);
+}
+
+/* Toggle row — Pill component handles enabled/disabled state */
+
+/* Endpoints panel */
+.scrape-ai-endpoint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--theme-elevation-50, #f8f8f8);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scrape-ai-endpoint__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scrape-ai-endpoint__path {
+  font-size: 0.8125rem;
+  font-family: monospace;
+  font-weight: 500;
+}
+
+.scrape-ai-endpoint__description {
+  font-size: 0.75rem;
+  color: var(--theme-elevation-400, #999);
+}
+
+.scrape-ai-endpoint__actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Integration guide */
+.scrape-ai-guide {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--theme-elevation-50, #f8f8f8);
+  border-radius: 4px;
+}
+
+.scrape-ai-guide__text {
+  font-size: 0.8125rem;
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+/* Nav link */
+.scrape-ai-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-650, #444);
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.scrape-ai-nav:hover {
+  background-color: var(--theme-elevation-50, #f5f5f5);
+  color: var(--theme-text, #333);
+}
+
+.scrape-ai-nav__icon {
+  display: flex;
+  width: 16px;
+  height: 16px;
+}
+
+/* Filters */
+.scrape-ai-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.scrape-ai-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Priority list (llms.txt) */
+.scrape-ai-priority-list {
+  margin-bottom: 20px;
+}
+
+.scrape-ai-priority-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  background: var(--theme-elevation-50, #f8f8f8);
+  border-radius: 4px;
+  cursor: grab;
+}
+
+.scrape-ai-priority-item__handle {
+  font-size: 0.875rem;
+  cursor: grab;
+  color: #999;
+}
+
+.scrape-ai-priority-item__slug {
+  flex: 1;
+  font-size: 0.8125rem;
+  font-family: monospace;
+}
+
+.scrape-ai-priority-item__section {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.scrape-ai-priority-item__optional {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+}
+
+/* Preview tabs */
+.scrape-ai-preview-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Collapsible sections in detail pane */
+.scrape-ai-collapsible {
+  margin-top: 12px;
+}
