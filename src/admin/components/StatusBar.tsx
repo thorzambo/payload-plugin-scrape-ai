@@ -82,7 +82,7 @@ export const StatusBar: React.FC = () => {
           {status.aiEnabled && (
             <Pill pillStyle="dark">AI: {status.aiApiCallCount} calls</Pill>
           )}
-          <Button buttonStyle="primary" size="small" onClick={handleRegenerateAll} disabled={regenerating}>
+          <Button type="button" buttonStyle="primary" size="small" onClick={handleRegenerateAll} disabled={regenerating}>
             {regenerating ? 'Regenerating...' : 'Regenerate All'}
           </Button>
         </div>

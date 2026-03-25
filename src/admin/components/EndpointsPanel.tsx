@@ -63,6 +63,7 @@ export const EndpointsPanel: React.FC<{ siteUrl: string }> = ({ siteUrl }) => {
               <CopyToClipboard value={`${siteUrl}${ep.path}`} defaultMessage="Copy URL" successMessage="Copied!" />
               {!ep.path.includes('{') && (
                 <Button
+                  type="button"
                   buttonStyle="secondary"
                   size="small"
                   onClick={() => handleTest(ep.path)}

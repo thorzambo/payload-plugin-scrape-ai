@@ -114,7 +114,7 @@ export const LlmsTxtManager: React.FC = () => {
               </label>
             </div>
           ))}
-          <Button buttonStyle="primary" size="small" onClick={handleSave} disabled={saving} className="scrape-ai-priority-save">
+          <Button type="button" buttonStyle="primary" size="small" onClick={handleSave} disabled={saving} className="scrape-ai-priority-save">
             {saving ? 'Saving...' : 'Save & Rebuild'}
           </Button>
         </div>
@@ -123,6 +123,7 @@ export const LlmsTxtManager: React.FC = () => {
       <div style={{ marginTop: 16 }}>
         <div className="scrape-ai-preview-header">
           <Button
+            type="button"
             buttonStyle={!showFull ? 'primary' : 'secondary'}
             size="small"
             onClick={() => setShowFull(false)}
@@ -130,6 +131,7 @@ export const LlmsTxtManager: React.FC = () => {
             llms.txt
           </Button>
           <Button
+            type="button"
             buttonStyle={showFull ? 'primary' : 'secondary'}
             size="small"
             onClick={() => setShowFull(true)}

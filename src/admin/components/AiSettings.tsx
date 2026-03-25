@@ -115,10 +115,10 @@ export const AiSettings: React.FC = () => {
       </div>
 
       <div className="scrape-ai-actions">
-        <Button buttonStyle="primary" size="small" onClick={handleSave} disabled={saving}>
+        <Button type="button" buttonStyle="primary" size="small" onClick={handleSave} disabled={saving}>
           {saving ? 'Saving...' : 'Save Settings'}
         </Button>
-        <Button buttonStyle="secondary" size="small" onClick={handleTest} disabled={testing}>
+        <Button type="button" buttonStyle="secondary" size="small" onClick={handleTest} disabled={testing}>
           {testing ? 'Testing...' : 'Test Connection'}
         </Button>
       </div>
@@ -134,7 +134,7 @@ export const AiSettings: React.FC = () => {
       <div className="scrape-ai-estimate">
         <div className="scrape-ai-estimate__header">
           <h4 className="scrape-ai-card__subheading" style={{ margin: 0 }}>Token Estimation &amp; Model Recommendation</h4>
-          <Button buttonStyle="primary" size="small" onClick={fetchEstimate} disabled={estimating}>
+          <Button type="button" buttonStyle="primary" size="small" onClick={fetchEstimate} disabled={estimating}>
             {estimating ? 'Estimating...' : estimate ? 'Re-estimate' : 'Estimate Tokens'}
           </Button>
         </div>
@@ -173,7 +173,7 @@ export const AiSettings: React.FC = () => {
                   <strong>Recommended: {estimate.recommendation.modelName}</strong>
                   <span style={{ marginLeft: 8, color: '#666' }}>({estimate.recommendation.provider}) — {estimate.recommendation.reason}</span>
                 </div>
-                <Button buttonStyle="primary" size="small" onClick={() => handleApplyRecommendation(estimate.recommendation!.modelId, estimate.recommendation!.provider)}>
+                <Button type="button" buttonStyle="primary" size="small" onClick={() => handleApplyRecommendation(estimate.recommendation!.modelId, estimate.recommendation!.provider)}>
                   Apply This Model
                 </Button>
               </div>
@@ -196,7 +196,7 @@ export const AiSettings: React.FC = () => {
                     <td>{c.contextWindowFormatted}</td>
                     <td><strong>{c.totalCostFormatted}</strong></td>
                     <td>{c.canHandle ? <span style={{ color: '#22c55e' }}>{c.reason || 'Compatible'}</span> : <span style={{ color: '#ef4444' }}>{c.reason}</span>}</td>
-                    <td>{c.canHandle && <Button buttonStyle="secondary" size="small" onClick={() => handleApplyRecommendation(c.modelId, c.provider)}>Use</Button>}</td>
+                    <td>{c.canHandle && <Button type="button" buttonStyle="secondary" size="small" onClick={() => handleApplyRecommendation(c.modelId, c.provider)}>Use</Button>}</td>
                   </tr>
                 ))}
               </tbody>

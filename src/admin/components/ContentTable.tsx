@@ -127,6 +127,7 @@ export const ContentTable: React.FC = () => {
                     <td>{entry.hasAiMeta ? 'Yes' : '\u2014'}</td>
                     <td>
                       <Button
+                        type="button"
                         buttonStyle="secondary"
                         size="small"
                         onClick={(e) => { e.stopPropagation(); handleRegenerate([entry.id]) }}
@@ -140,11 +141,13 @@ export const ContentTable: React.FC = () => {
                       <td colSpan={6} className="scrape-ai-detail">
                         <div className="scrape-ai-detail__header">
                           <Button
+                            type="button"
                             buttonStyle={viewMode === 'rendered' ? 'primary' : 'secondary'}
                             size="small"
                             onClick={() => setViewMode('rendered')}
                           >Rendered</Button>
                           <Button
+                            type="button"
                             buttonStyle={viewMode === 'raw' ? 'primary' : 'secondary'}
                             size="small"
                             onClick={() => setViewMode('raw')}
