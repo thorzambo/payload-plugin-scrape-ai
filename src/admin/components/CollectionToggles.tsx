@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Pill, ShimmerEffect } from '@payloadcms/ui'
+import { Pill } from '@payloadcms/ui'
 
 interface CollectionInfo {
   slug: string
@@ -36,7 +36,7 @@ export const CollectionToggles: React.FC = () => {
     })
   }
 
-  if (loading) return <ShimmerEffect />
+  if (loading) return <div className="scrape-ai-loading">Loading collections...</div>
 
   return (
     // R3: Custom card container — Payload's Card component is a clickable navigation

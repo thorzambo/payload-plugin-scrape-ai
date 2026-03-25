@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Banner, Button, CheckboxInput, Pill, SelectInput, TextInput } from '@payloadcms/ui'
+import { Banner, Button, Pill } from '@payloadcms/ui'
 
 interface CostEstimate {
   modelId: string; modelName: string; provider: string; tier: string
@@ -89,31 +89,23 @@ export const AiSettings: React.FC = () => {
     <div className="scrape-ai-card">
       <h3 className="scrape-ai-card__heading">AI Enrichment Settings</h3>
 
+      {/* Form inputs use native HTML styled with Payload CSS tokens.
+          Payload's SelectInput/TextInput/CheckboxInput require form provider context
+          (useLocale, useConfig hooks) which is not available in custom admin views. */}
       <div className="scrape-ai-field">
-        <CheckboxInput
-          checked={aiEnabled}
-          onToggle={(e) => setAiEnabled(e.target.checked)}
-          label="Enable AI Enrichment"
-          name="aiEnabled"
-        />
+        <label className="scrape-ai-field__label scrape-ai-field__label--inline">
+          <input type="checkbox" checked={aiEnabled} onChange={(e) => setAiEnabled(e.target.checked)} />
+          Enable AI Enrichment
+        </label>
       </div>
 
       <div className="scrape-ai-field">
-        <SelectInput
-          path="provider"
-          name="provider"
-          label="Provider"
-          value={provider}
-          options={[
-            { label: 'OpenAI', value: 'openai' },
-            { label: 'Anthropic', value: 'anthropic' },
-          ]}
-          onChange={(opt) => {
-            if (opt && !Array.isArray(opt)) setProvider(String(opt.value))
-            else setProvider('')
-          }}
-          placeholder="Select provider..."
-        />
+        <label className="scrape-ai-field__label">Provider</label>
+        <select className="scrape-ai-field__select" value={provider} onChange={(e) => setProvider(e.target.value)}>
+          <option value="">Select provider...</option>
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic</option>
+        </select>
       </div>
 
       <div className="scrape-ai-field">
@@ -122,14 +114,8 @@ export const AiSettings: React.FC = () => {
       </div>
 
       <div className="scrape-ai-field">
-        <TextInput
-          path="model"
-          label="Model"
-          value={model}
-          hasMany={false}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setModel(e.target.value)}
-          placeholder="e.g., gpt-4.1-nano or claude-haiku-4-5-20251001"
-        />
+        <label className="scrape-ai-field__label">Model</label>
+        <input type="text" className="scrape-ai-field__input" value={model} onChange={(e) => setModel(e.target.value)} placeholder="e.g., gpt-4.1-nano or claude-haiku-4-5-20251001" />
         <span className="scrape-ai-field__hint">Use the token estimator below to find the best model for your content.</span>
       </div>
 
@@ -152,7 +138,7 @@ export const AiSettings: React.FC = () => {
 
       <div className="scrape-ai-estimate">
         <div className="scrape-ai-estimate__header">
-          <h4 className="scrape-ai-card__subheading" style={{ margin: 0 }}>Token Estimation &amp; Model Recommendation</h4>
+          <h4 className="scrape-ai-card__subheading scrape-ai-m-0">Token Estimation &amp; Model Recommendation</h4>
           <Button type="button" buttonStyle="primary" size="small" onClick={fetchEstimate} disabled={estimating}>
             {estimating ? 'Estimating...' : estimate ? 'Re-estimate' : 'Estimate Tokens'}
           </Button>

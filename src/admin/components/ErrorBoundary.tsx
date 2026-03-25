@@ -29,7 +29,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
         <Banner type="error">
           <div>
             <strong>{this.props.fallbackLabel || 'Something went wrong'}</strong>
-            <p style={{ fontSize: '0.8125rem', margin: '4px 0 0 0' }}>
+            <p className="scrape-ai-error-detail">
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
           </div>

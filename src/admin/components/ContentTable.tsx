@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button, Collapsible, Pagination, Pill, SelectInput, ShimmerEffect } from '@payloadcms/ui'
+import { Button, Collapsible, Pagination, Pill } from '@payloadcms/ui'
 
 interface Entry {
   id: string
@@ -108,25 +108,14 @@ export const ContentTable: React.FC = () => {
       <div className="scrape-ai-header-row">
         <h3 className="scrape-ai-card__heading">Content Entries ({totalDocs})</h3>
         <div className="scrape-ai-filters">
-          <SelectInput
-            path="filterStatus"
-            name="filterStatus"
-            value={filterStatus}
-            options={[
-              { label: 'All Statuses', value: '' },
-              { label: 'Synced', value: 'synced' },
-              { label: 'Pending', value: 'pending' },
-              { label: 'Error', value: 'error' },
-              { label: 'Permanent Error', value: 'error-permanent' },
-            ]}
-            onChange={(opt) => {
-              const val = opt && !Array.isArray(opt) ? String(opt.value) : ''
-              setFilterStatus(val)
-              setPage(1)
-            }}
-            isClearable={false}
-            style={{ width: 'auto', minWidth: '160px' }}
-          />
+          {/* Native select — Payload's SelectInput requires form provider context */}
+          <select className="scrape-ai-field__select scrape-ai-field__select--compact" value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}>
+            <option value="">All Statuses</option>
+            <option value="synced">Synced</option>
+            <option value="pending">Pending</option>
+            <option value="error">Error</option>
+            <option value="error-permanent">Permanent Error</option>
+          </select>
         </div>
       </div>
 
@@ -163,7 +152,7 @@ export const ContentTable: React.FC = () => {
         </Collapsible>
       )}
 
-      {loading ? <ShimmerEffect /> : (
+      {loading ? <div className="scrape-ai-loading">Loading entries...</div> : (
         <>
           {/* R4: Custom table — Payload's Table requires Column[] with pre-rendered cells
               and is tightly coupled to the collection list view data pipeline. */}
