@@ -1,4 +1,9 @@
-export function createAiSyncQueueCollection(overrides) {
+/**
+ * AI Sync Queue — background job queue for content processing.
+ *
+ * Production: create compound index on (jobType, status) for optimal query performance:
+ *   db['ai-sync-queue'].createIndex({ jobType: 1, status: 1 })
+ */ export function createAiSyncQueueCollection(overrides) {
     const defaultFields = [
         {
             name: 'jobType',
@@ -6,19 +11,31 @@ export function createAiSyncQueueCollection(overrides) {
             required: true,
             index: true,
             options: [
-                { label: 'Rebuild Aggregates', value: 'rebuild-aggregates' },
-                { label: 'Sync Document', value: 'sync-document' },
-                { label: 'Enrich Document', value: 'enrich-document' },
-                { label: 'Initial Sync', value: 'initial-sync' },
-            ],
+                {
+                    label: 'Rebuild Aggregates',
+                    value: 'rebuild-aggregates'
+                },
+                {
+                    label: 'Sync Document',
+                    value: 'sync-document'
+                },
+                {
+                    label: 'Enrich Document',
+                    value: 'enrich-document'
+                },
+                {
+                    label: 'Initial Sync',
+                    value: 'initial-sync'
+                }
+            ]
         },
         {
             name: 'sourceCollection',
-            type: 'text',
+            type: 'text'
         },
         {
             name: 'sourceDocId',
-            type: 'text',
+            type: 'text'
         },
         {
             name: 'status',
@@ -27,38 +44,53 @@ export function createAiSyncQueueCollection(overrides) {
             index: true,
             defaultValue: 'pending',
             options: [
-                { label: 'Pending', value: 'pending' },
-                { label: 'Processing', value: 'processing' },
-                { label: 'Completed', value: 'completed' },
-                { label: 'Failed', value: 'failed' },
-            ],
+                {
+                    label: 'Pending',
+                    value: 'pending'
+                },
+                {
+                    label: 'Processing',
+                    value: 'processing'
+                },
+                {
+                    label: 'Completed',
+                    value: 'completed'
+                },
+                {
+                    label: 'Failed',
+                    value: 'failed'
+                }
+            ]
         },
         {
             name: 'processedAt',
-            type: 'date',
+            type: 'date'
         },
         {
             name: 'errorMessage',
-            type: 'text',
-        },
+            type: 'text'
+        }
     ];
     return {
         slug: 'ai-sync-queue',
         admin: {
             hidden: true,
-            ...(overrides?.admin || {}),
+            ...overrides?.admin || {}
         },
         access: {
-            read: ({ req }) => Boolean(req.user),
-            create: ({ req }) => Boolean(req.user),
-            update: ({ req }) => Boolean(req.user),
-            delete: ({ req }) => Boolean(req.user),
-            ...(overrides?.access || {}),
+            read: ({ req })=>Boolean(req.user),
+            create: ({ req })=>Boolean(req.user),
+            update: ({ req })=>Boolean(req.user),
+            delete: ({ req })=>Boolean(req.user),
+            ...overrides?.access || {}
         },
         hooks: {
-            ...(overrides?.hooks || {}),
+            ...overrides?.hooks || {}
         },
-        fields: overrides?.fields ? overrides.fields({ defaultFields }) : defaultFields,
+        fields: overrides?.fields ? overrides.fields({
+            defaultFields
+        }) : defaultFields
     };
 }
+
 //# sourceMappingURL=ai-sync-queue.js.map

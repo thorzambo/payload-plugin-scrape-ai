@@ -1,61 +1,74 @@
 export const aiConfigGlobal = {
     slug: 'ai-config',
     admin: {
-        hidden: true,
+        hidden: true
     },
     access: {
-        read: ({ req }) => Boolean(req.user),
-        update: ({ req }) => Boolean(req.user),
+        read: ({ req })=>Boolean(req.user),
+        update: ({ req })=>Boolean(req.user)
     },
     fields: [
         {
             name: 'enabledCollections',
             type: 'json',
-            defaultValue: {},
+            defaultValue: {}
         },
         {
             name: 'aiEnabled',
             type: 'checkbox',
-            defaultValue: false,
+            defaultValue: false
         },
         {
             name: 'aiProvider',
             type: 'select',
             options: [
-                { label: 'OpenAI', value: 'openai' },
-                { label: 'Anthropic', value: 'anthropic' },
-            ],
+                {
+                    label: 'OpenAI',
+                    value: 'openai'
+                },
+                {
+                    label: 'Anthropic',
+                    value: 'anthropic'
+                }
+            ]
         },
         {
             name: 'aiModel',
-            type: 'text',
+            type: 'text'
         },
         {
             name: 'llmsTxtPriority',
             type: 'json',
-            defaultValue: [],
+            defaultValue: []
         },
         {
             name: 'llmsTxtSections',
             type: 'json',
             defaultValue: [
-                { name: 'pages', label: 'Pages' },
-                { name: 'posts', label: 'Blog' },
-            ],
+                {
+                    name: 'pages',
+                    label: 'Pages'
+                },
+                {
+                    name: 'posts',
+                    label: 'Blog'
+                }
+            ]
         },
         {
             name: 'aiApiCallCount',
             type: 'number',
-            defaultValue: 0,
+            defaultValue: 0
         },
         {
             name: 'aiApiCallCountResetDate',
-            type: 'date',
+            type: 'date'
         },
         {
             name: 'lastAggregateRebuild',
-            type: 'date',
-        },
-    ],
+            type: 'date'
+        }
+    ]
 };
+
 //# sourceMappingURL=ai-config.js.map

@@ -1,6 +1,14 @@
 /**
  * Renders AI discovery tags in the <head> section.
- * Add to your root layout's <head>.
+ *
+ * NOTE: For Next.js App Router, prefer `generateAiMetadata` from this package —
+ * it integrates with Next.js's built-in Metadata API and is the recommended approach:
+ *
+ *   import { generateAiMetadata } from 'payload-plugin-scrape-ai/discovery'
+ *   export const metadata = { ...generateAiMetadata('https://your-site.com') }
+ *
+ * Use `ScrapeAiMeta` for Next.js Pages Router (_document.tsx) or any other
+ * framework where you control the <head> directly.
  *
  * Usage:
  *   import { ScrapeAiMeta } from 'payload-plugin-scrape-ai/discovery'

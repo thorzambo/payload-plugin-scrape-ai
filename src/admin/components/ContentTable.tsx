@@ -101,6 +101,9 @@ export const ContentTable: React.FC = () => {
   }
 
   return (
+    // R3: Custom card container — Payload's Card component is a clickable navigation
+    // card (title + optional action) and does not support arbitrary children content.
+    // Styled via .scrape-ai-card using only Payload CSS tokens for theme adaptation.
     <div className="scrape-ai-card">
       <div className="scrape-ai-header-row">
         <h3 className="scrape-ai-card__heading">Content Entries ({totalDocs})</h3>
@@ -129,6 +132,8 @@ export const ContentTable: React.FC = () => {
 
       {deadLetterCount > 0 && (
         <Collapsible header={`Dead Letter Queue (${deadLetterCount} permanent errors)`} initCollapsed={true} className="scrape-ai-collapsible">
+          {/* R4: Custom table — Payload's Table requires Column[] with pre-rendered cells
+              and is tightly coupled to the collection list view data pipeline. */}
           <table className="scrape-ai-table">
             <thead>
               <tr>
@@ -160,6 +165,8 @@ export const ContentTable: React.FC = () => {
 
       {loading ? <ShimmerEffect /> : (
         <>
+          {/* R4: Custom table — Payload's Table requires Column[] with pre-rendered cells
+              and is tightly coupled to the collection list view data pipeline. */}
           <table className="scrape-ai-table">
             <thead>
               <tr>

@@ -1,43 +1,47 @@
 'use client';
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Banner, Button, Pill } from '@payloadcms/ui';
-export const StatusBar = () => {
+export const StatusBar = ()=>{
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
     const [regenerating, setRegenerating] = useState(false);
-    const fetchStatus = async () => {
+    const fetchStatus = async ()=>{
         try {
-            const res = await fetch('/api/scrape-ai/status', { credentials: 'include' });
-            if (res.ok)
-                setStatus(await res.json());
-        }
-        catch {
-            // Silent fail
-        }
-        finally {
+            const res = await fetch('/api/scrape-ai/status', {
+                credentials: 'include'
+            });
+            if (res.ok) setStatus(await res.json());
+        } catch  {
+        // Silent fail
+        } finally{
             setLoading(false);
         }
     };
-    useEffect(() => {
+    useEffect(()=>{
         fetchStatus();
         const interval = setInterval(fetchStatus, 10000);
-        return () => clearInterval(interval);
+        return ()=>clearInterval(interval);
     }, []);
-    const handleRegenerateAll = async () => {
+    const handleRegenerateAll = async ()=>{
         setRegenerating(true);
         try {
             await fetch('/api/scrape-ai/regenerate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 credentials: 'include',
-                body: JSON.stringify({ all: true }),
+                body: JSON.stringify({
+                    all: true
+                })
             });
             // Poll aggressively until entries reappear (sync runs on scheduler tick)
             let attempts = 0;
-            const pollUntilReady = setInterval(async () => {
+            const pollUntilReady = setInterval(async ()=>{
                 attempts++;
-                const res = await fetch('/api/scrape-ai/status', { credentials: 'include' });
+                const res = await fetch('/api/scrape-ai/status', {
+                    credentials: 'include'
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setStatus(data);
@@ -47,24 +51,42 @@ export const StatusBar = () => {
                     }
                 }
             }, 2000);
-        }
-        catch {
+        } catch  {
             setRegenerating(false);
         }
     };
-    if (loading)
-        return _jsx(Banner, { type: "default", children: "Loading..." });
-    if (!status)
-        return _jsx(Banner, { type: "error", children: "Failed to load status" });
-    const bannerType = regenerating ? 'info'
-        : status.errorCount > 0 ? 'error'
-            : status.pendingCount > 0 ? 'info'
-                : 'success';
-    const statusText = regenerating ? 'Regenerating...'
-        : status.errorCount > 0 ? `${status.errorCount} Errors`
-            : status.pendingCount > 0 ? `${status.pendingCount} Pending`
-                : 'All Synced';
+    if (loading) return /*#__PURE__*/ React.createElement(Banner, {
+        type: "default"
+    }, "Loading...");
+    if (!status) return /*#__PURE__*/ React.createElement(Banner, {
+        type: "error"
+    }, "Failed to load status");
+    const bannerType = regenerating ? 'info' : status.errorCount > 0 ? 'error' : status.pendingCount > 0 ? 'info' : 'success';
+    const statusText = regenerating ? 'Regenerating...' : status.errorCount > 0 ? `${status.errorCount} Errors` : status.pendingCount > 0 ? `${status.pendingCount} Pending` : 'All Synced';
     const collectionCount = Object.keys(status.collections).length;
-    return (_jsx(Banner, { type: bannerType, children: _jsxs("div", { className: "scrape-ai-status__row", children: [_jsxs("div", { className: "scrape-ai-status__group", children: [_jsx(Pill, { pillStyle: status.errorCount > 0 ? 'error' : status.pendingCount > 0 ? 'warning' : 'success', children: statusText }), _jsxs("span", { className: "scrape-ai-status__stat", children: [status.totalEntries, " pages across ", collectionCount, " collections"] })] }), _jsxs("div", { className: "scrape-ai-status__group", children: [status.lastRebuild && (_jsxs("span", { className: "scrape-ai-status__timestamp", children: ["Last rebuild: ", new Date(status.lastRebuild).toLocaleString()] })), status.aiEnabled && (_jsxs(Pill, { pillStyle: "dark", children: ["AI: ", status.aiApiCallCount, " calls"] })), _jsx(Button, { type: "button", buttonStyle: "primary", size: "small", onClick: handleRegenerateAll, disabled: regenerating, children: regenerating ? 'Regenerating...' : 'Regenerate All' })] })] }) }));
+    return /*#__PURE__*/ React.createElement(Banner, {
+        type: bannerType
+    }, /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-status__row"
+    }, /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-status__group"
+    }, /*#__PURE__*/ React.createElement(Pill, {
+        pillStyle: status.errorCount > 0 ? 'error' : status.pendingCount > 0 ? 'warning' : 'success'
+    }, statusText), /*#__PURE__*/ React.createElement("span", {
+        className: "scrape-ai-status__stat"
+    }, status.totalEntries, " pages across ", collectionCount, " collections")), /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-status__group"
+    }, status.lastRebuild && /*#__PURE__*/ React.createElement("span", {
+        className: "scrape-ai-status__timestamp"
+    }, "Last rebuild: ", new Date(status.lastRebuild).toLocaleString()), status.aiEnabled && /*#__PURE__*/ React.createElement(Pill, {
+        pillStyle: "dark"
+    }, "AI: ", status.aiApiCallCount, " calls"), /*#__PURE__*/ React.createElement(Button, {
+        type: "button",
+        buttonStyle: "primary",
+        size: "small",
+        onClick: handleRegenerateAll,
+        disabled: regenerating
+    }, regenerating ? 'Regenerating...' : 'Regenerate All'))));
 };
+
 //# sourceMappingURL=StatusBar.js.map

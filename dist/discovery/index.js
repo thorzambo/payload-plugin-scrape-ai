@@ -1,4 +1,5 @@
 export { ScrapeAiMeta } from './ScrapeAiMeta';
 export { ScrapeAiFooterTag } from './ScrapeAiFooterTag';
-export { generateHeadTags, getDiscoveryLinks } from './head-tags';
+export { generateHeadTags, getDiscoveryLinks, generateAiMetadata } from './head-tags';
+
 //# sourceMappingURL=index.js.map

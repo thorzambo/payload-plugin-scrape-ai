@@ -1,61 +1,76 @@
 import { createAiProvider } from '../ai/provider';
 import { estimateJob, MODEL_CATALOG, formatTokens, formatCost } from '../ai/token-estimator';
-/** Safely parse request body — handles missing/invalid json gracefully */
-async function parseBody(req) {
+/** Safely parse request body — handles missing/invalid json gracefully */ async function parseBody(req) {
     try {
         if (typeof req.json === 'function') {
             return await req.json() || {};
         }
         return {};
-    }
-    catch {
+    } catch  {
         return {};
     }
 }
 /**
  * Create all authenticated admin API endpoints for the dashboard.
- */
-export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
+ */ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
     return [
         // GET /api/scrape-ai/status
         {
             path: '/scrape-ai/status',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 // Auth handled by admin panel (GET endpoints are open)
                 const { payload } = req;
                 try {
                     const [allEntries, pendingEntries, errorEntries, aiConfig] = await Promise.all([
                         payload.find({
                             collection: 'ai-content',
-                            limit: 0,
-                        }),
-                        payload.find({
-                            collection: 'ai-content',
-                            where: { status: { equals: 'pending' } },
-                            limit: 0,
+                            limit: 0
                         }),
                         payload.find({
                             collection: 'ai-content',
                             where: {
-                                status: { in: ['error', 'error-permanent'] },
+                                status: {
+                                    equals: 'pending'
+                                }
                             },
-                            limit: 0,
+                            limit: 0
                         }),
-                        payload.findGlobal({ slug: 'ai-config' }).catch(() => null),
+                        payload.find({
+                            collection: 'ai-content',
+                            where: {
+                                status: {
+                                    in: [
+                                        'error',
+                                        'error-permanent'
+                                    ]
+                                }
+                            },
+                            limit: 0
+                        }),
+                        payload.findGlobal({
+                            slug: 'ai-config'
+                        }).catch(()=>null)
                     ]);
                     const typedAiConfig = aiConfig;
                     // Count per collection
                     const collectionCounts = {};
                     // We can't group-by with Payload local API, so we query per collection
                     const enabledCollections = typedAiConfig?.enabledCollections || {};
-                    const enabledSlugs = Object.keys(enabledCollections).filter(slug => enabledCollections[slug]);
-                    const countResults = await Promise.all(enabledSlugs.map(slug => payload.find({
-                        collection: 'ai-content',
-                        where: { sourceCollection: { equals: slug } },
-                        limit: 0,
-                    }).then(result => ({ slug, count: result.totalDocs }))));
-                    for (const { slug, count } of countResults) {
+                    const enabledSlugs = Object.keys(enabledCollections).filter((slug)=>enabledCollections[slug]);
+                    const countResults = await Promise.all(enabledSlugs.map((slug)=>payload.find({
+                            collection: 'ai-content',
+                            where: {
+                                sourceCollection: {
+                                    equals: slug
+                                }
+                            },
+                            limit: 0
+                        }).then((result)=>({
+                                slug,
+                                count: result.totalDocs
+                            }))));
+                    for (const { slug, count } of countResults){
                         collectionCounts[slug] = count;
                     }
                     return Response.json({
@@ -67,19 +82,22 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                         aiEnabled: typedAiConfig?.aiEnabled || false,
                         aiProvider: typedAiConfig?.aiProvider || null,
                         aiModel: typedAiConfig?.aiModel || null,
-                        aiApiCallCount: typedAiConfig?.aiApiCallCount || 0,
+                        aiApiCallCount: typedAiConfig?.aiApiCallCount || 0
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
                     });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // GET /api/scrape-ai/entries
         {
             path: '/scrape-ai/entries',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 // Auth handled by admin panel (GET endpoints are open)
                 const { payload } = req;
                 const url = new URL(req.url || '', 'http://localhost');
@@ -88,65 +106,79 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 const collection = url.searchParams.get('collection');
                 const status = url.searchParams.get('status');
                 const where = {};
-                if (collection)
-                    where.sourceCollection = { equals: collection };
-                if (status)
-                    where.status = { equals: status };
+                if (collection) where.sourceCollection = {
+                    equals: collection
+                };
+                if (status) where.status = {
+                    equals: status
+                };
                 try {
                     const result = await payload.find({
                         collection: 'ai-content',
                         where,
                         page,
                         limit,
-                        sort: '-lastSynced',
+                        sort: '-lastSynced'
                     });
                     return Response.json({
-                        docs: result.docs.map((doc) => ({
-                            id: doc.id,
-                            title: doc.title,
-                            slug: doc.slug,
-                            sourceCollection: doc.sourceCollection,
-                            status: doc.status,
-                            lastSynced: doc.lastSynced,
-                            hasAiMeta: Boolean(doc.aiMeta),
-                            isDraft: doc.isDraft,
-                            errorMessage: doc.errorMessage,
-                        })),
+                        docs: result.docs.map((doc)=>({
+                                id: doc.id,
+                                title: doc.title,
+                                slug: doc.slug,
+                                sourceCollection: doc.sourceCollection,
+                                status: doc.status,
+                                lastSynced: doc.lastSynced,
+                                hasAiMeta: Boolean(doc.aiMeta),
+                                isDraft: doc.isDraft,
+                                errorMessage: doc.errorMessage
+                            })),
                         totalDocs: result.totalDocs,
                         page: result.page,
                         totalPages: result.totalPages,
-                        hasNextPage: result.hasNextPage,
+                        hasNextPage: result.hasNextPage
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
                     });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // GET /api/scrape-ai/entry/:id
         {
             path: '/scrape-ai/entry/:id',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 // Auth handled by admin panel (GET endpoints are open)
                 const { payload } = req;
                 const id = req.routeParams?.id;
                 try {
-                    const doc = await payload.findByID({ collection: 'ai-content', id });
+                    const doc = await payload.findByID({
+                        collection: 'ai-content',
+                        id
+                    });
                     return Response.json(doc);
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 404
+                    });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 404 });
-                }
-            },
+            }
         },
         // POST /api/scrape-ai/regenerate
         {
             path: '/scrape-ai/regenerate',
             method: 'post',
-            handler: async (req) => {
-                if (!req.user)
-                    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            handler: async (req)=>{
+                if (!req.user) return Response.json({
+                    error: 'Unauthorized'
+                }, {
+                    status: 401
+                });
                 const { payload } = req;
                 const body = await parseBody(req);
                 try {
@@ -154,198 +186,291 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                         // Bulk delete all ai-content entries
                         const result = await payload.delete({
                             collection: 'ai-content',
-                            where: {},
+                            where: {}
                         });
                         // Queue initial re-sync
                         await payload.create({
                             collection: 'ai-sync-queue',
-                            data: { jobType: 'initial-sync', status: 'pending' },
+                            data: {
+                                jobType: 'initial-sync',
+                                status: 'pending'
+                            }
                         });
                         const count = Array.isArray(result.docs) ? result.docs.length : 0;
-                        return Response.json({ message: 'Full regeneration queued', count });
+                        return Response.json({
+                            message: 'Full regeneration queued',
+                            count
+                        });
                     }
                     if (body.ids && Array.isArray(body.ids)) {
-                        for (const id of body.ids) {
+                        for (const id of body.ids){
                             await payload.update({
                                 collection: 'ai-content',
                                 id,
-                                data: { status: 'pending', retryCount: 0, errorMessage: null },
+                                data: {
+                                    status: 'pending',
+                                    retryCount: 0,
+                                    errorMessage: null
+                                }
                             });
                         }
-                        return Response.json({ message: 'Regeneration queued', count: body.ids.length });
+                        return Response.json({
+                            message: 'Regeneration queued',
+                            count: body.ids.length
+                        });
                     }
-                    return Response.json({ error: 'Provide { all: true } or { ids: [...] }' }, { status: 400 });
+                    return Response.json({
+                        error: 'Provide { all: true } or { ids: [...] }'
+                    }, {
+                        status: 400
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
+                    });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // POST /api/scrape-ai/toggle-collection
         {
             path: '/scrape-ai/toggle-collection',
             method: 'post',
-            handler: async (req) => {
-                if (!req.user)
-                    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            handler: async (req)=>{
+                if (!req.user) return Response.json({
+                    error: 'Unauthorized'
+                }, {
+                    status: 401
+                });
                 const { payload } = req;
                 const body = await parseBody(req);
                 try {
                     const { collection: slug, enabled } = body;
                     if (!slug || typeof enabled !== 'boolean') {
-                        return Response.json({ error: 'Provide { collection, enabled }' }, { status: 400 });
+                        return Response.json({
+                            error: 'Provide { collection, enabled }'
+                        }, {
+                            status: 400
+                        });
                     }
-                    const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
+                    const aiConfig = await payload.findGlobal({
+                        slug: 'ai-config'
+                    });
                     const currentEnabled = aiConfig?.enabledCollections || {};
                     await payload.updateGlobal({
                         slug: 'ai-config',
                         data: {
-                            enabledCollections: { ...currentEnabled, [slug]: enabled },
-                        },
+                            enabledCollections: {
+                                ...currentEnabled,
+                                [slug]: enabled
+                            }
+                        }
                     });
-                    return Response.json({ message: `Collection '${slug}' ${enabled ? 'enabled' : 'disabled'}` });
+                    return Response.json({
+                        message: `Collection '${slug}' ${enabled ? 'enabled' : 'disabled'}`
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
+                    });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // POST /api/scrape-ai/ai-settings
         {
             path: '/scrape-ai/ai-settings',
             method: 'post',
-            handler: async (req) => {
-                if (!req.user)
-                    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            handler: async (req)=>{
+                if (!req.user) return Response.json({
+                    error: 'Unauthorized'
+                }, {
+                    status: 401
+                });
                 const { payload } = req;
                 const body = await parseBody(req);
                 try {
                     const data = {};
-                    if (typeof body.aiEnabled === 'boolean')
-                        data.aiEnabled = body.aiEnabled;
-                    if (body.aiProvider)
-                        data.aiProvider = body.aiProvider;
-                    if (body.aiModel)
-                        data.aiModel = body.aiModel;
-                    await payload.updateGlobal({ slug: 'ai-config', data });
-                    return Response.json({ message: 'AI settings updated' });
+                    if (typeof body.aiEnabled === 'boolean') data.aiEnabled = body.aiEnabled;
+                    if (body.aiProvider) data.aiProvider = body.aiProvider;
+                    if (body.aiModel) data.aiModel = body.aiModel;
+                    await payload.updateGlobal({
+                        slug: 'ai-config',
+                        data
+                    });
+                    return Response.json({
+                        message: 'AI settings updated'
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
+                    });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // POST /api/scrape-ai/test-ai
         {
             path: '/scrape-ai/test-ai',
             method: 'post',
-            handler: async (req) => {
-                if (!req.user)
-                    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            handler: async (req)=>{
+                if (!req.user) return Response.json({
+                    error: 'Unauthorized'
+                }, {
+                    status: 401
+                });
                 const { payload } = req;
                 try {
-                    const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
+                    const aiConfig = await payload.findGlobal({
+                        slug: 'ai-config'
+                    });
                     const provider = aiConfig?.aiProvider || pluginRawOptions?.ai?.provider;
                     const apiKey = pluginRawOptions?.ai?.apiKey;
                     const model = aiConfig?.aiModel || pluginRawOptions?.ai?.model;
                     if (!provider || !apiKey) {
-                        return Response.json({ success: false, error: 'No AI provider configured. Set ai.apiKey in plugin options (env var).' });
+                        return Response.json({
+                            success: false,
+                            error: 'No AI provider configured. Set ai.apiKey in plugin options (env var).'
+                        });
                     }
-                    const ai = await createAiProvider({ provider, apiKey, model });
+                    const ai = await createAiProvider({
+                        provider,
+                        apiKey,
+                        model
+                    });
                     if (!ai) {
-                        return Response.json({ success: false, error: 'Failed to create AI provider' });
+                        return Response.json({
+                            success: false,
+                            error: 'Failed to create AI provider'
+                        });
                     }
                     const result = await ai.complete('Say "hello" in one word.', 'You are a test assistant.');
-                    return Response.json({ success: true, response: result });
+                    return Response.json({
+                        success: true,
+                        response: result
+                    });
+                } catch (error) {
+                    return Response.json({
+                        success: false,
+                        error: error.message
+                    });
                 }
-                catch (error) {
-                    return Response.json({ success: false, error: error.message });
-                }
-            },
+            }
         },
         // GET /api/scrape-ai/llms-txt-config
         {
             path: '/scrape-ai/llms-txt-config',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 // Auth handled by admin panel (GET endpoints are open)
                 const { payload } = req;
                 try {
-                    const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
+                    const aiConfig = await payload.findGlobal({
+                        slug: 'ai-config'
+                    });
                     return Response.json({
                         priority: aiConfig?.llmsTxtPriority || [],
-                        sections: aiConfig?.llmsTxtSections || [],
+                        sections: aiConfig?.llmsTxtSections || []
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
                     });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // POST /api/scrape-ai/llms-txt-config
         {
             path: '/scrape-ai/llms-txt-config',
             method: 'post',
-            handler: async (req) => {
-                if (!req.user)
-                    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            handler: async (req)=>{
+                if (!req.user) return Response.json({
+                    error: 'Unauthorized'
+                }, {
+                    status: 401
+                });
                 const { payload } = req;
                 const body = await parseBody(req);
                 try {
                     const data = {};
-                    if (body.priority)
-                        data.llmsTxtPriority = body.priority;
-                    if (body.sections)
-                        data.llmsTxtSections = body.sections;
-                    await payload.updateGlobal({ slug: 'ai-config', data });
+                    if (body.priority) data.llmsTxtPriority = body.priority;
+                    if (body.sections) data.llmsTxtSections = body.sections;
+                    await payload.updateGlobal({
+                        slug: 'ai-config',
+                        data
+                    });
                     // Queue aggregate rebuild
                     await payload.create({
                         collection: 'ai-sync-queue',
-                        data: { jobType: 'rebuild-aggregates', status: 'pending' },
+                        data: {
+                            jobType: 'rebuild-aggregates',
+                            status: 'pending'
+                        }
                     });
-                    return Response.json({ message: 'llms.txt config updated, rebuild queued' });
+                    return Response.json({
+                        message: 'llms.txt config updated, rebuild queued'
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
+                    });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // GET /api/scrape-ai/detected-collections
         {
             path: '/scrape-ai/detected-collections',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 // Auth handled by admin panel (GET endpoints are open)
                 const { payload } = req;
                 try {
-                    const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
+                    const aiConfig = await payload.findGlobal({
+                        slug: 'ai-config'
+                    });
                     const enabledCollections = aiConfig?.enabledCollections || {};
                     // Get all non-plugin collections
-                    const allCollections = Object.keys(payload.collections).filter((slug) => !['ai-content', 'ai-sync-queue', 'ai-aggregates'].includes(slug));
-                    const result = await Promise.all(allCollections.map(async (slug) => {
+                    const allCollections = Object.keys(payload.collections).filter((slug)=>![
+                            'ai-content',
+                            'ai-sync-queue',
+                            'ai-aggregates'
+                        ].includes(slug));
+                    const result = await Promise.all(allCollections.map(async (slug)=>{
                         const count = await payload.find({
                             collection: slug,
-                            limit: 0,
+                            limit: 0
                         });
                         return {
                             slug,
                             label: payload.collections[slug]?.config?.labels?.plural || slug,
                             docCount: count.totalDocs,
-                            enabled: enabledCollections[slug] === true,
+                            enabled: enabledCollections[slug] === true
                         };
                     }));
-                    return Response.json({ collections: result });
+                    return Response.json({
+                        collections: result
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
+                    });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // GET /api/scrape-ai/token-estimate
         {
             path: '/scrape-ai/token-estimate',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 // Auth handled by admin panel (GET endpoints are open)
                 const { payload } = req;
                 const url = new URL(req.url || '', 'http://localhost');
@@ -355,19 +480,19 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                     const documents = [];
                     let page = 1;
                     let hasMore = true;
-                    while (hasMore) {
+                    while(hasMore){
                         const batch = await payload.find({
                             collection: 'ai-content',
                             limit: 100,
-                            page,
+                            page
                         });
-                        for (const doc of batch.docs) {
+                        for (const doc of batch.docs){
                             documents.push({
                                 title: doc.title || '',
                                 markdown: doc.markdown || '',
                                 sourceCollection: doc.sourceCollection || '',
                                 sourceDocId: doc.sourceDocId || '',
-                                hasAiMeta: Boolean(doc.aiMeta && Object.keys(doc.aiMeta).length > 0),
+                                hasAiMeta: Boolean(doc.aiMeta && Object.keys(doc.aiMeta).length > 0)
                             });
                         }
                         hasMore = batch.hasNextPage;
@@ -387,98 +512,148 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                                 totalInputTokens: formatTokens(estimate.totals.totalInputTokens),
                                 totalOutputTokens: formatTokens(estimate.totals.totalOutputTokens),
                                 totalTokens: formatTokens(estimate.totals.totalTokens),
-                                maxSingleRequest: formatTokens(estimate.totals.maxSingleRequestTokens),
-                            },
-                        },
-                        costEstimates: estimate.costEstimates.map((c) => ({
-                            modelId: c.model.id,
-                            modelName: c.model.name,
-                            provider: c.model.provider,
-                            tier: c.model.tier,
-                            contextWindow: c.model.contextWindow,
-                            contextWindowFormatted: formatTokens(c.model.contextWindow),
-                            inputCost: c.inputCost,
-                            outputCost: c.outputCost,
-                            totalCost: c.totalCost,
-                            totalCostFormatted: formatCost(c.totalCost),
-                            canHandle: c.canHandle,
-                            recommended: c.recommended,
-                            reason: c.reason,
-                            notes: c.model.notes,
-                        })),
-                        recommendation: estimate.recommendation
-                            ? {
-                                modelId: estimate.recommendation.model.id,
-                                modelName: estimate.recommendation.model.name,
-                                provider: estimate.recommendation.model.provider,
-                                totalCost: estimate.recommendation.totalCost,
-                                totalCostFormatted: formatCost(estimate.recommendation.totalCost),
-                                reason: estimate.recommendation.reason,
+                                maxSingleRequest: formatTokens(estimate.totals.maxSingleRequestTokens)
                             }
-                            : null,
+                        },
+                        costEstimates: estimate.costEstimates.map((c)=>({
+                                modelId: c.model.id,
+                                modelName: c.model.name,
+                                provider: c.model.provider,
+                                tier: c.model.tier,
+                                contextWindow: c.model.contextWindow,
+                                contextWindowFormatted: formatTokens(c.model.contextWindow),
+                                inputCost: c.inputCost,
+                                outputCost: c.outputCost,
+                                totalCost: c.totalCost,
+                                totalCostFormatted: formatCost(c.totalCost),
+                                canHandle: c.canHandle,
+                                recommended: c.recommended,
+                                reason: c.reason,
+                                notes: c.model.notes
+                            })),
+                        recommendation: estimate.recommendation ? {
+                            modelId: estimate.recommendation.model.id,
+                            modelName: estimate.recommendation.model.name,
+                            provider: estimate.recommendation.model.provider,
+                            totalCost: estimate.recommendation.totalCost,
+                            totalCostFormatted: formatCost(estimate.recommendation.totalCost),
+                            reason: estimate.recommendation.reason
+                        } : null,
                         // Per-document breakdown (top 10 largest by token count)
-                        largestDocuments: estimate.perDocumentEstimates
-                            .sort((a, b) => b.contentTokens - a.contentTokens)
-                            .slice(0, 10)
-                            .map((d) => ({
-                            title: d.title,
-                            sourceCollection: d.sourceCollection,
-                            contentTokens: d.contentTokens,
-                            contentTokensFormatted: formatTokens(d.contentTokens),
-                            totalInputTokens: d.totalInputTokens,
-                            totalOutputTokens: d.totalOutputTokens,
-                            callsBreakdown: {
-                                summary: `${formatTokens(d.calls.summary.inputTokens)} in / ${formatTokens(d.calls.summary.outputTokens)} out`,
-                                entities: `${formatTokens(d.calls.entities.inputTokens)} in / ${formatTokens(d.calls.entities.outputTokens)} out`,
-                                chunks: `${formatTokens(d.calls.chunks.inputTokens)} in / ${formatTokens(d.calls.chunks.outputTokens)} out`,
-                            },
-                        })),
+                        largestDocuments: estimate.perDocumentEstimates.sort((a, b)=>b.contentTokens - a.contentTokens).slice(0, 10).map((d)=>({
+                                title: d.title,
+                                sourceCollection: d.sourceCollection,
+                                contentTokens: d.contentTokens,
+                                contentTokensFormatted: formatTokens(d.contentTokens),
+                                totalInputTokens: d.totalInputTokens,
+                                totalOutputTokens: d.totalOutputTokens,
+                                callsBreakdown: {
+                                    summary: `${formatTokens(d.calls.summary.inputTokens)} in / ${formatTokens(d.calls.summary.outputTokens)} out`,
+                                    entities: `${formatTokens(d.calls.entities.inputTokens)} in / ${formatTokens(d.calls.entities.outputTokens)} out`,
+                                    chunks: `${formatTokens(d.calls.chunks.inputTokens)} in / ${formatTokens(d.calls.chunks.outputTokens)} out`
+                                }
+                            }))
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
                     });
                 }
-                catch (error) {
-                    return Response.json({ error: error.message }, { status: 500 });
-                }
-            },
+            }
         },
         // GET /api/scrape-ai/model-catalog
         {
             path: '/scrape-ai/model-catalog',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 // Auth handled by admin panel (GET endpoints are open)
                 return Response.json({
-                    models: MODEL_CATALOG.map((m) => ({
-                        id: m.id,
-                        name: m.name,
-                        provider: m.provider,
-                        contextWindow: m.contextWindow,
-                        contextWindowFormatted: formatTokens(m.contextWindow),
-                        inputPricePerMTok: m.inputPricePerMTok,
-                        outputPricePerMTok: m.outputPricePerMTok,
-                        tier: m.tier,
-                        notes: m.notes,
-                    })),
+                    models: MODEL_CATALOG.map((m)=>({
+                            id: m.id,
+                            name: m.name,
+                            provider: m.provider,
+                            contextWindow: m.contextWindow,
+                            contextWindowFormatted: formatTokens(m.contextWindow),
+                            inputPricePerMTok: m.inputPricePerMTok,
+                            outputPricePerMTok: m.outputPricePerMTok,
+                            tier: m.tier,
+                            notes: m.notes
+                        }))
                 });
-            },
+            }
+        },
+        // GET /api/scrape-ai/dead-letter
+        {
+            path: '/scrape-ai/dead-letter',
+            method: 'get',
+            handler: async (req)=>{
+                if (!req.user) return Response.json({
+                    error: 'Unauthorized'
+                }, {
+                    status: 401
+                });
+                const { payload } = req;
+                try {
+                    const result = await payload.find({
+                        collection: 'ai-content',
+                        where: {
+                            status: {
+                                equals: 'error-permanent'
+                            }
+                        },
+                        limit: 50,
+                        sort: '-updatedAt'
+                    });
+                    return Response.json({
+                        docs: result.docs.map((doc)=>({
+                                id: doc.id,
+                                title: doc.title,
+                                slug: doc.slug,
+                                sourceCollection: doc.sourceCollection,
+                                sourceDocId: doc.sourceDocId,
+                                errorMessage: doc.errorMessage,
+                                retryCount: doc.retryCount,
+                                lastSynced: doc.lastSynced
+                            })),
+                        totalDocs: result.totalDocs
+                    });
+                } catch (error) {
+                    return Response.json({
+                        error: error.message
+                    }, {
+                        status: 500
+                    });
+                }
+            }
         },
         // GET /api/scrape-ai/health
         {
             path: '/scrape-ai/health',
             method: 'get',
-            handler: async (req) => {
+            handler: async (req)=>{
                 const { payload } = req;
                 const isAuthenticated = Boolean(req.user);
                 try {
                     // Queue depth (always visible)
                     const pendingJobs = await payload.find({
                         collection: 'ai-sync-queue',
-                        where: { status: { equals: 'pending' } },
-                        limit: 0,
+                        where: {
+                            status: {
+                                equals: 'pending'
+                            }
+                        },
+                        limit: 0
                     });
                     const processingJobs = await payload.find({
                         collection: 'ai-sync-queue',
-                        where: { status: { equals: 'processing' } },
-                        limit: 0,
+                        where: {
+                            status: {
+                                equals: 'processing'
+                            }
+                        },
+                        limit: 0
                     });
                     // Basic health info (public)
                     const health = {
@@ -486,40 +661,59 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                         timestamp: new Date().toISOString(),
                         queue: {
                             pending: pendingJobs.totalDocs,
-                            processing: processingJobs.totalDocs,
-                        },
+                            processing: processingJobs.totalDocs
+                        }
                     };
                     // Detailed info (authenticated only)
                     if (isAuthenticated) {
                         const [errorEntries, aiConfig] = await Promise.all([
                             payload.find({
                                 collection: 'ai-content',
-                                where: { status: { in: ['error', 'error-permanent'] } },
-                                limit: 0,
+                                where: {
+                                    status: {
+                                        in: [
+                                            'error',
+                                            'error-permanent'
+                                        ]
+                                    }
+                                },
+                                limit: 0
                             }),
-                            payload.findGlobal({ slug: 'ai-config' }).catch(() => null),
+                            payload.findGlobal({
+                                slug: 'ai-config'
+                            }).catch(()=>null)
                         ]);
                         const typedConfig = aiConfig;
                         health.errors = {
-                            count: errorEntries.totalDocs,
+                            count: errorEntries.totalDocs
                         };
                         health.ai = {
                             enabled: typedConfig?.aiEnabled || false,
                             provider: typedConfig?.aiProvider || null,
                             model: typedConfig?.aiModel || null,
-                            apiCallsThisMonth: typedConfig?.aiApiCallCount || 0,
+                            apiCallsThisMonth: typedConfig?.aiApiCallCount || 0
                         };
                         health.lastAggregateRebuild = typedConfig?.lastAggregateRebuild || null;
                     }
                     return Response.json(health, {
-                        headers: { 'Cache-Control': 'no-cache' },
+                        headers: {
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
+                } catch (error) {
+                    return Response.json({
+                        status: 'error',
+                        message: error.message
+                    }, {
+                        status: 500,
+                        headers: {
+                            'Cache-Control': 'no-cache'
+                        }
                     });
                 }
-                catch (error) {
-                    return Response.json({ status: 'error', message: error.message }, { status: 500, headers: { 'Cache-Control': 'no-cache' } });
-                }
-            },
-        },
+            }
+        }
     ];
 }
+
 //# sourceMappingURL=admin-api.js.map

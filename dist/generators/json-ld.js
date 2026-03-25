@@ -1,8 +1,7 @@
 /**
  * Generate JSON-LD structured data for a document.
  * Maps collection slugs to schema.org types.
- */
-export function generateJsonLd(params) {
+ */ export function generateJsonLd(params) {
     const { title, slug, collection, siteUrl, siteName, description, lastModified, createdAt } = params;
     const schemaType = inferSchemaType(collection, params.contentType);
     const canonicalUrl = `${siteUrl}/${slug}`;
@@ -15,8 +14,8 @@ export function generateJsonLd(params) {
         isPartOf: {
             '@type': 'WebSite',
             name: siteName,
-            url: siteUrl,
-        },
+            url: siteUrl
+        }
     };
     if (description) {
         jsonLd.description = description;
@@ -25,25 +24,21 @@ export function generateJsonLd(params) {
         jsonLd.dateModified = lastModified;
     }
     // Add type-specific properties
-    switch (schemaType) {
+    switch(schemaType){
         case 'Article':
         case 'BlogPosting':
             jsonLd.datePublished = createdAt || lastModified;
             jsonLd.headline = title;
             break;
         case 'Product':
-            // Products might have price, but we can't know the field structure
-            // So we keep it generic
             break;
     }
     return jsonLd;
 }
 /**
  * Map collection slug to schema.org type.
- */
-function inferSchemaType(collection, explicitType) {
-    if (explicitType)
-        return explicitType;
+ */ function inferSchemaType(collection, explicitType) {
+    if (explicitType) return explicitType;
     const slug = collection.toLowerCase();
     // Direct mappings
     const typeMap = {
@@ -73,8 +68,9 @@ function inferSchemaType(collection, explicitType) {
         categories: 'Thing',
         category: 'Thing',
         tags: 'Thing',
-        tag: 'Thing',
+        tag: 'Thing'
     };
     return typeMap[slug] || 'CreativeWork';
 }
+
 //# sourceMappingURL=json-ld.js.map

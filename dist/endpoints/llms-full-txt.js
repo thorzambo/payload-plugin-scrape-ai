@@ -4,7 +4,7 @@ export function createLlmsFullTxtEndpoint(rateLimiter) {
     return {
         path: '/llms-full.txt',
         method: 'get',
-        handler: async (req) => {
+        handler: async (req)=>{
             if (!rateLimiter.check(getClientIp(req))) {
                 return rateLimitedResponse();
             }
@@ -14,21 +14,27 @@ export function createLlmsFullTxtEndpoint(rateLimiter) {
                     status: 200,
                     headers: {
                         'Content-Type': 'text/plain; charset=utf-8',
-                        'Cache-Control': 'public, max-age=300, s-maxage=600',
-                    },
+                        'Cache-Control': 'public, max-age=300, s-maxage=600'
+                    }
                 });
             }
             const { payload } = req;
             try {
                 const result = await payload.find({
                     collection: 'ai-aggregates',
-                    where: { key: { equals: '__llms-full-txt' } },
-                    limit: 1,
+                    where: {
+                        key: {
+                            equals: '__llms-full-txt'
+                        }
+                    },
+                    limit: 1
                 });
                 if (result.docs.length === 0) {
                     return new Response('# No content generated yet', {
                         status: 200,
-                        headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+                        headers: {
+                            'Content-Type': 'text/markdown; charset=utf-8'
+                        }
                     });
                 }
                 const content = result.docs[0].content || '';
@@ -39,14 +45,18 @@ export function createLlmsFullTxtEndpoint(rateLimiter) {
                     headers: {
                         'Content-Type': 'text/plain; charset=utf-8',
                         'Cache-Control': 'public, max-age=300, s-maxage=600',
-                        ...(lastGenerated ? { ETag: `"${new Date(lastGenerated).getTime()}"` } : {}),
-                    },
+                        ...lastGenerated ? {
+                            ETag: `"${new Date(lastGenerated).getTime()}"`
+                        } : {}
+                    }
+                });
+            } catch (error) {
+                return new Response(`Error: ${error.message}`, {
+                    status: 500
                 });
             }
-            catch (error) {
-                return new Response(`Error: ${error.message}`, { status: 500 });
-            }
-        },
+        }
     };
 }
+
 //# sourceMappingURL=llms-full-txt.js.map

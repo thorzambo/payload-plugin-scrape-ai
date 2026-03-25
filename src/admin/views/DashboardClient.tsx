@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Gutter } from '@payloadcms/ui'
+import { Button, Gutter } from '@payloadcms/ui'
 import { SetStepNav } from '@payloadcms/ui'
 import { StatusBar } from '../components/StatusBar'
 import { CollectionToggles } from '../components/CollectionToggles'
@@ -37,15 +37,26 @@ export const DashboardClient: React.FC = () => {
 
       <StatusBar />
 
-      <nav className="scrape-ai__tabs">
+      {/*
+        R2 — Tab navigation uses Payload's native Button component with buttonStyle="tab".
+        The active tab is rendered with disabled={true} to match Payload's own
+        DefaultListViewTabs pattern (btn--disabled produces the active/selected style
+        via --btn-font-weight: 600 and --bg-color: var(--theme-elevation-100)).
+        The container reuses .default-list-view-tabs from @payloadcms/ui for consistent spacing.
+        TabComponent from @payloadcms/ui is not usable here — it requires a ClientTab
+        (Payload field config object) and form-level callbacks, not simple string labels.
+      */}
+      <nav className="default-list-view-tabs scrape-ai__tabs">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.key}
-            className={`scrape-ai__tab ${activeTab === tab.key ? 'scrape-ai__tab--active' : ''}`}
+            buttonStyle="tab"
+            el="button"
+            disabled={activeTab === tab.key}
             onClick={() => setActiveTab(tab.key)}
           >
             {tab.label}
-          </button>
+          </Button>
         ))}
       </nav>
 

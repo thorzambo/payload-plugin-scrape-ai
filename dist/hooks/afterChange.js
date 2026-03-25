@@ -2,9 +2,8 @@ import { transformDocument } from '../pipeline/transform';
 /**
  * Creates an afterChange hook that runs Stage 1+2 synchronously,
  * then queues AI enrichment and aggregate rebuild asynchronously.
- */
-export function createAfterChangeHook(pluginOptions, collectionConfig) {
-    return async ({ doc, req, operation, collection }) => {
+ */ export function createAfterChangeHook(pluginOptions, collectionConfig) {
+    return async ({ doc, req, operation, collection })=>{
         const { payload } = req;
         try {
             // Check draft status
@@ -21,17 +20,25 @@ export function createAfterChangeHook(pluginOptions, collectionConfig) {
                 collectionConfig,
                 payload,
                 pluginOptions,
-                locale,
+                locale
             });
             // Upsert into ai-content
             const existing = await payload.find({
                 collection: 'ai-content',
                 where: {
-                    sourceCollection: { equals: collectionSlug },
-                    sourceDocId: { equals: String(doc.id) },
-                    ...(locale ? { locale: { equals: locale } } : {}),
+                    sourceCollection: {
+                        equals: collectionSlug
+                    },
+                    sourceDocId: {
+                        equals: String(doc.id)
+                    },
+                    ...locale ? {
+                        locale: {
+                            equals: locale
+                        }
+                    } : {}
                 },
-                limit: 1,
+                limit: 1
             });
             const aiContentData = {
                 sourceCollection: collectionSlug,
@@ -48,25 +55,26 @@ export function createAfterChangeHook(pluginOptions, collectionConfig) {
                 isDraft: result.isDraft,
                 lastSynced: new Date().toISOString(),
                 errorMessage: null,
-                retryCount: 0,
+                retryCount: 0
             };
             if (existing.docs.length > 0) {
                 await payload.update({
                     collection: 'ai-content',
                     id: existing.docs[0].id,
-                    data: aiContentData,
+                    data: aiContentData
                 });
-            }
-            else {
+            } else {
                 await payload.create({
                     collection: 'ai-content',
-                    data: aiContentData,
+                    data: aiContentData
                 });
             }
             // Queue AI enrichment if enabled (async, never blocks)
             // Check ai-config global for runtime toggle
             try {
-                const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
+                const aiConfig = await payload.findGlobal({
+                    slug: 'ai-config'
+                });
                 if (aiConfig?.aiEnabled || pluginOptions.ai) {
                     await payload.create({
                         collection: 'ai-sync-queue',
@@ -74,38 +82,44 @@ export function createAfterChangeHook(pluginOptions, collectionConfig) {
                             jobType: 'enrich-document',
                             sourceCollection: collectionSlug,
                             sourceDocId: String(doc.id),
-                            status: 'pending',
-                        },
+                            status: 'pending'
+                        }
                     });
                 }
-            }
-            catch {
-                // ai-config might not exist yet on first run — that's fine
+            } catch  {
+            // ai-config might not exist yet on first run — that's fine
             }
             // Queue aggregate rebuild (deduplicated — skip if one is already pending)
             const existingRebuild = await payload.find({
                 collection: 'ai-sync-queue',
                 where: {
-                    jobType: { equals: 'rebuild-aggregates' },
-                    status: { in: ['pending', 'processing'] },
+                    jobType: {
+                        equals: 'rebuild-aggregates'
+                    },
+                    status: {
+                        in: [
+                            'pending',
+                            'processing'
+                        ]
+                    }
                 },
-                limit: 1,
+                limit: 1
             });
             if (existingRebuild.docs.length === 0) {
                 await payload.create({
                     collection: 'ai-sync-queue',
                     data: {
                         jobType: 'rebuild-aggregates',
-                        status: 'pending',
-                    },
+                        status: 'pending'
+                    }
                 });
             }
-        }
-        catch (error) {
+        } catch (error) {
             // Never break the user's save operation
             payload.logger.error(`[scrape-ai] afterChange error: ${error.message}`);
         }
         return doc;
     };
 }
+
 //# sourceMappingURL=afterChange.js.map

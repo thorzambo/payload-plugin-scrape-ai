@@ -18,13 +18,17 @@ export async function extractEntities(markdown, provider) {
             return {
                 topics: Array.isArray(parsed.topics) ? parsed.topics : [],
                 entities: Array.isArray(parsed.entities) ? parsed.entities : [],
-                category: typeof parsed.category === 'string' ? parsed.category : 'General',
+                category: typeof parsed.category === 'string' ? parsed.category : 'General'
             };
         }
+    } catch  {
+    // JSON parse failed — return defaults
     }
-    catch {
-        // JSON parse failed — return defaults
-    }
-    return { topics: [], entities: [], category: 'General' };
+    return {
+        topics: [],
+        entities: [],
+        category: 'General'
+    };
 }
+
 //# sourceMappingURL=entities.js.map

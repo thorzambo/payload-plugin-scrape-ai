@@ -30,7 +30,8 @@ export const en = {
         allSynced: 'All Synced',
         testConnection: 'Test Connection',
         saveSettings: 'Save Settings',
-        estimateTokens: 'Estimate Tokens',
-    },
+        estimateTokens: 'Estimate Tokens'
+    }
 };
+
 //# sourceMappingURL=en.js.map

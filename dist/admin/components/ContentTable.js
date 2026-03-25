@@ -1,5 +1,4 @@
 'use client';
-import { jsxs as _jsxs, jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
 import React, { useEffect, useState } from 'react';
 import { Button, Collapsible, Pagination, Pill, SelectInput, ShimmerEffect } from '@payloadcms/ui';
 const statusPillStyle = {
@@ -7,9 +6,9 @@ const statusPillStyle = {
     pending: 'warning',
     processing: 'light',
     error: 'error',
-    'error-permanent': 'error',
+    'error-permanent': 'error'
 };
-export const ContentTable = () => {
+export const ContentTable = ()=>{
     const [entries, setEntries] = useState([]);
     const [totalDocs, setTotalDocs] = useState(0);
     const [page, setPage] = useState(1);
@@ -19,27 +18,49 @@ export const ContentTable = () => {
     const [detail, setDetail] = useState(null);
     const [viewMode, setViewMode] = useState('rendered');
     const [filterStatus, setFilterStatus] = useState('');
-    const fetchEntries = async () => {
+    const [deadLetterEntries, setDeadLetterEntries] = useState([]);
+    const [deadLetterCount, setDeadLetterCount] = useState(0);
+    const fetchEntries = async ()=>{
         setLoading(true);
         try {
-            const params = new URLSearchParams({ page: String(page), limit: '20' });
-            if (filterStatus)
-                params.set('status', filterStatus);
-            const res = await fetch(`/api/scrape-ai/entries?${params}`, { credentials: 'include' });
+            const params = new URLSearchParams({
+                page: String(page),
+                limit: '20'
+            });
+            if (filterStatus) params.set('status', filterStatus);
+            const res = await fetch(`/api/scrape-ai/entries?${params}`, {
+                credentials: 'include'
+            });
             if (res.ok) {
                 const data = await res.json();
                 setEntries(data.docs || []);
                 setTotalDocs(data.totalDocs);
                 setTotalPages(data.totalPages);
             }
-        }
-        catch { }
-        finally {
+        } catch  {} finally{
             setLoading(false);
         }
     };
-    useEffect(() => { fetchEntries(); }, [page, filterStatus]);
-    const handleRowClick = async (id) => {
+    const fetchDeadLetter = async ()=>{
+        try {
+            const res = await fetch('/api/scrape-ai/dead-letter', {
+                credentials: 'include'
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setDeadLetterEntries(data.docs || []);
+                setDeadLetterCount(data.totalDocs || 0);
+            }
+        } catch  {}
+    };
+    useEffect(()=>{
+        fetchEntries();
+        fetchDeadLetter();
+    }, [
+        page,
+        filterStatus
+    ]);
+    const handleRowClick = async (id)=>{
         if (selectedId === id) {
             setSelectedId(null);
             setDetail(null);
@@ -47,33 +68,149 @@ export const ContentTable = () => {
         }
         setSelectedId(id);
         try {
-            const res = await fetch(`/api/scrape-ai/entry/${id}`, { credentials: 'include' });
-            if (res.ok)
-                setDetail(await res.json());
-        }
-        catch { }
+            const res = await fetch(`/api/scrape-ai/entry/${id}`, {
+                credentials: 'include'
+            });
+            if (res.ok) setDetail(await res.json());
+        } catch  {}
     };
-    const handleRegenerate = async (ids) => {
+    const handleRegenerate = async (ids)=>{
         await fetch('/api/scrape-ai/regenerate', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             credentials: 'include',
-            body: JSON.stringify({ ids }),
+            body: JSON.stringify({
+                ids
+            })
         });
         await fetchEntries();
     };
-    return (_jsxs("div", { className: "scrape-ai-card", children: [_jsxs("div", { className: "scrape-ai-header-row", children: [_jsxs("h3", { className: "scrape-ai-card__heading", children: ["Content Entries (", totalDocs, ")"] }), _jsx("div", { className: "scrape-ai-filters", children: _jsx(SelectInput, { path: "filterStatus", name: "filterStatus", value: filterStatus, options: [
-                                { label: 'All Statuses', value: '' },
-                                { label: 'Synced', value: 'synced' },
-                                { label: 'Pending', value: 'pending' },
-                                { label: 'Error', value: 'error' },
-                                { label: 'Permanent Error', value: 'error-permanent' },
-                            ], onChange: (opt) => {
-                                const val = opt && !Array.isArray(opt) ? String(opt.value) : '';
-                                setFilterStatus(val);
-                                setPage(1);
-                            }, isClearable: false, style: { width: 'auto', minWidth: '160px' } }) })] }), loading ? _jsx(ShimmerEffect, {}) : (_jsxs(_Fragment, { children: [_jsxs("table", { className: "scrape-ai-table", children: [_jsx("thead", { children: _jsxs("tr", { children: [_jsx("th", { children: "Title" }), _jsx("th", { children: "Collection" }), _jsx("th", { children: "Status" }), _jsx("th", { children: "Last Synced" }), _jsx("th", { children: "AI" }), _jsx("th", { children: "Actions" })] }) }), _jsx("tbody", { children: entries.map((entry) => (_jsxs(React.Fragment, { children: [_jsxs("tr", { className: "scrape-ai-row--clickable", onClick: () => handleRowClick(entry.id), children: [_jsxs("td", { children: [entry.title, entry.isDraft && _jsx(Pill, { pillStyle: "warning", size: "small", className: "scrape-ai-inline-pill", children: "DRAFT" })] }), _jsx("td", { children: entry.sourceCollection }), _jsx("td", { children: _jsx(Pill, { pillStyle: statusPillStyle[entry.status] || 'light', size: "small", children: entry.status }) }), _jsx("td", { children: entry.lastSynced ? new Date(entry.lastSynced).toLocaleString() : '\u2014' }), _jsx("td", { children: entry.hasAiMeta ? 'Yes' : '\u2014' }), _jsx("td", { children: _jsx(Button, { type: "button", buttonStyle: "secondary", size: "small", onClick: (e) => { e.stopPropagation(); handleRegenerate([entry.id]); }, children: "Regenerate" }) })] }), selectedId === entry.id && detail && (_jsx("tr", { children: _jsxs("td", { colSpan: 6, className: "scrape-ai-detail", children: [_jsxs("div", { className: "scrape-ai-detail__header", children: [_jsx(Button, { type: "button", buttonStyle: viewMode === 'rendered' ? 'primary' : 'secondary', size: "small", onClick: () => setViewMode('rendered'), children: "Rendered" }), _jsx(Button, { type: "button", buttonStyle: viewMode === 'raw' ? 'primary' : 'secondary', size: "small", onClick: () => setViewMode('raw'), children: "Raw Markdown" })] }), _jsx("pre", { className: "scrape-ai-code", children: viewMode === 'raw'
-                                                            ? detail.markdown || 'No content'
-                                                            : detail.markdown?.replace(/^---[\s\S]*?---\n*/m, '') || 'No content' }), detail.jsonLd && (_jsx(Collapsible, { header: "JSON-LD", initCollapsed: true, className: "scrape-ai-collapsible", children: _jsx("pre", { className: "scrape-ai-code", children: JSON.stringify(detail.jsonLd, null, 2) }) })), detail.aiMeta && (_jsx(Collapsible, { header: "AI Metadata", initCollapsed: true, className: "scrape-ai-collapsible", children: _jsx("pre", { className: "scrape-ai-code", children: JSON.stringify(detail.aiMeta, null, 2) }) }))] }) }))] }, entry.id))) })] }), _jsx(Pagination, { page: page, totalPages: totalPages, hasNextPage: page < totalPages, hasPrevPage: page > 1, onChange: setPage })] }))] }));
+    return(// R3: Custom card container — Payload's Card component is a clickable navigation
+    // card (title + optional action) and does not support arbitrary children content.
+    // Styled via .scrape-ai-card using only Payload CSS tokens for theme adaptation.
+    /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-card"
+    }, /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-header-row"
+    }, /*#__PURE__*/ React.createElement("h3", {
+        className: "scrape-ai-card__heading"
+    }, "Content Entries (", totalDocs, ")"), /*#__PURE__*/ React.createElement("div", {
+        className: "scrape-ai-filters"
+    }, /*#__PURE__*/ React.createElement(SelectInput, {
+        path: "filterStatus",
+        name: "filterStatus",
+        value: filterStatus,
+        options: [
+            {
+                label: 'All Statuses',
+                value: ''
+            },
+            {
+                label: 'Synced',
+                value: 'synced'
+            },
+            {
+                label: 'Pending',
+                value: 'pending'
+            },
+            {
+                label: 'Error',
+                value: 'error'
+            },
+            {
+                label: 'Permanent Error',
+                value: 'error-permanent'
+            }
+        ],
+        onChange: (opt)=>{
+            const val = opt && !Array.isArray(opt) ? String(opt.value) : '';
+            setFilterStatus(val);
+            setPage(1);
+        },
+        isClearable: false,
+        style: {
+            width: 'auto',
+            minWidth: '160px'
+        }
+    }))), deadLetterCount > 0 && /*#__PURE__*/ React.createElement(Collapsible, {
+        header: `Dead Letter Queue (${deadLetterCount} permanent errors)`,
+        initCollapsed: true,
+        className: "scrape-ai-collapsible"
+    }, /*#__PURE__*/ React.createElement("table", {
+        className: "scrape-ai-table"
+    }, /*#__PURE__*/ React.createElement("thead", null, /*#__PURE__*/ React.createElement("tr", null, /*#__PURE__*/ React.createElement("th", null, "Title"), /*#__PURE__*/ React.createElement("th", null, "Collection"), /*#__PURE__*/ React.createElement("th", null, "Error"), /*#__PURE__*/ React.createElement("th", null, "Retries"), /*#__PURE__*/ React.createElement("th", null, "Actions"))), /*#__PURE__*/ React.createElement("tbody", null, deadLetterEntries.map((entry)=>/*#__PURE__*/ React.createElement("tr", {
+            key: entry.id
+        }, /*#__PURE__*/ React.createElement("td", null, entry.title), /*#__PURE__*/ React.createElement("td", null, entry.sourceCollection), /*#__PURE__*/ React.createElement("td", null, /*#__PURE__*/ React.createElement("span", {
+            className: "scrape-ai-status--incompatible"
+        }, entry.errorMessage || 'Unknown error')), /*#__PURE__*/ React.createElement("td", null, entry.retryCount), /*#__PURE__*/ React.createElement("td", null, /*#__PURE__*/ React.createElement(Button, {
+            type: "button",
+            buttonStyle: "secondary",
+            size: "small",
+            onClick: ()=>handleRegenerate([
+                    entry.id
+                ])
+        }, "Retry"))))))), loading ? /*#__PURE__*/ React.createElement(ShimmerEffect, null) : /*#__PURE__*/ React.createElement(React.Fragment, null, /*#__PURE__*/ React.createElement("table", {
+        className: "scrape-ai-table"
+    }, /*#__PURE__*/ React.createElement("thead", null, /*#__PURE__*/ React.createElement("tr", null, /*#__PURE__*/ React.createElement("th", null, "Title"), /*#__PURE__*/ React.createElement("th", null, "Collection"), /*#__PURE__*/ React.createElement("th", null, "Status"), /*#__PURE__*/ React.createElement("th", null, "Last Synced"), /*#__PURE__*/ React.createElement("th", null, "AI"), /*#__PURE__*/ React.createElement("th", null, "Actions"))), /*#__PURE__*/ React.createElement("tbody", null, entries.map((entry)=>/*#__PURE__*/ React.createElement(React.Fragment, {
+            key: entry.id
+        }, /*#__PURE__*/ React.createElement("tr", {
+            className: "scrape-ai-row--clickable",
+            onClick: ()=>handleRowClick(entry.id)
+        }, /*#__PURE__*/ React.createElement("td", null, entry.title, entry.isDraft && /*#__PURE__*/ React.createElement(Pill, {
+            pillStyle: "warning",
+            size: "small",
+            className: "scrape-ai-inline-pill"
+        }, "DRAFT")), /*#__PURE__*/ React.createElement("td", null, entry.sourceCollection), /*#__PURE__*/ React.createElement("td", null, /*#__PURE__*/ React.createElement(Pill, {
+            pillStyle: statusPillStyle[entry.status] || 'light',
+            size: "small"
+        }, entry.status)), /*#__PURE__*/ React.createElement("td", null, entry.lastSynced ? new Date(entry.lastSynced).toLocaleString() : '\u2014'), /*#__PURE__*/ React.createElement("td", null, entry.hasAiMeta ? 'Yes' : '\u2014'), /*#__PURE__*/ React.createElement("td", null, /*#__PURE__*/ React.createElement(Button, {
+            type: "button",
+            buttonStyle: "secondary",
+            size: "small",
+            onClick: (e)=>{
+                e.stopPropagation();
+                handleRegenerate([
+                    entry.id
+                ]);
+            }
+        }, "Regenerate"))), selectedId === entry.id && detail && /*#__PURE__*/ React.createElement("tr", null, /*#__PURE__*/ React.createElement("td", {
+            colSpan: 6,
+            className: "scrape-ai-detail"
+        }, /*#__PURE__*/ React.createElement("div", {
+            className: "scrape-ai-detail__header"
+        }, /*#__PURE__*/ React.createElement(Button, {
+            type: "button",
+            buttonStyle: viewMode === 'rendered' ? 'primary' : 'secondary',
+            size: "small",
+            onClick: ()=>setViewMode('rendered')
+        }, "Rendered"), /*#__PURE__*/ React.createElement(Button, {
+            type: "button",
+            buttonStyle: viewMode === 'raw' ? 'primary' : 'secondary',
+            size: "small",
+            onClick: ()=>setViewMode('raw')
+        }, "Raw Markdown")), /*#__PURE__*/ React.createElement("pre", {
+            className: "scrape-ai-code"
+        }, viewMode === 'raw' ? detail.markdown || 'No content' : detail.markdown?.replace(/^---[\s\S]*?---\n*/m, '') || 'No content'), detail.jsonLd && /*#__PURE__*/ React.createElement(Collapsible, {
+            header: "JSON-LD",
+            initCollapsed: true,
+            className: "scrape-ai-collapsible"
+        }, /*#__PURE__*/ React.createElement("pre", {
+            className: "scrape-ai-code"
+        }, JSON.stringify(detail.jsonLd, null, 2))), detail.aiMeta && /*#__PURE__*/ React.createElement(Collapsible, {
+            header: "AI Metadata",
+            initCollapsed: true,
+            className: "scrape-ai-collapsible"
+        }, /*#__PURE__*/ React.createElement("pre", {
+            className: "scrape-ai-code"
+        }, JSON.stringify(detail.aiMeta, null, 2))))))))), /*#__PURE__*/ React.createElement(Pagination, {
+        page: page,
+        totalPages: totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        onChange: setPage
+    }))));
 };
+
 //# sourceMappingURL=ContentTable.js.map

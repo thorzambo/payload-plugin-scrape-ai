@@ -2,16 +2,19 @@ import { transformDocument } from '../pipeline/transform';
 /**
  * Run initial sync on first plugin start.
  * Scans all enabled collections and creates ai-content entries.
- */
-export async function runInitialSync(payload, pluginOptions, enabledCollections) {
+ */ export async function runInitialSync(payload, pluginOptions, enabledCollections) {
     payload.logger.info(`[scrape-ai] Checking initial sync for ${enabledCollections.length} collections`);
     // Filter to only collections that have no ai-content entries yet
     const collectionsToSync = [];
-    for (const slug of enabledCollections) {
+    for (const slug of enabledCollections){
         const existing = await payload.find({
             collection: 'ai-content',
-            where: { sourceCollection: { equals: slug } },
-            limit: 1,
+            where: {
+                sourceCollection: {
+                    equals: slug
+                }
+            },
+            limit: 1
         });
         if (existing.docs.length === 0) {
             collectionsToSync.push(slug);
@@ -23,7 +26,7 @@ export async function runInitialSync(payload, pluginOptions, enabledCollections)
     }
     payload.logger.info(`[scrape-ai] Starting initial sync for ${collectionsToSync.length} collections: ${collectionsToSync.join(', ')}`);
     const concurrency = pluginOptions.sync.initialSyncConcurrency;
-    for (const collectionSlug of collectionsToSync) {
+    for (const collectionSlug of collectionsToSync){
         const collectionConfig = payload.collections[collectionSlug]?.config;
         if (!collectionConfig) {
             payload.logger.warn(`[scrape-ai] Collection '${collectionSlug}' not found, skipping`);
@@ -32,16 +35,16 @@ export async function runInitialSync(payload, pluginOptions, enabledCollections)
         // Query all documents in the collection (paginated)
         let page = 1;
         let hasMore = true;
-        while (hasMore) {
+        while(hasMore){
             const result = await payload.find({
                 collection: collectionSlug,
                 limit: concurrency,
                 page,
-                sort: 'createdAt',
+                sort: 'createdAt'
             });
             const docs = result.docs;
             // Process batch
-            const promises = docs.map(async (doc) => {
+            const promises = docs.map(async (doc)=>{
                 try {
                     // Check draft status
                     if (pluginOptions.drafts === 'published-only' && doc._status === 'draft') {
@@ -52,7 +55,7 @@ export async function runInitialSync(payload, pluginOptions, enabledCollections)
                         collectionSlug,
                         collectionConfig,
                         payload,
-                        pluginOptions,
+                        pluginOptions
                     });
                     await payload.create({
                         collection: 'ai-content',
@@ -70,11 +73,10 @@ export async function runInitialSync(payload, pluginOptions, enabledCollections)
                             locale: transformResult.locale || null,
                             isDraft: transformResult.isDraft,
                             lastSynced: new Date().toISOString(),
-                            retryCount: 0,
-                        },
+                            retryCount: 0
+                        }
                     });
-                }
-                catch (error) {
+                } catch (error) {
                     payload.logger.error(`[scrape-ai] Failed to sync ${collectionSlug}/${doc.id}: ${error.message}`);
                 }
             });
@@ -89,9 +91,10 @@ export async function runInitialSync(payload, pluginOptions, enabledCollections)
         collection: 'ai-sync-queue',
         data: {
             jobType: 'rebuild-aggregates',
-            status: 'pending',
-        },
+            status: 'pending'
+        }
     });
     payload.logger.info('[scrape-ai] Initial sync complete');
 }
+
 //# sourceMappingURL=initial-sync.js.map

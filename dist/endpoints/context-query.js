@@ -3,7 +3,7 @@ export function createContextQueryEndpoint(rateLimiter, siteUrl) {
     return {
         path: '/ai/context',
         method: 'get',
-        handler: async (req) => {
+        handler: async (req)=>{
             if (!rateLimiter.check(getClientIp(req))) {
                 return rateLimitedResponse();
             }
@@ -13,27 +13,34 @@ export function createContextQueryEndpoint(rateLimiter, siteUrl) {
             const limitParam = url.searchParams.get('limit');
             const collectionFilter = url.searchParams.get('collection');
             if (!query) {
-                return Response.json({ error: 'query parameter is required' }, { status: 400 });
+                return Response.json({
+                    error: 'query parameter is required'
+                }, {
+                    status: 400
+                });
             }
             const limit = Math.min(Math.max(parseInt(limitParam || '5', 10) || 5, 1), 20);
             try {
                 // Query all synced entries
                 const whereClause = {
-                    status: { equals: 'synced' },
+                    status: {
+                        equals: 'synced'
+                    }
                 };
                 if (collectionFilter) {
-                    whereClause.sourceCollection = { equals: collectionFilter };
+                    whereClause.sourceCollection = {
+                        equals: collectionFilter
+                    };
                 }
                 const allContent = await payload.find({
                     collection: 'ai-content',
                     where: whereClause,
-                    limit: 1000,
-                    // Only fetch fields needed for scoring — avoid loading full markdown
+                    limit: 1000
                 });
                 // Score and rank entries
                 const terms = tokenize(query);
                 const scored = [];
-                for (const entry of allContent.docs) {
+                for (const entry of allContent.docs){
                     const title = entry.title || '';
                     const slug = entry.slug || '';
                     const markdown = entry.markdown || '';
@@ -43,7 +50,7 @@ export function createContextQueryEndpoint(rateLimiter, siteUrl) {
                     const entities = aiMeta?.entities || [];
                     const summary = aiMeta?.summary || '';
                     let score = 0;
-                    for (const term of terms) {
+                    for (const term of terms){
                         const termLower = term.toLowerCase();
                         // Title matches (3x weight)
                         if (title.toLowerCase().includes(termLower)) {
@@ -54,13 +61,13 @@ export function createContextQueryEndpoint(rateLimiter, siteUrl) {
                             score += 2;
                         }
                         // Topic matches (4x weight)
-                        for (const topic of topics) {
+                        for (const topic of topics){
                             if (topic.toLowerCase().includes(termLower)) {
                                 score += 4;
                             }
                         }
                         // Entity matches (3x weight)
-                        for (const entity of entities) {
+                        for (const entity of entities){
                             if (entity.toLowerCase().includes(termLower)) {
                                 score += 3;
                             }
@@ -72,7 +79,8 @@ export function createContextQueryEndpoint(rateLimiter, siteUrl) {
                     }
                     if (score > 0) {
                         // Normalize score to 0-1 range (rough approximation)
-                        const maxPossibleScore = terms.length * (3 + 2 + 4 + 3 + 2); // 14 per term max
+                        const maxPossibleScore = terms.length * (3 + 2 + 4 + 3 + 2 // 14 per term max
+                        );
                         const normalizedScore = Math.min(score / maxPossibleScore, 1);
                         scored.push({
                             title,
@@ -84,35 +92,38 @@ export function createContextQueryEndpoint(rateLimiter, siteUrl) {
                             summary: summary || undefined,
                             topics: topics.length > 0 ? topics : undefined,
                             relevanceScore: Math.round(normalizedScore * 100) / 100,
-                            score,
+                            score
                         });
                     }
                 }
                 // Sort by score descending, take top N
-                scored.sort((a, b) => b.score - a.score);
+                scored.sort((a, b)=>b.score - a.score);
                 const topResults = scored.slice(0, limit);
                 // Remove internal score field
-                const results = topResults.map(({ score, ...rest }) => rest);
+                const results = topResults.map(({ score, ...rest })=>rest);
                 const response = {
                     query,
                     results,
-                    totalResults: results.length,
+                    totalResults: results.length
                 };
                 return Response.json(response, {
                     status: 200,
-                    headers: { 'Cache-Control': 'public, max-age=30' },
+                    headers: {
+                        'Cache-Control': 'public, max-age=30'
+                    }
+                });
+            } catch (error) {
+                return Response.json({
+                    error: error.message
+                }, {
+                    status: 500
                 });
             }
-            catch (error) {
-                return Response.json({ error: error.message }, { status: 500 });
-            }
-        },
+        }
     };
 }
 function tokenize(query) {
-    return query
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((t) => t.length > 1);
+    return query.toLowerCase().split(/\s+/).filter((t)=>t.length > 1);
 }
+
 //# sourceMappingURL=context-query.js.map

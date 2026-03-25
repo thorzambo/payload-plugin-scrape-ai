@@ -19,46 +19,36 @@
   color: var(--theme-elevation-500, #888);
 }
 
+/*
+  R2 — Tab navigation now uses Payload's native Button (buttonStyle="tab") and the
+  .default-list-view-tabs class from @payloadcms/ui for spacing. The custom
+  .scrape-ai__tab and .scrape-ai__tab--active classes have been removed.
+  This class adds only the bottom border and bottom margin that the nav needs
+  as a section separator — layout spacing is handled by .default-list-view-tabs.
+*/
 .scrape-ai__tabs {
-  display: flex;
-  gap: 4px;
   margin-bottom: 20px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--theme-elevation-150, #e0e0e0);
-}
-
-.scrape-ai__tab {
-  padding: 10px 20px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  font-family: inherit;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  color: var(--theme-elevation-500, #888);
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.scrape-ai__tab:hover {
-  color: var(--theme-text, #333);
-}
-
-.scrape-ai__tab--active {
-  color: var(--theme-text, #333);
-  border-bottom-color: var(--theme-success-500, #22c55e);
-  font-weight: 600;
 }
 
 .scrape-ai__content {
   min-height: 400px;
 }
 
-/* Card */
+/*
+  R3 — Card containers use a custom .scrape-ai-card class rather than Payload's
+  exported Card component. Payload's Card is a clickable navigation card (title +
+  optional action button + full-area click target) designed for collection/global
+  list views — it does not accept arbitrary children content. All styling below
+  uses only Payload CSS custom properties (var(--theme-elevation-*)) so it
+  automatically adapts to light/dark theme switching.
+*/
 .scrape-ai-card {
   padding: 20px;
-  background: var(--theme-elevation-0, #fff);
-  border: 1px solid var(--theme-elevation-150, #e0e0e0);
-  border-radius: 4px;
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-m, 4px);
   margin-bottom: 16px;
 }
 
@@ -112,32 +102,50 @@
   margin-top: 12px;
 }
 
-/* Table */
+/*
+  R4 — Tables use a custom .scrape-ai-table class rather than Payload's exported
+  Table component. Payload's Table requires a Column[] structure with pre-rendered
+  React cells, active flags, and accessor keys — it is tightly coupled to the
+  collection list view data pipeline and cannot be used as a general-purpose table.
+  Styling mirrors Payload's own .table SCSS (elements/Table/index.scss): alternating
+  row backgrounds using var(--theme-elevation-50), header color via
+  var(--theme-elevation-400), and padding aligned with --base units.
+  All values use only Payload CSS custom properties for automatic theme adaptation.
+*/
 .scrape-ai-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+  overflow: auto;
+}
+
+.scrape-ai-table thead {
+  color: var(--theme-elevation-400);
 }
 
 .scrape-ai-table th {
   text-align: left;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--theme-elevation-150, #e0e0e0);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  font-weight: normal;
   font-size: 0.75rem;
-  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--theme-elevation-500, #888);
 }
 
 .scrape-ai-table td {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--theme-elevation-100, #f0f0f0);
-  color: var(--theme-text, #333);
+  border-bottom: 1px solid var(--theme-elevation-100);
+  color: var(--theme-text);
+  vertical-align: middle;
+}
+
+.scrape-ai-table tbody tr:nth-child(odd) {
+  background: var(--theme-elevation-50);
 }
 
 .scrape-ai-table tr:hover td {
-  background: var(--theme-elevation-50, #fafafa);
+  background: var(--theme-elevation-100);
 }
 
 /* Form fields */

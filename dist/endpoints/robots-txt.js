@@ -1,20 +1,19 @@
 /**
  * Returns the AI discovery additions for robots.txt.
  * GET /api/scrape-ai/robots-txt
- */
-export function createRobotsTxtEndpoint(siteUrl) {
+ */ export function createRobotsTxtEndpoint(siteUrl) {
     return {
         path: '/scrape-ai/robots-txt',
         method: 'get',
-        handler: async (req) => {
+        handler: async (req)=>{
             return new Response(getAiRobotsTxtBlock(siteUrl), {
                 status: 200,
                 headers: {
                     'Content-Type': 'text/plain; charset=utf-8',
-                    'Cache-Control': 'public, max-age=3600, s-maxage=86400',
-                },
+                    'Cache-Control': 'public, max-age=3600, s-maxage=86400'
+                }
             });
-        },
+        }
     };
 }
 function getAiRobotsTxtBlock(siteUrl) {
@@ -29,7 +28,8 @@ function getAiRobotsTxtBlock(siteUrl) {
         'Allow: /llms.txt',
         'Allow: /llms-full.txt',
         'Allow: /ai/',
-        'Allow: /.well-known/ai-plugin.json',
+        'Allow: /.well-known/ai-plugin.json'
     ].join('\n');
 }
+
 //# sourceMappingURL=robots-txt.js.map

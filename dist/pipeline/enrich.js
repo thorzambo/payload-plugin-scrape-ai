@@ -4,12 +4,11 @@ import { semanticChunk } from '../ai/chunk';
 /**
  * Fallback: 3 separate AI calls (summary, entities, chunks).
  * Used when the batched structured-output call fails.
- */
-async function enrichContentFallback(markdown, provider) {
+ */ async function enrichContentFallback(markdown, provider) {
     const results = await Promise.allSettled([
         generateSummary(markdown, provider),
         extractEntities(markdown, provider),
-        semanticChunk(markdown, provider),
+        semanticChunk(markdown, provider)
     ]);
     const meta = {};
     // Summary
@@ -32,9 +31,9 @@ async function enrichContentFallback(markdown, provider) {
 /**
  * Single batched AI call requesting all enrichment data as structured JSON.
  * Falls back to enrichContentFallback if parsing fails.
- */
-async function enrichContentBatched(markdown, aiProvider) {
-    const truncated = markdown.slice(0, 8000); // Enough for all three tasks
+ */ async function enrichContentBatched(markdown, aiProvider) {
+    const truncated = markdown.slice(0, 8000) // Enough for all three tasks
+    ;
     const systemPrompt = `You are a content analysis assistant. Analyze the provided content and return a JSON object with exactly these fields:
 - "summary": A concise 1-2 sentence summary (max 500 chars)
 - "topics": An array of 3-8 key topic phrases
@@ -53,16 +52,13 @@ Return ONLY valid JSON, no markdown code fences.`;
             topics: Array.isArray(parsed.topics) ? parsed.topics.slice(0, 10) : [],
             entities: Array.isArray(parsed.entities) ? parsed.entities.slice(0, 20) : [],
             category: typeof parsed.category === 'string' ? parsed.category : 'General',
-            chunks: Array.isArray(parsed.chunks)
-                ? parsed.chunks.slice(0, 8).map((c, i) => ({
+            chunks: Array.isArray(parsed.chunks) ? parsed.chunks.slice(0, 8).map((c, i)=>({
                     id: c.id || `chunk-${i + 1}`,
                     topic: c.topic || '',
-                    content: c.content || '',
-                }))
-                : [],
+                    content: c.content || ''
+                })) : []
         };
-    }
-    catch {
+    } catch  {
         // Fallback to individual calls if structured output fails
         return enrichContentFallback(markdown, aiProvider);
     }
@@ -71,8 +67,8 @@ Return ONLY valid JSON, no markdown code fences.`;
  * Stage 3: Optional AI enrichment.
  * Generates summary, topics, entities, and semantic chunks.
  * Uses a single batched AI call; falls back to 3 individual calls on parse failure.
- */
-export async function enrichContent(markdown, aiProvider) {
+ */ export async function enrichContent(markdown, aiProvider) {
     return enrichContentBatched(markdown, aiProvider);
 }
+
 //# sourceMappingURL=enrich.js.map

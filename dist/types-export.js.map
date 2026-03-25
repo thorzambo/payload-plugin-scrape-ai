@@ -1,1 +1,1 @@
-{"version":3,"file":"types-export.js","sourceRoot":"","sources":["../src/types-export.ts"],"names":[],"mappings":""}
+{"version":3,"sources":["../src/types-export.ts"],"sourcesContent":["export type {\n  ScrapeAiPluginOptions,\n  AiProviderConfig,\n  SyncConfig,\n  ResolvedPluginConfig,\n  AiContentDoc,\n  AiSyncQueueDoc,\n  AiAggregateDoc,\n  AiConfigGlobal,\n  AiMeta,\n  TransformResult,\n  PipelineContext,\n  IAiProvider,\n  ContextQueryResult,\n  ContextQueryResponse,\n  FieldsOverride,\n  CollectionOverrides,\n} from './types'\n"],"names":[],"mappings":"AAAA,WAiBgB"}

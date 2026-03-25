@@ -83,6 +83,9 @@ export const AiSettings: React.FC = () => {
   const handleApplyRecommendation = (modelId: string, modelProvider: string) => { setModel(modelId); setProvider(modelProvider) }
 
   return (
+    // R3: Custom card container — Payload's Card component is a clickable navigation
+    // card (title + optional action) and does not support arbitrary children content.
+    // Styled via .scrape-ai-card using only Payload CSS tokens for theme adaptation.
     <div className="scrape-ai-card">
       <h3 className="scrape-ai-card__heading">AI Enrichment Settings</h3>
 
@@ -196,6 +199,8 @@ export const AiSettings: React.FC = () => {
             )}
 
             <h4 className="scrape-ai-card__subheading">All Compatible Models</h4>
+            {/* R4: Custom table — Payload's Table requires Column[] with pre-rendered cells
+                and is tightly coupled to the collection list view data pipeline. */}
             <table className="scrape-ai-table">
               <thead>
                 <tr><th>Model</th><th>Provider</th><th>Tier</th><th>Context</th><th>Est. Cost</th><th>Status</th><th></th></tr>

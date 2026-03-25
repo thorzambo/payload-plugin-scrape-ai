@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/admin/client.ts"],"sourcesContent":["export { DashboardClient } from './views/DashboardClient'\nexport { default as NavLink } from './components/NavLink'\n"],"names":["DashboardClient","default","NavLink"],"mappings":"AAAA,SAASA,eAAe,QAAQ,0BAAyB;AACzD,SAASC,WAAWC,OAAO,QAAQ,uBAAsB"}

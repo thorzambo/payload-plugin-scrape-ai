@@ -1,9 +1,8 @@
 /**
  * Creates an afterDelete hook that removes the corresponding ai-content entry
  * and queues an aggregate rebuild.
- */
-export function createAfterDeleteHook(pluginOptions) {
-    return async ({ doc, req, collection }) => {
+ */ export function createAfterDeleteHook(pluginOptions) {
+    return async ({ doc, req, collection })=>{
         const { payload } = req;
         try {
             const collectionSlug = collection.slug;
@@ -11,33 +10,44 @@ export function createAfterDeleteHook(pluginOptions) {
             await payload.delete({
                 collection: 'ai-content',
                 where: {
-                    sourceCollection: { equals: collectionSlug },
-                    sourceDocId: { equals: String(doc.id) },
-                },
+                    sourceCollection: {
+                        equals: collectionSlug
+                    },
+                    sourceDocId: {
+                        equals: String(doc.id)
+                    }
+                }
             });
             // Queue aggregate rebuild (deduplicated — skip if one is already pending)
             const existingRebuild = await payload.find({
                 collection: 'ai-sync-queue',
                 where: {
-                    jobType: { equals: 'rebuild-aggregates' },
-                    status: { in: ['pending', 'processing'] },
+                    jobType: {
+                        equals: 'rebuild-aggregates'
+                    },
+                    status: {
+                        in: [
+                            'pending',
+                            'processing'
+                        ]
+                    }
                 },
-                limit: 1,
+                limit: 1
             });
             if (existingRebuild.docs.length === 0) {
                 await payload.create({
                     collection: 'ai-sync-queue',
                     data: {
                         jobType: 'rebuild-aggregates',
-                        status: 'pending',
-                    },
+                        status: 'pending'
+                    }
                 });
             }
-        }
-        catch (error) {
+        } catch (error) {
             payload.logger.error(`[scrape-ai] afterDelete error: ${error.message}`);
         }
         return doc;
     };
 }
+
 //# sourceMappingURL=afterDelete.js.map

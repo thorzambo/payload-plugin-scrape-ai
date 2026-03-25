@@ -85,6 +85,9 @@ export const LlmsTxtManager: React.FC = () => {
   }
 
   return (
+    // R3: Custom card container — Payload's Card component is a clickable navigation
+    // card (title + optional action) and does not support arbitrary children content.
+    // Styled via .scrape-ai-card using only Payload CSS tokens for theme adaptation.
     <div className="scrape-ai-card">
       <h3 className="scrape-ai-card__heading">llms.txt Manager</h3>
 

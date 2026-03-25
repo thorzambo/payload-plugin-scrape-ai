@@ -21,66 +21,65 @@ export async function semanticChunk(markdown, provider) {
         if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
             if (Array.isArray(parsed)) {
-                return parsed.map((chunk, i) => ({
-                    id: chunk.id || `chunk-${i}`,
-                    topic: chunk.topic || `Section ${i + 1}`,
-                    content: chunk.content || '',
-                }));
+                return parsed.map((chunk, i)=>({
+                        id: chunk.id || `chunk-${i}`,
+                        topic: chunk.topic || `Section ${i + 1}`,
+                        content: chunk.content || ''
+                    }));
             }
         }
-    }
-    catch {
-        // Fall back to heading-based chunking
+    } catch  {
+    // Fall back to heading-based chunking
     }
     return headingBasedChunk(markdown);
 }
 /**
  * Simple heading-based chunking fallback (no AI needed).
  * Splits on ## headings.
- */
-function headingBasedChunk(markdown) {
+ */ function headingBasedChunk(markdown) {
     // Remove frontmatter
     const content = markdown.replace(/^---[\s\S]*?---\n*/m, '');
-    const sections = content.split(/(?=^#{2,6} )/m).filter((s) => s.trim());
+    const sections = content.split(/(?=^#{2,6} )/m).filter((s)=>s.trim());
     if (sections.length === 0) {
-        return [{ id: 'main', topic: 'Main Content', content: content.trim() }];
+        return [
+            {
+                id: 'main',
+                topic: 'Main Content',
+                content: content.trim()
+            }
+        ];
     }
-    const chunks = sections.map((section, i) => {
+    const chunks = sections.map((section, i)=>{
         const headingMatch = section.match(/^#{2,6} (.+)/m);
         const topic = headingMatch ? headingMatch[1].trim() : `Section ${i + 1}`;
-        const id = topic
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
+        const id = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
         return {
             id: id || `section-${i}`,
             topic,
-            content: section.trim(),
+            content: section.trim()
         };
     });
     const MAX_CHUNK_SIZE = 4000;
     // Further split oversized chunks by paragraphs
     const finalChunks = [];
-    for (const chunk of chunks) {
+    for (const chunk of chunks){
         if (chunk.content.length <= MAX_CHUNK_SIZE) {
             finalChunks.push(chunk);
-        }
-        else {
+        } else {
             // Split by paragraph breaks
             const paragraphs = chunk.content.split(/\n\n+/);
             let currentContent = '';
             let partIndex = 0;
-            for (const para of paragraphs) {
+            for (const para of paragraphs){
                 if (currentContent.length + para.length > MAX_CHUNK_SIZE && currentContent.length > 0) {
                     finalChunks.push({
                         id: `${chunk.id}-part${partIndex}`,
                         topic: `${chunk.topic} (part ${partIndex + 1})`,
-                        content: currentContent.trim(),
+                        content: currentContent.trim()
                     });
                     currentContent = para;
                     partIndex++;
-                }
-                else {
+                } else {
                     currentContent += (currentContent ? '\n\n' : '') + para;
                 }
             }
@@ -88,11 +87,12 @@ function headingBasedChunk(markdown) {
                 finalChunks.push({
                     id: partIndex > 0 ? `${chunk.id}-part${partIndex}` : chunk.id,
                     topic: partIndex > 0 ? `${chunk.topic} (part ${partIndex + 1})` : chunk.topic,
-                    content: currentContent.trim(),
+                    content: currentContent.trim()
                 });
             }
         }
     }
     return finalChunks;
 }
+
 //# sourceMappingURL=chunk.js.map
