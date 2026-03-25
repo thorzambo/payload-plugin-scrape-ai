@@ -56,7 +56,7 @@ export function createStructuredDataEndpoint(rateLimiter: RateLimiter) {
         return Response.json(jsonLd, {
           status: 200,
           headers: {
-            'Cache-Control': 'public, max-age=60',
+            'Cache-Control': 'public, max-age=60, s-maxage=300',
             ...(lastSynced ? { ETag: `"${new Date(lastSynced).getTime()}"` } : {}),
           },
         })

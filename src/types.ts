@@ -1,4 +1,15 @@
-import type { CollectionConfig, Config, GlobalConfig, Payload, PayloadRequest } from 'payload'
+import type { CollectionConfig, Config, Field, GlobalConfig, Payload, PayloadRequest } from 'payload'
+
+// --- Collection override types ---
+
+export type FieldsOverride = (args: { defaultFields: Field[] }) => Field[]
+
+export interface CollectionOverrides {
+  fields?: FieldsOverride
+  access?: CollectionConfig['access']
+  admin?: CollectionConfig['admin']
+  hooks?: CollectionConfig['hooks']
+}
 
 // --- Plugin Options ---
 
@@ -24,6 +35,8 @@ export interface ScrapeAiPluginOptions {
   siteDescription?: string
   drafts?: 'published-only' | 'include-drafts'
   enabled?: boolean
+  aiContentOverrides?: CollectionOverrides
+  aiSyncQueueOverrides?: CollectionOverrides
 }
 
 // --- Resolved internal config (after detection + defaults) ---

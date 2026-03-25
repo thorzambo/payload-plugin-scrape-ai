@@ -9,6 +9,7 @@ import { ContentTable } from '../components/ContentTable'
 import { LlmsTxtManager } from '../components/LlmsTxtManager'
 import { AiSettings } from '../components/AiSettings'
 import { EndpointsPanel } from '../components/EndpointsPanel'
+import { ErrorBoundary } from '../components/ErrorBoundary'
 import '../styles.css'
 
 type Tab = 'content' | 'collections' | 'llms-txt' | 'ai-settings' | 'endpoints'
@@ -49,11 +50,31 @@ export const DashboardClient: React.FC = () => {
       </nav>
 
       <div className="scrape-ai__content">
-        {activeTab === 'content' && <ContentTable />}
-        {activeTab === 'collections' && <CollectionToggles />}
-        {activeTab === 'llms-txt' && <LlmsTxtManager />}
-        {activeTab === 'ai-settings' && <AiSettings />}
-        {activeTab === 'endpoints' && <EndpointsPanel siteUrl={siteUrl} />}
+        {activeTab === 'content' && (
+          <ErrorBoundary fallbackLabel="Content table failed to load">
+            <ContentTable />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'collections' && (
+          <ErrorBoundary fallbackLabel="Collections failed to load">
+            <CollectionToggles />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'llms-txt' && (
+          <ErrorBoundary fallbackLabel="llms.txt manager failed to load">
+            <LlmsTxtManager />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'ai-settings' && (
+          <ErrorBoundary fallbackLabel="AI settings failed to load">
+            <AiSettings />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'endpoints' && (
+          <ErrorBoundary fallbackLabel="Endpoints panel failed to load">
+            <EndpointsPanel siteUrl={siteUrl} />
+          </ErrorBoundary>
+        )}
       </div>
     </Gutter>
   )

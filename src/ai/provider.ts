@@ -1,4 +1,5 @@
-import type { AiProviderConfig, IAiProvider } from '../types'
+import type { Payload } from 'payload'
+import type { AiProviderConfig, IAiProvider, AiConfigGlobal } from '../types'
 
 class OpenAiProvider implements IAiProvider {
   private client: any
@@ -105,4 +106,16 @@ export async function resolveAiProvider(
   }
 
   return createAiProvider(pluginAiConfig)
+}
+
+export async function resolveAiProviderFromPayload(
+  payload: Payload,
+  pluginAiConfig?: AiProviderConfig,
+): Promise<IAiProvider | null> {
+  try {
+    const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
+    return resolveAiProvider(pluginAiConfig, aiConfig)
+  } catch {
+    return pluginAiConfig ? resolveAiProvider(pluginAiConfig) : null
+  }
 }

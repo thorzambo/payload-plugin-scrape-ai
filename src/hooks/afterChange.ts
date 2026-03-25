@@ -95,14 +95,24 @@ export function createAfterChangeHook(
         // ai-config might not exist yet on first run — that's fine
       }
 
-      // Queue aggregate rebuild
-      await payload.create({
+      // Queue aggregate rebuild (deduplicated — skip if one is already pending)
+      const existingRebuild = await payload.find({
         collection: 'ai-sync-queue',
-        data: {
-          jobType: 'rebuild-aggregates',
-          status: 'pending',
+        where: {
+          jobType: { equals: 'rebuild-aggregates' },
+          status: { in: ['pending', 'processing'] },
         },
+        limit: 1,
       })
+      if (existingRebuild.docs.length === 0) {
+        await payload.create({
+          collection: 'ai-sync-queue',
+          data: {
+            jobType: 'rebuild-aggregates',
+            status: 'pending',
+          },
+        })
+      }
     } catch (error: any) {
       // Never break the user's save operation
       payload.logger.error(`[scrape-ai] afterChange error: ${error.message}`)

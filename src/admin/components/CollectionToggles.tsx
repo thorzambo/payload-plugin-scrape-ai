@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Pill } from '@payloadcms/ui'
+import { Pill, ShimmerEffect } from '@payloadcms/ui'
 
 interface CollectionInfo {
   slug: string
@@ -36,7 +36,7 @@ export const CollectionToggles: React.FC = () => {
     })
   }
 
-  if (loading) return <div>Loading collections...</div>
+  if (loading) return <ShimmerEffect />
 
   return (
     <div className="scrape-ai-card">

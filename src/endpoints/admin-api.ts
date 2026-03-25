@@ -46,14 +46,20 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
           const collectionCounts: Record<string, number> = {}
           // We can't group-by with Payload local API, so we query per collection
           const enabledCollections = typedAiConfig?.enabledCollections || {}
-          for (const slug of Object.keys(enabledCollections)) {
-            if (!enabledCollections[slug]) continue
-            const count = await payload.find({
-              collection: 'ai-content',
-              where: { sourceCollection: { equals: slug } },
-              limit: 0,
-            })
-            collectionCounts[slug] = count.totalDocs
+          const enabledSlugs = Object.keys(enabledCollections).filter(slug => enabledCollections[slug])
+
+          const countResults = await Promise.all(
+            enabledSlugs.map(slug =>
+              payload.find({
+                collection: 'ai-content',
+                where: { sourceCollection: { equals: slug } },
+                limit: 0,
+              }).then(result => ({ slug, count: result.totalDocs }))
+            )
+          )
+
+          for (const { slug, count } of countResults) {
+            collectionCounts[slug] = count
           }
 
           return Response.json({
@@ -381,20 +387,30 @@ export function createAdminEndpoints(pluginOptions: ResolvedPluginConfig, plugin
         const providerFilter = url.searchParams.get('provider') as 'openai' | 'anthropic' | null
 
         try {
-          // Fetch all ai-content entries
-          const allContent = await payload.find({
-            collection: 'ai-content',
-            where: { sourceCollection: { not_equals: '__aggregate' } },
-            limit: 10000,
-          })
+          // Fetch all ai-content entries with pagination to handle large sites
+          const documents: Array<{ title: string; markdown: string; sourceCollection: string; sourceDocId: string; hasAiMeta: boolean }> = []
+          let page = 1
+          let hasMore = true
 
-          const documents = allContent.docs.map((doc: any) => ({
-            title: doc.title || '',
-            markdown: doc.markdown || '',
-            sourceCollection: doc.sourceCollection || '',
-            sourceDocId: doc.sourceDocId || '',
-            hasAiMeta: Boolean(doc.aiMeta && Object.keys(doc.aiMeta).length > 0),
-          }))
+          while (hasMore) {
+            const batch = await payload.find({
+              collection: 'ai-content',
+              where: { sourceCollection: { not_equals: '__aggregate' } },
+              limit: 100,
+              page,
+            })
+            for (const doc of batch.docs) {
+              documents.push({
+                title: (doc as any).title || '',
+                markdown: (doc as any).markdown || '',
+                sourceCollection: (doc as any).sourceCollection || '',
+                sourceDocId: (doc as any).sourceDocId || '',
+                hasAiMeta: Boolean((doc as any).aiMeta && Object.keys((doc as any).aiMeta).length > 0),
+              })
+            }
+            hasMore = batch.hasNextPage
+            page++
+          }
 
           const estimate = estimateJob(documents, providerFilter || undefined)
 
