@@ -4,7 +4,7 @@ import { retryErrors } from './error-recovery';
  * Start the background scheduler that processes the sync queue
  * and handles error recovery.
  */
-export function startScheduler(payload, pluginOptions, aiProvider) {
+export function startScheduler(payload, pluginOptions) {
     const debounceMs = pluginOptions.sync.debounceMs;
     payload.logger.info(`[scrape-ai] Scheduler started (interval: ${debounceMs}ms)`);
     // Main queue processing loop
@@ -14,7 +14,7 @@ export function startScheduler(payload, pluginOptions, aiProvider) {
             return;
         isProcessing = true;
         try {
-            await processQueue(payload, pluginOptions, aiProvider);
+            await processQueue(payload, pluginOptions);
         }
         catch (error) {
             payload.logger.error(`[scrape-ai] Queue processing error: ${error.message}`);

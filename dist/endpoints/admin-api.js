@@ -39,15 +39,14 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                     const collectionCounts = {};
                     // We can't group-by with Payload local API, so we query per collection
                     const enabledCollections = typedAiConfig?.enabledCollections || {};
-                    for (const slug of Object.keys(enabledCollections)) {
-                        if (!enabledCollections[slug])
-                            continue;
-                        const count = await payload.find({
-                            collection: 'ai-content',
-                            where: { sourceCollection: { equals: slug } },
-                            limit: 0,
-                        });
-                        collectionCounts[slug] = count.totalDocs;
+                    const enabledSlugs = Object.keys(enabledCollections).filter(slug => enabledCollections[slug]);
+                    const countResults = await Promise.all(enabledSlugs.map(slug => payload.find({
+                        collection: 'ai-content',
+                        where: { sourceCollection: { equals: slug } },
+                        limit: 0,
+                    }).then(result => ({ slug, count: result.totalDocs }))));
+                    for (const { slug, count } of countResults) {
+                        collectionCounts[slug] = count;
                     }
                     return Response.json({
                         totalEntries: allEntries.totalDocs,
@@ -360,19 +359,29 @@ export function createAdminEndpoints(pluginOptions, pluginRawOptions) {
                 const url = new URL(req.url || '', 'http://localhost');
                 const providerFilter = url.searchParams.get('provider');
                 try {
-                    // Fetch all ai-content entries
-                    const allContent = await payload.find({
-                        collection: 'ai-content',
-                        where: { sourceCollection: { not_equals: '__aggregate' } },
-                        limit: 10000,
-                    });
-                    const documents = allContent.docs.map((doc) => ({
-                        title: doc.title || '',
-                        markdown: doc.markdown || '',
-                        sourceCollection: doc.sourceCollection || '',
-                        sourceDocId: doc.sourceDocId || '',
-                        hasAiMeta: Boolean(doc.aiMeta && Object.keys(doc.aiMeta).length > 0),
-                    }));
+                    // Fetch all ai-content entries with pagination to handle large sites
+                    const documents = [];
+                    let page = 1;
+                    let hasMore = true;
+                    while (hasMore) {
+                        const batch = await payload.find({
+                            collection: 'ai-content',
+                            where: { sourceCollection: { not_equals: '__aggregate' } },
+                            limit: 100,
+                            page,
+                        });
+                        for (const doc of batch.docs) {
+                            documents.push({
+                                title: doc.title || '',
+                                markdown: doc.markdown || '',
+                                sourceCollection: doc.sourceCollection || '',
+                                sourceDocId: doc.sourceDocId || '',
+                                hasAiMeta: Boolean(doc.aiMeta && Object.keys(doc.aiMeta).length > 0),
+                            });
+                        }
+                        hasMore = batch.hasNextPage;
+                        page++;
+                    }
                     const estimate = estimateJob(documents, providerFilter || undefined);
                     // Format for the dashboard
                     return Response.json({

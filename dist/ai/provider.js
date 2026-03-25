@@ -86,4 +86,13 @@ export async function resolveAiProvider(pluginAiConfig, globalConfig) {
     }
     return createAiProvider(pluginAiConfig);
 }
+export async function resolveAiProviderFromPayload(payload, pluginAiConfig) {
+    try {
+        const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
+        return resolveAiProvider(pluginAiConfig, aiConfig);
+    }
+    catch {
+        return pluginAiConfig ? resolveAiProvider(pluginAiConfig) : null;
+    }
+}
 //# sourceMappingURL=provider.js.map

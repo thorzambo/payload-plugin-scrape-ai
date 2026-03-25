@@ -9,7 +9,10 @@ export function createRobotsTxtEndpoint(siteUrl) {
         handler: async (req) => {
             return new Response(getAiRobotsTxtBlock(siteUrl), {
                 status: 200,
-                headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+                headers: {
+                    'Content-Type': 'text/plain; charset=utf-8',
+                    'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+                },
             });
         },
     };

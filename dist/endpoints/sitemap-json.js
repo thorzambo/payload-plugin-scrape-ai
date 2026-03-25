@@ -33,7 +33,7 @@ export function createSitemapJsonEndpoint(rateLimiter) {
                 return Response.json(parsed, {
                     status: 200,
                     headers: {
-                        'Cache-Control': 'public, max-age=60',
+                        'Cache-Control': 'public, max-age=300, s-maxage=600',
                         ...(lastSynced ? { ETag: `"${new Date(lastSynced).getTime()}"` } : {}),
                     },
                 });

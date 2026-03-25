@@ -9,6 +9,7 @@ import { ContentTable } from '../components/ContentTable';
 import { LlmsTxtManager } from '../components/LlmsTxtManager';
 import { AiSettings } from '../components/AiSettings';
 import { EndpointsPanel } from '../components/EndpointsPanel';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import '../styles.css';
 export const DashboardClient = () => {
     const [activeTab, setActiveTab] = useState('content');
@@ -20,7 +21,7 @@ export const DashboardClient = () => {
         { key: 'ai-settings', label: 'AI Settings' },
         { key: 'endpoints', label: 'Endpoints' },
     ];
-    return (_jsxs(Gutter, { children: [_jsx(SetStepNav, { nav: [{ label: 'Scrape AI' }] }), _jsxs("header", { className: "scrape-ai__header", children: [_jsx("h1", { className: "scrape-ai__title", children: "Scrape AI" }), _jsx("p", { className: "scrape-ai__description", children: "AI-friendly content generation dashboard" })] }), _jsx(StatusBar, {}), _jsx("nav", { className: "scrape-ai__tabs", children: tabs.map((tab) => (_jsx("button", { className: `scrape-ai__tab ${activeTab === tab.key ? 'scrape-ai__tab--active' : ''}`, onClick: () => setActiveTab(tab.key), children: tab.label }, tab.key))) }), _jsxs("div", { className: "scrape-ai__content", children: [activeTab === 'content' && _jsx(ContentTable, {}), activeTab === 'collections' && _jsx(CollectionToggles, {}), activeTab === 'llms-txt' && _jsx(LlmsTxtManager, {}), activeTab === 'ai-settings' && _jsx(AiSettings, {}), activeTab === 'endpoints' && _jsx(EndpointsPanel, { siteUrl: siteUrl })] })] }));
+    return (_jsxs(Gutter, { children: [_jsx(SetStepNav, { nav: [{ label: 'Scrape AI' }] }), _jsxs("header", { className: "scrape-ai__header", children: [_jsx("h1", { className: "scrape-ai__title", children: "Scrape AI" }), _jsx("p", { className: "scrape-ai__description", children: "AI-friendly content generation dashboard" })] }), _jsx(StatusBar, {}), _jsx("nav", { className: "scrape-ai__tabs", children: tabs.map((tab) => (_jsx("button", { className: `scrape-ai__tab ${activeTab === tab.key ? 'scrape-ai__tab--active' : ''}`, onClick: () => setActiveTab(tab.key), children: tab.label }, tab.key))) }), _jsxs("div", { className: "scrape-ai__content", children: [activeTab === 'content' && (_jsx(ErrorBoundary, { fallbackLabel: "Content table failed to load", children: _jsx(ContentTable, {}) })), activeTab === 'collections' && (_jsx(ErrorBoundary, { fallbackLabel: "Collections failed to load", children: _jsx(CollectionToggles, {}) })), activeTab === 'llms-txt' && (_jsx(ErrorBoundary, { fallbackLabel: "llms.txt manager failed to load", children: _jsx(LlmsTxtManager, {}) })), activeTab === 'ai-settings' && (_jsx(ErrorBoundary, { fallbackLabel: "AI settings failed to load", children: _jsx(AiSettings, {}) })), activeTab === 'endpoints' && (_jsx(ErrorBoundary, { fallbackLabel: "Endpoints panel failed to load", children: _jsx(EndpointsPanel, { siteUrl: siteUrl }) }))] })] }));
 };
 export default DashboardClient;
 //# sourceMappingURL=DashboardClient.js.map

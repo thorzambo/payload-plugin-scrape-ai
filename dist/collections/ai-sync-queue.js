@@ -1,15 +1,5 @@
-export const aiSyncQueueCollection = {
-    slug: 'ai-sync-queue',
-    admin: {
-        hidden: true,
-    },
-    access: {
-        read: ({ req }) => Boolean(req.user),
-        create: ({ req }) => Boolean(req.user),
-        update: ({ req }) => Boolean(req.user),
-        delete: ({ req }) => Boolean(req.user),
-    },
-    fields: [
+export function createAiSyncQueueCollection(overrides) {
+    const defaultFields = [
         {
             name: 'jobType',
             type: 'select',
@@ -49,6 +39,24 @@ export const aiSyncQueueCollection = {
             name: 'errorMessage',
             type: 'text',
         },
-    ],
-};
+    ];
+    return {
+        slug: 'ai-sync-queue',
+        admin: {
+            hidden: true,
+            ...(overrides?.admin || {}),
+        },
+        access: {
+            read: ({ req }) => Boolean(req.user),
+            create: ({ req }) => Boolean(req.user),
+            update: ({ req }) => Boolean(req.user),
+            delete: ({ req }) => Boolean(req.user),
+            ...(overrides?.access || {}),
+        },
+        hooks: {
+            ...(overrides?.hooks || {}),
+        },
+        fields: overrides?.fields ? overrides.fields({ defaultFields }) : defaultFields,
+    };
+}
 //# sourceMappingURL=ai-sync-queue.js.map

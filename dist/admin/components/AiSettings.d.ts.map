@@ -1,1 +1,1 @@
-{"version":3,"file":"AiSettings.d.ts","sourceRoot":"","sources":["../../../src/admin/components/AiSettings.tsx"],"names":[],"mappings":"AAEA,OAAO,KAA8B,MAAM,OAAO,CAAA;AA4BlD,eAAO,MAAM,UAAU,EAAE,KAAK,CAAC,EAyM9B,CAAA"}
+{"version":3,"file":"AiSettings.d.ts","sourceRoot":"","sources":["../../../src/admin/components/AiSettings.tsx"],"names":[],"mappings":"AAEA,OAAO,KAA8B,MAAM,OAAO,CAAA;AA2BlD,eAAO,MAAM,UAAU,EAAE,KAAK,CAAC,EA0N9B,CAAA"}

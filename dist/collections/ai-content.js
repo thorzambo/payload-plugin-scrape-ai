@@ -1,15 +1,5 @@
-export const aiContentCollection = {
-    slug: 'ai-content',
-    admin: {
-        hidden: true,
-    },
-    access: {
-        read: () => true,
-        create: ({ req }) => Boolean(req.user),
-        update: ({ req }) => Boolean(req.user),
-        delete: ({ req }) => Boolean(req.user),
-    },
-    fields: [
+export function createAiContentCollection(overrides) {
+    const defaultFields = [
         {
             name: 'sourceCollection',
             type: 'text',
@@ -49,6 +39,7 @@ export const aiContentCollection = {
             name: 'status',
             type: 'select',
             required: true,
+            index: true,
             defaultValue: 'pending',
             options: [
                 { label: 'Pending', value: 'pending' },
@@ -82,16 +73,36 @@ export const aiContentCollection = {
         {
             name: 'locale',
             type: 'text',
+            index: true,
         },
         {
             name: 'isDraft',
             type: 'checkbox',
             defaultValue: false,
+            index: true,
         },
         {
             name: 'lastSynced',
             type: 'date',
         },
-    ],
-};
+    ];
+    return {
+        slug: 'ai-content',
+        admin: {
+            hidden: true,
+            ...(overrides?.admin || {}),
+        },
+        access: {
+            read: () => true,
+            create: ({ req }) => Boolean(req.user),
+            update: ({ req }) => Boolean(req.user),
+            delete: ({ req }) => Boolean(req.user),
+            ...(overrides?.access || {}),
+        },
+        hooks: {
+            ...(overrides?.hooks || {}),
+        },
+        fields: overrides?.fields ? overrides.fields({ defaultFields }) : defaultFields,
+    };
+}
 //# sourceMappingURL=ai-content.js.map

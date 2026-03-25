@@ -1,1 +1,1 @@
-{"version":3,"file":"ai-sync-queue.d.ts","sourceRoot":"","sources":["../../src/collections/ai-sync-queue.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,SAAS,CAAA;AAE/C,eAAO,MAAM,qBAAqB,EAAE,gBAoDnC,CAAA"}
+{"version":3,"file":"ai-sync-queue.d.ts","sourceRoot":"","sources":["../../src/collections/ai-sync-queue.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,gBAAgB,EAAS,MAAM,SAAS,CAAA;AACtD,OAAO,KAAK,EAAE,mBAAmB,EAAE,MAAM,UAAU,CAAA;AAEnD,wBAAgB,2BAA2B,CAAC,SAAS,CAAC,EAAE,mBAAmB,GAAG,gBAAgB,CA6D7F"}

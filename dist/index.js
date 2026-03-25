@@ -1,5 +1,5 @@
-import { aiContentCollection } from './collections/ai-content';
-import { aiSyncQueueCollection } from './collections/ai-sync-queue';
+import { createAiContentCollection } from './collections/ai-content';
+import { createAiSyncQueueCollection } from './collections/ai-sync-queue';
 import { aiConfigGlobal } from './globals/ai-config';
 import { detectContentCollections } from './detection/smart-detect';
 import { createAfterChangeHook } from './hooks/afterChange';
@@ -17,7 +17,6 @@ import { createSitemapXmlEndpoint } from './endpoints/sitemap-xml';
 import { withHeadSupport } from './endpoints/head-support';
 import { RateLimiter } from './endpoints/rate-limiter';
 import { startScheduler } from './sync/scheduler';
-import { resolveAiProvider } from './ai/provider';
 export { generateHeadTags, getDiscoveryLinks } from './discovery/head-tags';
 export { ScrapeAiMeta } from './discovery/ScrapeAiMeta';
 export { ScrapeAiFooterTag } from './discovery/ScrapeAiFooterTag';
@@ -43,8 +42,8 @@ export const scrapeAiPlugin = (options) => (incomingConfig) => {
     // Always add collections and global for schema consistency
     config.collections = [
         ...(config.collections || []),
-        aiContentCollection,
-        aiSyncQueueCollection,
+        createAiContentCollection(options.aiContentOverrides),
+        createAiSyncQueueCollection(options.aiSyncQueueOverrides),
     ];
     config.globals = [
         ...(config.globals || []),
@@ -138,22 +137,20 @@ export const scrapeAiPlugin = (options) => (incomingConfig) => {
         catch (error) {
             payload.logger.warn(`[scrape-ai] Could not initialize ai-config: ${error.message}`);
         }
-        // Resolve AI provider
-        let aiProvider = null;
-        try {
-            const aiConfig = await payload.findGlobal({ slug: 'ai-config' });
-            aiProvider = await resolveAiProvider(options.ai, aiConfig);
-        }
-        catch {
-            aiProvider = options.ai ? await resolveAiProvider(options.ai) : null;
-        }
         // Queue initial sync (non-blocking)
         await payload.create({
             collection: 'ai-sync-queue',
             data: { jobType: 'initial-sync', status: 'pending' },
         });
         // Start background scheduler
-        startScheduler(payload, resolvedConfig, aiProvider);
+        const stopScheduler = startScheduler(payload, resolvedConfig);
+        // Register cleanup on process exit
+        const cleanup = () => {
+            stopScheduler();
+        };
+        process.on('beforeExit', cleanup);
+        process.on('SIGTERM', cleanup);
+        process.on('SIGINT', cleanup);
         payload.logger.info('[scrape-ai] Plugin initialized successfully');
     };
     return config;

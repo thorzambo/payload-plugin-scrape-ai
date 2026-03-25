@@ -11,16 +11,6 @@ export function createSitemapXmlEndpoint(siteUrl) {
         handler: async (req) => {
             const { payload } = req;
             try {
-                // Query all synced non-aggregate entries
-                const allContent = await payload.find({
-                    collection: 'ai-content',
-                    where: {
-                        sourceCollection: { not_equals: '__aggregate' },
-                        status: { equals: 'synced' },
-                    },
-                    limit: 10000,
-                    sort: '-lastSynced',
-                });
                 const urls = [];
                 // Root AI files — highest priority
                 urls.push({
@@ -43,16 +33,33 @@ export function createSitemapXmlEndpoint(siteUrl) {
                     lastmod: new Date().toISOString(),
                     priority: '0.7',
                 });
-                // Individual content pages
-                for (const entry of allContent.docs) {
-                    const collection = entry.sourceCollection;
-                    const slug = entry.slug;
-                    const lastSynced = entry.lastSynced;
-                    urls.push({
-                        loc: `${siteUrl}/ai/${collection}/${slug}.md`,
-                        lastmod: lastSynced || new Date().toISOString(),
-                        priority: '0.6',
+                // Query all synced non-aggregate entries with pagination to handle large sites
+                let page = 1;
+                let hasMore = true;
+                while (hasMore) {
+                    const batch = await payload.find({
+                        collection: 'ai-content',
+                        where: {
+                            sourceCollection: { not_equals: '__aggregate' },
+                            status: { equals: 'synced' },
+                        },
+                        limit: 100,
+                        page,
+                        sort: '-lastSynced',
                     });
+                    // Individual content pages
+                    for (const entry of batch.docs) {
+                        const collection = entry.sourceCollection;
+                        const slug = entry.slug;
+                        const lastSynced = entry.lastSynced;
+                        urls.push({
+                            loc: `${siteUrl}/ai/${collection}/${slug}.md`,
+                            lastmod: lastSynced || new Date().toISOString(),
+                            priority: '0.6',
+                        });
+                    }
+                    hasMore = batch.hasNextPage;
+                    page++;
                 }
                 // Build XML
                 const xml = [
@@ -65,7 +72,7 @@ export function createSitemapXmlEndpoint(siteUrl) {
                     status: 200,
                     headers: {
                         'Content-Type': 'application/xml; charset=utf-8',
-                        'Cache-Control': 'public, max-age=3600',
+                        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
                     },
                 });
             }

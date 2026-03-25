@@ -8,6 +8,12 @@ export function createWellKnownEndpoint(siteUrl) {
         path: '/scrape-ai/well-known',
         method: 'get',
         handler: async (req) => {
+            let aiEnabled = false;
+            try {
+                const aiConfig = await req.payload.findGlobal({ slug: 'ai-config' });
+                aiEnabled = aiConfig?.aiEnabled || false;
+            }
+            catch { }
             const manifest = {
                 schema_version: 'v1',
                 name_for_human: 'AI Content Index',
@@ -67,13 +73,23 @@ export function createWellKnownEndpoint(siteUrl) {
                         `${siteUrl}/ai/sitemap.json`,
                     ],
                 },
+                capabilities: {
+                    llms_txt: true,
+                    llms_full_txt: true,
+                    sitemap_json: true,
+                    sitemap_xml: true,
+                    context_query: true,
+                    structured_data: true,
+                    content_markdown: true,
+                    ai_enrichment: aiEnabled,
+                },
                 contact: siteUrl,
                 logo_url: `${siteUrl}/favicon.ico`,
             };
             return Response.json(manifest, {
                 status: 200,
                 headers: {
-                    'Cache-Control': 'public, max-age=3600',
+                    'Cache-Control': 'public, max-age=3600, s-maxage=86400',
                     'Access-Control-Allow-Origin': '*',
                 },
             });

@@ -1,4 +1,13 @@
-import type { CollectionConfig, Payload } from 'payload';
+import type { CollectionConfig, Field, Payload } from 'payload';
+export type FieldsOverride = (args: {
+    defaultFields: Field[];
+}) => Field[];
+export interface CollectionOverrides {
+    fields?: FieldsOverride;
+    access?: CollectionConfig['access'];
+    admin?: CollectionConfig['admin'];
+    hooks?: CollectionConfig['hooks'];
+}
 export interface AiProviderConfig {
     provider: 'openai' | 'anthropic';
     apiKey: string;
@@ -19,6 +28,8 @@ export interface ScrapeAiPluginOptions {
     siteDescription?: string;
     drafts?: 'published-only' | 'include-drafts';
     enabled?: boolean;
+    aiContentOverrides?: CollectionOverrides;
+    aiSyncQueueOverrides?: CollectionOverrides;
 }
 export interface ResolvedPluginConfig {
     enabledCollections: string[];
