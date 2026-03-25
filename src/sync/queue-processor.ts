@@ -1,6 +1,7 @@
 import type { Payload } from 'payload'
 import type { ResolvedPluginConfig, IAiProvider, AiConfigGlobal, AiSyncQueueDoc, AiContentDoc } from '../types'
 import { enrichDocument } from '../pipeline/transform'
+import { resolveAiProviderFromPayload } from '../ai/provider'
 import { runInitialSync } from './initial-sync'
 import { generateLlmsTxt } from '../generators/llms-txt'
 import { generateLlmsFullTxt } from '../generators/llms-full-txt'
@@ -12,12 +13,12 @@ import { generateAiSitemap } from '../generators/sitemap'
 export async function processQueue(
   payload: Payload,
   pluginOptions: ResolvedPluginConfig,
-  aiProvider: IAiProvider | null,
 ): Promise<void> {
   // Process initial-sync jobs first
   await processInitialSyncJobs(payload, pluginOptions)
 
   // Process enrich-document jobs
+  const aiProvider = await resolveAiProviderFromPayload(payload, pluginOptions.ai)
   if (aiProvider) {
     await processEnrichJobs(payload, aiProvider)
   }
@@ -146,6 +147,9 @@ async function processEnrichJobs(
       })
 
       // Increment API call counter
+      // NOTE: This read-modify-write pattern has a potential race condition with
+      // concurrent instances. Acceptable because: (1) counter is informational only,
+      // (2) queue processing is sequential within a single instance via the isProcessing mutex.
       try {
         const aiConfig = await payload.findGlobal({ slug: 'ai-config' }) as unknown as AiConfigGlobal
         const currentCount = aiConfig?.aiApiCallCount || 0
@@ -253,20 +257,13 @@ async function processRebuildJobs(
 async function cleanupOldJobs(payload: Payload): Promise<void> {
   try {
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    const oldJobs = await payload.find({
+    await payload.delete({
       collection: 'ai-sync-queue',
       where: {
         status: { in: ['completed', 'failed'] },
         createdAt: { less_than: cutoff },
       },
-      limit: 100,
     })
-
-    if (oldJobs.docs.length > 0) {
-      for (const job of oldJobs.docs) {
-        await payload.delete({ collection: 'ai-sync-queue', id: job.id })
-      }
-    }
   } catch {
     // Non-critical cleanup
   }
