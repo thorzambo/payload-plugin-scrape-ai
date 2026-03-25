@@ -1,6 +1,18 @@
 import type { CollectionConfig, Field, Payload } from 'payload'
 
 /**
+ * Resolve a URL that may be relative to an absolute URL.
+ * If siteUrl is provided and the URL is a relative path (starts with /),
+ * prepend the siteUrl to make it absolute.
+ */
+function resolveUrl(url: string, siteUrl?: string): string {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (siteUrl && url.startsWith('/')) return `${siteUrl}${url}`
+  return url
+}
+
+/**
  * Stage 1: Extract document content into clean markdown.
  * Traverses all fields recursively, converting each type to markdown.
  */
@@ -8,13 +20,14 @@ export function extractDocument(
   doc: Record<string, unknown>,
   collectionConfig: CollectionConfig,
   payload: Payload,
+  siteUrl?: string,
 ): string {
   const parts: string[] = []
   const fields = collectionConfig.fields || []
   const skipFields = new Set(['id', 'createdAt', 'updatedAt', '_status', '__v'])
 
   for (const field of fields) {
-    const fieldParts = extractField(field, doc, skipFields, payload, 1)
+    const fieldParts = extractField(field, doc, skipFields, payload, 1, siteUrl)
     if (fieldParts) {
       parts.push(fieldParts)
     }
@@ -29,6 +42,7 @@ function extractField(
   skipFields: Set<string>,
   payload: Payload,
   depth: number,
+  siteUrl?: string,
 ): string | null {
   // Skip UI-only and unnamed fields
   if (!('name' in field) && !('type' in field)) return null
@@ -38,7 +52,7 @@ function extractField(
   if ('type' in field) {
     if (field.type === 'row' || field.type === 'collapsible') {
       if ('fields' in field && Array.isArray(field.fields)) {
-        return extractFieldGroup(field.fields, doc, skipFields, payload, depth)
+        return extractFieldGroup(field.fields, doc, skipFields, payload, depth, siteUrl)
       }
       return null
     }
@@ -48,12 +62,12 @@ function extractField(
       for (const tab of (field as any).tabs) {
         if (tab.label && tab.fields) {
           const heading = '#'.repeat(Math.min(depth + 1, 6))
-          const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth + 1)
+          const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth + 1, siteUrl)
           if (content) {
             tabParts.push(`${heading} ${tab.label}\n\n${content}`)
           }
         } else if (tab.fields) {
-          const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth)
+          const content = extractFieldGroup(tab.fields, doc, skipFields, payload, depth, siteUrl)
           if (content) tabParts.push(content)
         }
       }
@@ -72,7 +86,7 @@ function extractField(
 
   switch (fieldType) {
     case 'richText':
-      return extractRichText(value, field)
+      return extractRichText(value, field, siteUrl)
 
     case 'text':
     case 'textarea':
@@ -97,10 +111,10 @@ function extractField(
       return extractRelationship(value, name)
 
     case 'blocks':
-      return extractBlocks(value as any[], skipFields, payload, depth)
+      return extractBlocks(value as any[], skipFields, payload, depth, siteUrl)
 
     case 'array':
-      return extractArray(value as any[], field, skipFields, payload, depth)
+      return extractArray(value as any[], field, skipFields, payload, depth, siteUrl)
 
     case 'group':
       if (typeof value === 'object' && value !== null && 'fields' in field) {
@@ -110,6 +124,7 @@ function extractField(
           skipFields,
           payload,
           depth,
+          siteUrl,
         )
       }
       return null
@@ -134,28 +149,29 @@ function extractFieldGroup(
   skipFields: Set<string>,
   payload: Payload,
   depth: number,
+  siteUrl?: string,
 ): string | null {
   const parts: string[] = []
   for (const field of fields) {
-    const content = extractField(field, doc, skipFields, payload, depth)
+    const content = extractField(field, doc, skipFields, payload, depth, siteUrl)
     if (content) parts.push(content)
   }
   return parts.length > 0 ? parts.join('\n\n') : null
 }
 
-function extractRichText(value: unknown, _field?: Field): string | null {
+function extractRichText(value: unknown, _field?: Field, siteUrl?: string): string | null {
   if (!value) return null
 
   // Detect Lexical vs Slate based on value structure
   if (typeof value === 'object' && value !== null) {
     // Lexical format: { root: { children: [...] } }
     if ('root' in value && typeof (value as any).root === 'object') {
-      return lexicalToMarkdown((value as any).root)
+      return lexicalToMarkdown((value as any).root, siteUrl)
     }
 
     // Slate format: array of nodes
     if (Array.isArray(value)) {
-      return slateToMarkdown(value)
+      return slateToMarkdown(value, siteUrl)
     }
   }
 
@@ -167,34 +183,34 @@ function extractRichText(value: unknown, _field?: Field): string | null {
 
 // --- Lexical to Markdown ---
 
-function lexicalToMarkdown(root: any): string {
+function lexicalToMarkdown(root: any, siteUrl?: string): string {
   if (!root || !root.children) return ''
-  return lexicalChildrenToMarkdown(root.children).trim()
+  return lexicalChildrenToMarkdown(root.children, siteUrl).trim()
 }
 
-function lexicalChildrenToMarkdown(children: any[]): string {
+function lexicalChildrenToMarkdown(children: any[], siteUrl?: string): string {
   if (!Array.isArray(children)) return ''
-  return children.map(lexicalNodeToMarkdown).filter(Boolean).join('\n\n')
+  return children.map((node) => lexicalNodeToMarkdown(node, siteUrl)).filter(Boolean).join('\n\n')
 }
 
-function lexicalNodeToMarkdown(node: any): string {
+function lexicalNodeToMarkdown(node: any, siteUrl?: string): string {
   if (!node) return ''
 
   switch (node.type) {
     case 'paragraph':
-      return lexicalInlineChildrenToMarkdown(node.children || [])
+      return lexicalInlineChildrenToMarkdown(node.children || [], siteUrl)
 
     case 'heading': {
       const level = parseInt(node.tag?.replace('h', '') || '1', 10)
       const prefix = '#'.repeat(Math.min(level, 6))
-      const text = lexicalInlineChildrenToMarkdown(node.children || [])
+      const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl)
       return `${prefix} ${text}`
     }
 
     case 'list': {
       const items = (node.children || [])
         .map((item: any, i: number) => {
-          const text = lexicalInlineChildrenToMarkdown(item.children || [])
+          const text = lexicalInlineChildrenToMarkdown(item.children || [], siteUrl)
           const prefix = node.listType === 'number' ? `${i + 1}.` : '-'
           return `${prefix} ${text}`
         })
@@ -203,10 +219,10 @@ function lexicalNodeToMarkdown(node: any): string {
     }
 
     case 'listitem':
-      return lexicalInlineChildrenToMarkdown(node.children || [])
+      return lexicalInlineChildrenToMarkdown(node.children || [], siteUrl)
 
     case 'quote': {
-      const text = lexicalInlineChildrenToMarkdown(node.children || [])
+      const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl)
       return text
         .split('\n')
         .map((line: string) => `> ${line}`)
@@ -214,7 +230,7 @@ function lexicalNodeToMarkdown(node: any): string {
     }
 
     case 'code': {
-      const text = lexicalInlineChildrenToMarkdown(node.children || [])
+      const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl)
       const language = node.language || ''
       return `\`\`\`${language}\n${text}\n\`\`\``
     }
@@ -223,25 +239,25 @@ function lexicalNodeToMarkdown(node: any): string {
       return '---'
 
     case 'link': {
-      const text = lexicalInlineChildrenToMarkdown(node.children || [])
-      const url = node.fields?.url || node.url || '#'
+      const text = lexicalInlineChildrenToMarkdown(node.children || [], siteUrl)
+      const url = resolveUrl(node.fields?.url || node.url || '#', siteUrl)
       return `[${text}](${url})`
     }
 
     case 'image': {
       const alt = node.altText || node.alt || ''
-      const src = node.src || ''
+      const src = resolveUrl(node.src || '', siteUrl)
       return `![${alt}](${src})`
     }
 
     case 'upload': {
       const alt = node.value?.alt || node.value?.filename || ''
-      const src = node.value?.url || ''
+      const src = resolveUrl(node.value?.url || '', siteUrl)
       return `![${alt}](${src})`
     }
 
     case 'table': {
-      return lexicalTableToMarkdown(node)
+      return lexicalTableToMarkdown(node, siteUrl)
     }
 
     case 'linebreak':
@@ -250,7 +266,7 @@ function lexicalNodeToMarkdown(node: any): string {
     default:
       // Recurse into children for unknown container nodes
       if (node.children && Array.isArray(node.children)) {
-        return lexicalChildrenToMarkdown(node.children)
+        return lexicalChildrenToMarkdown(node.children, siteUrl)
       }
       // Text node
       if (node.text !== undefined) {
@@ -260,12 +276,12 @@ function lexicalNodeToMarkdown(node: any): string {
   }
 }
 
-function lexicalInlineChildrenToMarkdown(children: any[]): string {
+function lexicalInlineChildrenToMarkdown(children: any[], siteUrl?: string): string {
   if (!Array.isArray(children)) return ''
   return children
     .map((child) => {
       if (child.text !== undefined) return formatLexicalText(child)
-      return lexicalNodeToMarkdown(child)
+      return lexicalNodeToMarkdown(child, siteUrl)
     })
     .join('')
 }
@@ -284,7 +300,7 @@ function formatLexicalText(node: any): string {
   return text
 }
 
-function lexicalTableToMarkdown(node: any): string {
+function lexicalTableToMarkdown(node: any, siteUrl?: string): string {
   if (!node.children || !Array.isArray(node.children)) return ''
 
   const rows: string[][] = []
@@ -292,7 +308,7 @@ function lexicalTableToMarkdown(node: any): string {
     if (!row.children) continue
     const cells: string[] = []
     for (const cell of row.children) {
-      cells.push(lexicalInlineChildrenToMarkdown(cell.children || []))
+      cells.push(lexicalInlineChildrenToMarkdown(cell.children || [], siteUrl))
     }
     rows.push(cells)
   }
@@ -316,12 +332,12 @@ function lexicalTableToMarkdown(node: any): string {
 
 // --- Slate to Markdown ---
 
-function slateToMarkdown(nodes: any[]): string {
+function slateToMarkdown(nodes: any[], siteUrl?: string): string {
   if (!Array.isArray(nodes)) return ''
-  return nodes.map(slateNodeToMarkdown).filter(Boolean).join('\n\n')
+  return nodes.map((node) => slateNodeToMarkdown(node, siteUrl)).filter(Boolean).join('\n\n')
 }
 
-function slateNodeToMarkdown(node: any): string {
+function slateNodeToMarkdown(node: any, siteUrl?: string): string {
   if (!node) return ''
 
   // Text leaf node
@@ -330,7 +346,7 @@ function slateNodeToMarkdown(node: any): string {
   }
 
   const children = node.children || []
-  const childText = slateInlineToMarkdown(children)
+  const childText = slateInlineToMarkdown(children, siteUrl)
 
   switch (node.type) {
     case 'h1':
@@ -352,25 +368,25 @@ function slateNodeToMarkdown(node: any): string {
         .join('\n')
     case 'ul':
       return children
-        .map((item: any) => `- ${slateInlineToMarkdown(item.children || [])}`)
+        .map((item: any) => `- ${slateInlineToMarkdown(item.children || [], siteUrl)}`)
         .join('\n')
     case 'ol':
       return children
         .map(
           (item: any, i: number) =>
-            `${i + 1}. ${slateInlineToMarkdown(item.children || [])}`,
+            `${i + 1}. ${slateInlineToMarkdown(item.children || [], siteUrl)}`,
         )
         .join('\n')
     case 'li':
-      return slateInlineToMarkdown(children)
+      return slateInlineToMarkdown(children, siteUrl)
     case 'link': {
-      const url = node.url || '#'
+      const url = resolveUrl(node.url || '#', siteUrl)
       return `[${childText}](${url})`
     }
     case 'upload':
     case 'image': {
       const alt = node.alt || node.value?.alt || ''
-      const src = node.url || node.value?.url || ''
+      const src = resolveUrl(node.url || node.value?.url || '', siteUrl)
       return `![${alt}](${src})`
     }
     case 'code':
@@ -381,7 +397,7 @@ function slateNodeToMarkdown(node: any): string {
       const rows: string[][] = []
       for (const row of children) {
         const cells: string[] = (row.children || []).map((cell: any) =>
-          slateInlineToMarkdown(cell.children || [])
+          slateInlineToMarkdown(cell.children || [], siteUrl)
         )
         rows.push(cells)
       }
@@ -401,12 +417,12 @@ function slateNodeToMarkdown(node: any): string {
   }
 }
 
-function slateInlineToMarkdown(children: any[]): string {
+function slateInlineToMarkdown(children: any[], siteUrl?: string): string {
   if (!Array.isArray(children)) return ''
   return children
     .map((child) => {
       if (child.text !== undefined) return formatSlateText(child)
-      return slateNodeToMarkdown(child)
+      return slateNodeToMarkdown(child, siteUrl)
     })
     .join('')
 }
@@ -458,6 +474,7 @@ function extractBlocks(
   skipFields: Set<string>,
   payload: Payload,
   depth: number,
+  siteUrl?: string,
 ): string | null {
   if (!Array.isArray(blocks) || blocks.length === 0) return null
 
@@ -480,7 +497,7 @@ function extractBlocks(
           .map((item) => {
             if (typeof item === 'string') return item
             if (typeof item === 'object' && item !== null) {
-              const richText = extractRichText(item)
+              const richText = extractRichText(item, undefined, siteUrl)
               if (richText) return richText
               const texts: string[] = []
               for (const [k, v] of Object.entries(item)) {
@@ -494,7 +511,7 @@ function extractBlocks(
           .filter(Boolean)
         if (arrayContent.length > 0) blockParts.push(arrayContent.join('\n'))
       } else if (typeof val === 'object') {
-        const richText = extractRichText(val)
+        const richText = extractRichText(val, undefined, siteUrl)
         if (richText) blockParts.push(richText)
       }
     }
@@ -513,6 +530,7 @@ function extractArray(
   skipFields: Set<string>,
   payload: Payload,
   depth: number,
+  siteUrl?: string,
 ): string | null {
   if (!Array.isArray(items) || items.length === 0) return null
   if (!('fields' in field)) return null
@@ -525,6 +543,7 @@ function extractArray(
       skipFields,
       payload,
       depth + 1,
+      siteUrl,
     )
     if (content) parts.push(content)
   }

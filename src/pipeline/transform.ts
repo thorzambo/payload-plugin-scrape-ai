@@ -20,7 +20,7 @@ export function transformDocument(params: {
   const { doc, collectionSlug, collectionConfig, payload, pluginOptions, locale, allContent } = params
 
   // Stage 1: Extract
-  const rawMarkdown = extractDocument(doc, collectionConfig, payload)
+  const rawMarkdown = extractDocument(doc, collectionConfig, payload, pluginOptions.siteUrl)
 
   // Stage 2: Structure
   const result = structureContent({
