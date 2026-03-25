@@ -14,17 +14,6 @@ export function createSitemapXmlEndpoint(siteUrl: string) {
       const { payload } = req
 
       try {
-        // Query all synced non-aggregate entries
-        const allContent = await payload.find({
-          collection: 'ai-content',
-          where: {
-            sourceCollection: { not_equals: '__aggregate' },
-            status: { equals: 'synced' },
-          },
-          limit: 10000,
-          sort: '-lastSynced',
-        })
-
         const urls: Array<{ loc: string; lastmod: string; priority: string }> = []
 
         // Root AI files — highest priority
@@ -49,17 +38,37 @@ export function createSitemapXmlEndpoint(siteUrl: string) {
           priority: '0.7',
         })
 
-        // Individual content pages
-        for (const entry of allContent.docs) {
-          const collection = (entry as any).sourceCollection as string
-          const slug = (entry as any).slug as string
-          const lastSynced = (entry as any).lastSynced as string
+        // Query all synced non-aggregate entries with pagination to handle large sites
+        let page = 1
+        let hasMore = true
 
-          urls.push({
-            loc: `${siteUrl}/ai/${collection}/${slug}.md`,
-            lastmod: lastSynced || new Date().toISOString(),
-            priority: '0.6',
+        while (hasMore) {
+          const batch = await payload.find({
+            collection: 'ai-content',
+            where: {
+              sourceCollection: { not_equals: '__aggregate' },
+              status: { equals: 'synced' },
+            },
+            limit: 100,
+            page,
+            sort: '-lastSynced',
           })
+
+          // Individual content pages
+          for (const entry of batch.docs) {
+            const collection = (entry as any).sourceCollection as string
+            const slug = (entry as any).slug as string
+            const lastSynced = (entry as any).lastSynced as string
+
+            urls.push({
+              loc: `${siteUrl}/ai/${collection}/${slug}.md`,
+              lastmod: lastSynced || new Date().toISOString(),
+              priority: '0.6',
+            })
+          }
+
+          hasMore = batch.hasNextPage
+          page++
         }
 
         // Build XML
