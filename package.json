@@ -8,7 +8,9 @@
   "files": [
     "dist"
   ],
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -48,7 +50,10 @@
     }
   },
   "scripts": {
-    "build": "tsc && cp src/admin/styles.css dist/admin/styles.css",
+    "build": "npm run build:swc && npm run build:types && npm run build:copyfiles",
+    "build:swc": "swc src -d dist --strip-leading-paths",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "build:copyfiles": "copyfiles -u 1 \"src/**/*.css\" dist/",
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -76,11 +81,16 @@
     }
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@payloadcms/next": "^3.0.0",
     "@payloadcms/ui": "^3.0.0",
+    "@swc/cli": "^0.8.0",
+    "@swc/core": "^1.15.21",
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
+    "copyfiles": "^2.4.1",
     "next": "^15.0.0",
+    "openai": "^6.32.0",
     "payload": "^3.0.0",
     "react": "^19.0.0",
     "typescript": "^5.0.0",
